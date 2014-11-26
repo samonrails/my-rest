@@ -1,0 +1,50 @@
+-og = OptionGroup.new(:required => 0)
+
+.modal-wrapper
+  = form_tag create_option_group_vendor_inventory_item_path, remote: false do
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h3 New Inventory Item Option Group
+      %h4 #{@vendor.name}: #{@inventory_item.name_vendor}
+
+    .modal-body.auto_size_modal_body
+      .row-fluid
+        .span12
+          %h5 Details
+          = label_tag :name, "* Name"
+          = text_field_tag :name, nil, class: 'required'
+      .row-fluid
+        .span4
+          = label_tag :included, "Included # of Options"
+          = text_field_tag :included
+        .span4
+          = label_tag :required, "Required # of Options"
+          = text_field_tag :required, og.required
+        .span4
+          = label_tag :max, "Max # of Options (optional)"
+          = text_field_tag :max
+      .row-fluid
+        .span12
+          %hr
+          %h5 Inventory Item Options
+          %table.table.table-striped.condensed.table-bordered
+            %thead
+              %tr
+                %th Active 
+                %th Name
+                %th COGS
+                %th Prem Add-on COGS
+            %tbody
+              - @inventory_items_options.each do |item|
+                %tr 
+                  %td= check_box_tag("item_ids[]", value = item.id.to_s, checked = false, options = {})
+                  %td= item.name_vendor
+                  %td= item.cogs
+                  %td= item.premium_price
+
+    .modal-footer
+      = submit_tag "Save Option Group", :class => "btn btn-primary"
+
+
+

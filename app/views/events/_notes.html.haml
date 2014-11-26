@@ -1,0 +1,77 @@
+#event-notes-section.form-actions
+  %h2.pagination-centered
+    Event Instructions 
+  %hr
+  = simple_form_for(@event) do |f|
+    .row-fluid
+      .span3
+        %h4 Service Style
+        = f.input :service_style, collection: ServingStyle::available_values.collect{|c| [c.titleize, c]}, label: false
+        %br
+        %h4{style: "margin-bottom: 10px;"}
+          Event Checklist
+        = f.input :individual_label, as: :boolean, label: false, inline_label: "Individual Label"
+        = f.input :utensils_plates_napkins, as: :boolean, label: false, inline_label: "Utensils, Plates & Napkins"
+        = f.input :serving_utensils, as: :boolean, label: false, inline_label: "Serving Utensils"
+        = f.input :sternos, as: :boolean, label: false, inline_label: "Sternos"
+        = f.input :chaffing_frames, as: :boolean, label: false, inline_label: "Chaffing Frames"
+
+      .span9
+        .row
+          .span9
+            .pull-right
+              = link_to "Reload Site Notes", reload_site_notes_event_path(event), class: "btn btn-small"
+              / data: { confirm: 'Are you sure? You will lose the current building & locaiton notes.' }
+                
+            %h4 Site Instructions
+
+        .row
+          .span4
+            %label
+              %a{id: "tool-tip-location", title: "Building notes are imported from the selected location's building. They can be edited independently of the building's master notes. They will only be exported to the Packing Slip." } 
+                %i.icon.icon-info-sign
+                Building
+            = f.input :building_instructions, input_html: {style: 'width: 100%', rows: 8}, label: false
+
+          .span4.offset1
+            %label
+              %a{id: "tool-tip-building", title: "Locations notes are imported from the selected location. They can be edited independently of the location's master notes. They will only be exported to the Packing Slip." } 
+                %i.icon.icon-info-sign
+                Location
+            = f.input :location_instructions, input_html: {style: 'width: 100%', rows: 8}, label: false
+        .row
+          .span9
+            %hr
+            %h4 Account Notes
+            %label
+              %a{class: "tool-tip-label", title: "These notes will only be exported to the Quote, Invoice & Invoice Summary." } 
+                %i.icon.icon-info-sign
+                =f.object.account.name
+            = f.input :external_account_notes, input_html: {style: 'width: 100%', rows: 6}, label: false
+        .row
+          .span9
+            %hr
+            %h4 Vendor Notes
+            = f.simple_fields_for :event_vendors do |ev|
+              %label
+                %a{class: "tool-tip-label", title: "These notes will only be exported to the Packing Slip and Purchase Order" } 
+                  %i.icon.icon-info-sign
+                  =ev.object.vendor.name
+              = ev.input :external_vendor_notes, input_html: {style: 'width: 100%', rows: 6}, label: false
+            -if @event.event_vendors.count == 0
+              .center
+                %i This event does not have a vendor selected.
+              %br
+        .row
+          .span9
+            %hr
+            %h4 General Notes
+            %label
+              %a{class: "tool-tip-label", title: "These notes will not be exported to any of the event documents." } 
+                %i.icon.icon-info-sign
+                Private
+            = f.input :internal_event_notes, input_html: {style: 'width: 100%', rows: 6}, label: false
+
+    .row
+      .pull-right
+        = f.button :submit, "Save Notes", :class => "btn btn-primary"

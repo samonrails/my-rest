@@ -1,0 +1,30 @@
+.modal-wrapper
+
+  = simple_form_for :select_order_item, url: select_select_order_select_order_items_path(@select_order), method: :POST do |f|
+    .modal-header
+      %button.close{:type => "button", :"data-dismiss" => "modal"}
+        &times;
+      %h4
+        New Menu Item
+
+    .modal-body.auto_size_modal_body
+      #inventory-item-select
+        .row-fluid
+          .span3
+            = f.hidden_field :select_order_id, value: @select_order.id
+            %label.select
+              - vendors = [["-- Choose a Vendor --", 0]] + @select_order.select_event.select_event_vendors.all.map{|sev| [sev.vendor.name, sev.vendor.id]}
+              = f.select :vendor_id, options_for_select(vendors)
+          .span5
+            %label.select
+              = f.select :inventory_item_id, [[]]
+              = image_tag "ajax-loader.gif", class: "hidden ajax-loader", style: "margin-bottom: 10px"
+          .span4
+            .pull-right.muted
+              Select Order ##{pretty_id @select_order.id}
+
+      #inventory-item-details{:style => "width: 960px"}
+        / Filled in by AJAX/JS
+
+    .modal-footer
+      = f.submit "Add Menu Item", :class => "btn btn-primary disabled", :id => "add_menu_item_btn"

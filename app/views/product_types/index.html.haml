@@ -1,0 +1,11 @@
+.page-header
+  %h1
+    Product Types
+
+  = link_to "Add new product type", new_product_type_path
+
+- @product_types.each do |product_type|
+  = link_to product_type.name, product_type_path(product_type)
+  = link_to "edit", edit_product_type_path(product_type)
+  %br
+  

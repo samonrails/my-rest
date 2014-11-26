@@ -1,0 +1,23 @@
+.span11.form-actions#edit-bio
+  .row-fluid.edited
+    .span6
+      = simple_form_for vendor do |f|
+        = f.input :website, disabled: true
+        = f.input :bio, disabled: true, input_html: {style: 'width: 80%',rows: 8}, label: "Public Catering Bio"
+        Yelp Id:
+        = f.input :yelp_id, label: false, disabled: true
+        - if vendor.yelp_id
+          Yelp Reviews:
+          = image_tag vendor.rating_image_url
+          %a{:href => "#{vendor.yelp_url}", :target => "_blank"}
+            (#{vendor.review_count})
+        - else
+          Yelp Reviews not Found
+    .span6
+      %h4.center Images
+        
+      = render partial: "assets/index", locals: {enclosing_resource: @vendor}
+  .row.edited
+    .span2
+      %a.btn.btn-info#edit-bio-btn
+        Edit

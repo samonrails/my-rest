@@ -1,0 +1,44 @@
+- provide :title, "Sign In"
+#user-details.row-fluid
+  .clearfix.overflow-hidden
+    .pull-left.sidebar-bg
+      .pull-right.sidebar-max-width
+        .sidebar
+          .logo.relative
+            = link_to image_tag("catering/logo_catering.png"), catering.root_path
+
+    .pull-left.content-bg
+      .pull-left.content-max-width
+        .content.padded
+
+          .clearfix
+            .pull-left
+              %h1.page-title
+                Sign In
+
+          .clearfix
+            = form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f|
+              %div
+                = f.label :email
+                .in-between
+                = f.text_field :email
+              %div
+                = f.label :password
+                .in-between
+                = f.password_field :password
+              - if devise_mapping.rememberable?
+                %div{:style => "margin-bottom: 15px"}
+                  %input#set_card_as_default.fooda-checkbox{:type => "checkbox"}
+                  = f.label :remember_me
+                  = f.hidden_field :catering, value: true
+              %div= f.submit "Sign in", {:class=>'btn'}
+
+            = render "devise/shared/catering_links"
+
+            %hr{style: 'border: 1px solid #D8D8D8; width: 230px;'}
+            %a{:href => "#request-login", "data-toggle" => "modal"}
+              Don't have a login yet?
+              %br Request one here
+
+#request-login.request-login-form.modal.hide.fade
+  = render :partial => "catering/shared/request_login"

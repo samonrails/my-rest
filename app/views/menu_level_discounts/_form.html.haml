@@ -1,0 +1,10 @@
+= simple_form_for [@menu_level_discount] do |f|
+  = f.hidden_field :event_vendor_id
+  .in-between
+  = f.input :min_participation
+  .in-between
+  = f.input :cogs, :input_html => {value: number_with_precision(f.object.cogs, precision: 2)}, :label => "COGS"
+  .in-between
+  = f.input :sell_price, :input_html => {value: number_with_precision(f.object.sell_price, precision: 2)}
+  .in-between
+  = f.submit(:class => "btn btn-primary")

@@ -1,0 +1,31 @@
+-provide(:title, 'Reports')
+.section-header
+  %h1.center Reports
+  %hr
+
+%table.table.table-striped.table-condensed
+  %thead
+    %tr
+      %th Report
+  %tbody
+    %tr
+      %td
+        = link_to "Managed Service", admin_managed_services_reports_path
+    %tr
+      %td
+        = link_to "Billing Reference", admin_billing_reference_reports_path
+    %tr
+      %td
+        = link_to "Perks", "#"
+    %tr
+      %td
+        = link_to "Select", "#"
+    %tr
+      %td
+        = link_to "Miscellaneous", admin_general_reports_path
+    %tr
+      %td
+        = link_to "MS - Invoice", admin_ms_invoices_path
+    %tr
+      %td
+        = link_to "MS - Bill", admin_ms_bills_path

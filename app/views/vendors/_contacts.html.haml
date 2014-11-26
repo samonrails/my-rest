@@ -1,0 +1,59 @@
+.new-contact-form.modal.hide.fade
+  = render :partial => "contacts/new", :locals => {party: @vendor}
+
+.pull-right
+  %a#create_contact.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-contact-form"}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-contact-form"}
+    Contact
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Name
+      %th Position
+      %th Email
+      %th Phone #
+      %th Mobile #
+      %th Fax #
+      %th Type
+      %th Primary Contact
+      %th Billing Notifications
+      %th Event Notifications
+      %th SMS
+      %th Actions
+  %tbody
+    - vendor_contacts.each do |c|
+      .modal.hide.fade{"id"=>"edit_contact_form_" + c.id.to_s}
+        = render :partial => "contacts/edit", :locals => {party: @vendor, contact: c}
+      %tr{"data-record-id"=>c.id}
+        %td
+          - if c.destroyed?
+            = c.name
+            .label.label-warning Inactive
+          - else
+            %a.pointer.toggle-modal{"data-target"=>"#edit_contact_form_" + c.id.to_s}#{c.name}
+        %td= c.position
+        %td= mail_to c.email 
+        %td= c.phone_number
+        %td= c.mobile_number
+        %td= c.fax_number
+        %td= c.contact_type
+        .center
+          %td
+            - if c.primary_contact
+              %i.icon.icon-ok
+          %td
+            - if c.billing_notifications
+              %i.icon.icon-ok
+          %td
+            - if c.event_notifications
+              %i.icon.icon-ok
+          %td
+            - if c.sms
+              %i.icon.icon-ok
+        %td
+          - unless c.destroyed?
+            %a#delete_contact.btn.btn-mini.btn-danger{:href=>vendor_contact_path(@vendor, c), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+          - else
+            = link_to 'Restore', restore_vendor_contact_path(@vendor, c), method: :put, data: { confirm: "Are you sure?" }, class: "btn btn-mini btn-info"

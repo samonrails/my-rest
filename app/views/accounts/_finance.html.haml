@@ -1,0 +1,101 @@
+.modal.hide.fade{"id"=>"new_billing_reference_form"}
+  = render :partial => "billing_references/new", :locals => {}
+
+- @account.billing_references.each do |reference|
+  .modal.hide.fade{"id"=>"edit_billing_reference_form_" + reference.id.to_s}
+    = render :partial => "billing_references/edit", :locals => {reference: reference}
+
+#billing-section.form-actions
+  = simple_form_for(@account, :remote => true, :data => {type: :json}) do |f|
+    %input{:type=>"hidden",:name=>"_method",:value=>"PUT"}
+
+    .container.control-group
+      .row
+        .span5
+          %h3 Billing Address
+          = f.simple_fields_for :address do |a|
+            = a.input :address1, 
+              input_html: { style: 'width: 335px' },
+              label: false,
+              placeholder: "Address Line 1"
+            = a.input :address2, 
+              input_html: { style: 'width: 335px' },
+              label: false,
+              placeholder: "Address Line 2"
+            = a.input :city, 
+              input_html: { maxlength: 30}, 
+              wrapper_html: { class: "inline_field_wrapper" },
+              label: false,
+              placeholder: "City"
+            = a.input :state, 
+              input_html: { style: 'width: 35px'},
+              wrapper_html: { class: "inline_field_wrapper" },
+              label: false,
+              placeholder: "State"
+            = a.input :zip_code, 
+              wrapper_html: { class: "inline_field_wrapper" }, 
+              input_html: { style: 'width: 60px'},
+              label: false,
+              placeholder: "Zip Code"
+            = a.input :country, 
+              wrapper_html: { class: "inline_field_wrapper" },
+              label: false,
+              include_blank: "Country"
+
+        .span6
+          .row
+            .span6 
+              .admin-buttons
+                %a.btn.btn-success.btn-small.toggle-modal#add-billing-reference{"data-target"=>"#new_billing_reference_form"}
+                  %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_billing_reference_form"}
+                  Billing Reference
+              %h3 Billing References
+              %table.table.table-striped
+                %thead
+                  %tr
+                    %th{style: "padding-left: 0;"}
+                      Collections
+                    %th Choices
+                    %th Required
+                    %th Actions
+                %tbody
+                  - @account.billing_references.each do |reference|
+                    %tr{"data-record-id"=>reference.id}
+                      %td
+                        %a.pointer.toggle-modal{"data-target"=>"#edit_billing_reference_form_" + reference.id.to_s}#{reference.name}
+                      %td= reference.humanized_data
+                      %td
+                        = content_tag :i, nil, class: reference.required? ? 'icon icon-ok' : 'icon icon-remove'
+                      %td
+                        -if reference.can_destroy?
+                          %a.btn.btn-mini.btn-danger.delete-reference{:href=>account_billing_reference_path(@account, reference), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                            %i.icon.icon-white.icon-remove
+              %hr
+          .row
+            .span6
+              %h3 Credit Status
+              = f.input :credit_status, collection: [['prepay', 'Prepay'], ['on_account', 'On Account']], label_method: :last, value_method: :first, include_blank: false, label: false;
+
+              %div{:class => "credit-limit-hide-show", :style => (@account.credit_status == "on_account") ? "display: show" : "display:none;"}
+                .row-fluid
+                  .span6
+                    .span4
+                      %label Credit Limit:
+                    .span3
+                      %input.input-small{type: "text", name: "account[credit_limit]", value: number_to_currency(account.credit_limit)}
+                  .span6
+                    .span5
+                      %label Net Days for Full Payment:
+                    .span3
+                      = f.input :net_days_for_full_payment, label: false, input_html: { class: 'input-small'}
+                .row-fluid
+                  .span6.offset6
+                    .span5
+                      %label Buffer Days:
+                    .span3
+                      = f.input :buffer_days, label: false, input_html: { class: 'input-small' }
+    
+    = f.button :submit, "Save Billings", :class => "btn btn-primary"
+
+
+

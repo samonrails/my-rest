@@ -1,0 +1,130 @@
+-# select_order_item is a local (if used for existing select_order_item)
+-# inventory_item is a local (if creating a new select_order_item)
+-# edit_mode is a local (associated select_order.edit_mode)
+
+- select_order_item ||= nil
+- inventory_item ||= nil
+- edit_mode ||= false
+
+- if select_order_item and !inventory_item
+  - inventory_item = select_order_item.inventory_item
+
+/ For edit item, pre-select option choices
+- choices = []
+- if select_order_item and select_order_item.select_order_item_options.any?
+  - choices = select_order_item.select_order_item_options.map(&:inventory_item_id)
+
+- is_disabled = false
+- if select_order_item and !select_order_item.select_order.editing?
+  - is_disabled = true
+
+- if select_order_item
+  - edit_mode = select_order_item.select_order.edit_mode
+
+- provisioned_or_current = (edit_mode ? :provisioned : :current)
+
+.row-fluid.clearfix
+  .span5
+    .row-fluid
+      .span12
+        %h3= inventory_item.name_public
+    .row-fluid
+      .span4
+        - if inventory_item.image
+          - image_tag inventory_item.image
+        - else
+          .well
+            %span.muted No image
+      .span8
+        = inventory_item.description
+  .span3
+    - max_premium = 0   # used to display maximum option premium possible (if options are present)
+    - if inventory_item.option_groups.any?
+      %h6 Options
+      - inventory_item.option_groups.each do |grp|
+        .clearfix.option-table
+          %h6
+            - checkboxes = true
+            - if grp.max.nil?
+              - if grp.required > 0
+                %b
+                  #{grp.name} &mdash; Choose at least #{grp.required}
+                  %span.required *
+                  \:
+              - else
+                %b
+                  #{grp.name} &mdash; Choose as many as you'd like:
+            - else
+              - if grp.required == grp.max
+                - checkboxes = false if grp.required == 1
+                %b
+                  #{grp.name} &mdash; Choose at least #{grp.required}
+                  %span.required *
+                  \:
+              - elsif grp.required == 0
+                %b
+                  #{grp.name} &mdash; Choose up to #{grp.max}:
+              - else
+                %b
+                  #{grp.name} &mdash; Choose at least #{grp.required}, up to #{grp.max}:
+
+          - grp.inventory_items.each do |item|
+            - if choices and choices.include?(item.id)
+              - is_checked = true
+            - else
+              - is_checked = false
+            %label{:class => (checkboxes ? :checkbox : :radio)}
+              - if checkboxes
+                = check_box_tag("select_order_item[select_order_item_options_attributes][][inventory_item_id]", item.id, is_checked, disabled: is_disabled)
+              - else
+                = radio_button_tag("select_order_item[select_order_item_options_attributes][][inventory_item_id]", item.id, is_checked, disabled: is_disabled)
+              = item.name_public
+              %input{type: :hidden, name: "select_order_item[select_order_item_options_attributes][][option_group_id]", value: grp.id}
+              - if item.premium_price > 0
+                - max_premium = max_premium + item.premium_price.cents
+                %span.prominent #{" (+ " + number_to_currency(SelectPricing.calculate_sell_price(@select_order.select_event, item.premium_price)) + ")"}
+
+
+  .span1
+    %h6 Qty
+    %input.numeric.integer.required.item-qty{type: :number, min: 0, name: "select_order_item[quantity]", style: "width: 40px", value: (select_order_item ? select_order_item.quantity.to_s : "1"), disabled: is_disabled}
+    / Also add item status
+    %input{type: :hidden, name: "select_order_item[status]", value: provisioned_or_current}
+
+  .span3
+    - if select_order_item
+      / Existing line item, display dollar price of qty * price
+      .row-fluid
+        .span12
+          %h4.pull-right
+            $#{SelectPricing.quantity_sum_sell_price_select_order_item(select_order_item)}
+    .row-fluid
+      .span12
+        %dl.dl-horizontal.dl-narrow
+          / TODO: pricing API?
+          %dt COGS:
+          %dd $#{cogs_price( inventory_item )}
+          %dt Sell Price:
+          %dd
+            - if select_order_item
+              $#{SelectPricing.sum_sell_price_select_order_item(select_order_item)}
+            - else
+              $#{SelectPricing.inventory_item_sell_price(inventory_item, @select_order.select_event)}
+            - if max_premium > 0
+              %em.muted
+                %small
+                  %br + Premium Options (#{number_to_currency(Money.new(SelectPricing.calculate_sell_price(@select_order.select_event, max_premium)))})
+          %dt Item Type:
+          %dd #{inventory_item.packaging_details}
+          %dt SKU:
+          %dd #{inventory_item.sku}
+.row-fluid.clearfix
+  .pull-left
+    %h6 Customizations:
+    %input.input-xxlarge{type: :text, name: "select_order_item[special_instructions]", value: (select_order_item ? select_order_item.special_instructions : ""), disabled: is_disabled}
+  - if select_order_item and select_order_item.select_order.editing?
+    / Edit form requires submit & delete buttons
+    .pull-right
+      %h6 &nbsp;
+      %input.btn.btn-default{type: :submit, value: "Update Item" }
+

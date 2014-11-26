@@ -1,0 +1,25 @@
+.row-fluid
+  .span10
+    .pull-right
+      %a#add_event_vendor.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#new_select_event_schedule_vendor_form"}
+        %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_select_event_schedule_vendor_form"}
+        
+    %h4 Vendors 
+
+    %table.table.table-striped.table-bordered.table-condensed
+      %thead
+        %tr
+          %th Vendor
+          %th Menu Template
+          %th
+      %tbody
+        - @select_event_schedule.select_event_schedule_vendors.each do |ev|
+          %tr{"data-record-id"=>ev.id}
+            %td= link_to ev.vendor.name, vendor_path(ev.vendor)
+            %td= ev.menu_template.name
+            %td
+              .btn-group
+                %a.btn.btn-mini
+                  %i.open_edit_select_event_schedule_vendor.icon.icon-edit.toggle-modal{"data-target"=>"#edit_select_event_schedule_vendor_form", "data-account_id" => @account.id, "data-id" => ev.id}
+                  %a.btn.btn-mini.btn-danger{:href=>account_select_event_schedule_vendor_path(@select_event_schedule, ev.id), :"data-method" => "delete", data: { confirm: 'Are you sure?' }} 
+                    %i.icon.icon-white.icon-remove

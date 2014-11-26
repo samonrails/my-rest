@@ -1,0 +1,24 @@
+-provide(:title, 'Accounts')
+.new-account-form.auto_size_modal.modal.hide.fade
+  = render :partial => "accounts/new"
+.section-header
+  %h1.center Accounts
+  %hr
+
+.create-buttons
+  %a.btn.btn-small.btn-success.toggle-modal{"data-target"=>".new-account-form"}
+    %i.icon.icon-plus-sign.icon-white{"data-target"=>".new-account-form"}
+    Account
+
+.results
+  %table.table.table-striped.table-condensed{"id"=>"infinite_items"}
+    %thead
+      %tr
+        %th Name
+        %th Account Manager
+        %th Account Exec
+        %th Sales Rep
+    %tbody.page
+      = render @accounts
+
+  = paginate @accounts, :theme => 'twitter-bootstrap'

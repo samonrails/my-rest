@@ -1,0 +1,21 @@
+%h4 Included Items
+%table.table.table-striped.condensed.table-bordered
+  %thead
+    %tr
+      %th Name (Vendor)
+      %th Name (Public)
+      %th Type
+      %th Description
+      %th COGS
+      %th Perks Price
+      %th Retail Price
+  %tbody
+    - @menu_template.inventory_items_with_no_group.sort_by{|ii| [MealType.available_values.index(ii.meal_type), ii.name_vendor]}.each do |item|
+      %tr 
+        %td= link_to item.name_vendor, edit_vendor_inventory_item_path(@vendor, item)
+        %td= link_to item.name_public, edit_vendor_inventory_item_path(@vendor, item)
+        %td= item.meal_type.titleize
+        %td= item.description
+        %td= number_to_currency(item.cogs)
+        %td= number_to_currency(item.perks_price)
+        %td= number_to_currency(item.retail_price)

@@ -1,0 +1,36 @@
+- require "date"
+.pull-right
+  .span
+    Sort: 
+    %a{:href => "#", :class => "trigger-link", "data-index" => 1, "data-column" => "0", "data-order" => "1"}
+      = image_tag('/images/calendar_icon.png', size: "25x25")
+    %a{:href => "#", :class => "trigger-link", "data-index" => 1, "data-column" => "1", "data-order" => "1"}
+      = image_tag('/images/sort_descending.png', size: "25x25")
+    %a{:href => "#", :class => "trigger-link", "data-index" => 1, "data-column" => "1", "data-order" => "0"}
+      = image_tag('/images/sort_ascending.png', size: "25x25")
+.well.item-user-reviews
+  %table.table.table-striped.table-condensed{:class => "Grid", :id => "Grid1"}
+    %thead{:style => "display: none"}
+      %tr
+        %th Date
+        %th Rating
+        %th Rating
+        %th EventId / Sku
+    - @inventory_item.reviews.each_with_index do |review,i|
+      %tr
+        %td{:style => "display:none"}
+          = review.event.event_start_time
+        %td{:style => "display:none"}
+          = review.rating
+        %td.user-reviews-td
+          .inventory_rating{"data-rating" => review.rating }
+          .row.margin_left_0
+            = review.contact.name if review.contact
+          .row.margin_left_0
+            %i
+              = review.content
+        %td.user-reviews-td
+          .row
+            Event: #{link_to review.event.pretty_id, review.event}
+          .row
+            Date: #{review.event.event_start_time.strftime("%m/%d/%y")}

@@ -1,0 +1,50 @@
+-provide(:title, 'Admin')
+#admin-details
+  .page-header
+    %h1 Global SnapPea Administration
+
+    %hr
+
+    %ul#section-tab-navigation.nav.nav-tabs
+      %li{class: params[:selected].nil? || params[:selected] == "buildings" ? 'active' : ''}
+        %a{:href=>"#buildings"} Buildings
+      %li{class: params[:selected] == "pricing_tiers" ? 'active' : ''}
+        %a{:href=>"#pricing_tiers"} Pricing Tiers
+      %li{class: params[:selected] == "markets" ? 'active' : ''}
+        %a{:href=>"#markets"} Markets
+      %li{class: params[:selected] == "email_management" ? 'active' : ''}
+        %a{:href=>"#email_management"} Email Management
+      %li{class: params[:selected] == "event_schedules" ? 'active' : ''}
+        %a{:href=>"#event_schedules"} Event Schedules
+      %li{class: params[:selected] == "event_reviews" ? 'active' : ''}
+        %a{:href=>"#event_reviews", :class => "admin_reviews_tab"} Event Reviews
+      %li{class: params[:selected] == "delivery_groups" ? 'active' : ''}
+        %a{:href=>"#delivery_groups"} Delivery Groups
+      %li{class: params[:selected] == "voucher_redemption" ? 'active' : ''}
+        %a{:href=>"#voucher_redemption"} Voucher Redemption
+
+    #section-tabs
+
+      #buildings.section-tab{style: params[:selected].nil? || params[:selected] == "buildings" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/buildings"
+
+      #pricing_tiers.section-tab{style: params[:selected] == "pricing_tiers" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/pricing_tiers"
+
+      #markets.section-tab{style: params[:selected] == "markets" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/markets"
+
+      #email_management.section-tab{style: params[:selected] == "email_management" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/email_management"
+
+      #event_schedules.section-tab{style: params[:selected] == "event_schedules" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/event_schedules"
+
+      #event_reviews.section-tab{style: params[:selected] == "event_reviews" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/reviews"
+
+      #delivery_groups.section-tab{style: params[:selected] == "delivery_groups" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/delivery_groups"
+     
+      #voucher_redemption.section-tab{style: params[:selected] == "voucher_redemption" ? '' : 'display:none'}
+        = render :partial => "admin/dashboard/voucher_redemption"

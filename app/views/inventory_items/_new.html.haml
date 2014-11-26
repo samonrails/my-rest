@@ -1,0 +1,86 @@
+-inventory_item = InventoryItem.new
+
+.modal-wrapper
+  = simple_form_for [vendor, inventory_item] do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;  
+      %h3 New Inventory Item
+
+    .modal-body.auto_size_modal_body
+      .row-fluid
+        .span10.offset1
+          .row-fluid
+            .span7
+              %h5 Details       
+              = f.input :name_vendor, :label => "Name (Vendor)"
+              = f.input :name_public, :label => "Name (Public)"
+              = f.label "Item Type"
+              = f.select :meal_type, MealType.available_values.sort.collect{|c| [c.titleize, c]}
+              %h5 Style
+              .row-fluid
+                .span1
+                  =f.input :inventory_item_option, as: :boolean, label: false
+                .span9
+                  %label= "Use as Inventory Item Option"
+              .row-fluid
+                .span1
+                  =f.input :eligible_for_add_ons, as: :boolean, label: false
+                .span10
+                  %label= "Eligible for Self Service Impulse Add-Ons"
+              %br
+
+            .span5
+              %h5 Products
+              - ProductType.available_values.each do |product_type|
+                - checked = (inventory_item.inventory_item_product_types.where(:product_type => product_type).count > 0)
+                .row-fluid.form-inline
+                  .span1
+                    %input{:checked=>checked, :style => "margin: 0", :id=>"product_type_allowed_#{ product_type }",:type=>"checkbox",:name=>"inventory_item[product_types_allowed][#{ product_type }]"}
+                  .span9
+                    %label{:style => "margin: 2px 0 0 8px;"}
+                      = product_type.titleize
+
+          .row-fluid
+            .span12
+              = f.input :description, input_html: { rows: 4, style: "width:90%;" }
+              %hr
+              
+          .row-fluid
+            .span8
+              %h5 Tags
+              = f.input :tag_list, label: "Internal Tags", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.inventory_tags"}
+              
+              = f.input :external_tag_list, label: "External Tags", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.inventory_tags"}
+              
+              = f.input :dietary_restriction_list, label: "Dietary Restrictions", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.dietary_restrictions"}
+            
+              = f.input :min_quantity, label: "Minimum Self Service Quantity"
+
+            .span4
+              %h5 Pricing
+              .currency-textbox 
+                = f.input :cogs, label: "COGS"
+                = f.input :perks_price
+                = f.input :retail_price
+                .child-inventory-item
+                  Premium Price
+                = f.input :premium_price, label: false
+
+          .row-fluid
+            .span8
+              %h5
+                Feeds Qty:
+              .span4.margin-left-0
+                = f.input :min_feeds, label: false, :input_html => {class: "input-small"}
+              .span1.margin-left-10 -
+              .span4.margin-left-0
+                = f.input :max_feeds, label: false, :input_html => {class: "input-small"}
+            .span4
+              %h5 Packaging Details:
+              = f.input :packaging_details, label: false, collection: PackagingDetails.available_values.collect{|c| [c.titleize, c]}, as: :radio_buttons
+          
+    .modal-footer
+      = f.submit "Continue", :class => "btn btn-primary"
+      
+          

@@ -1,0 +1,61 @@
+- submit_button_text = (defined?(contact).nil? ? "Create Contact" : "Save Contact")
+- contact ||= Contact.new
+
+.modal-wrapper
+  = simple_form_for [party, contact] do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Contact
+
+    .modal-body.auto_size_modal_body
+     
+      Name
+      .in-between
+      = f.text_field :name
+      .in-between
+      Position
+      .in-between
+      = f.text_field :position
+      .in-between
+      Email
+      .in-between
+      = f.text_field :email  
+      .in-between
+      Phone Number
+      .in-between
+      = f.text_field :phone_number
+      .in-between
+      Mobile Number
+      .in-between
+      = f.text_field :mobile_number
+      .in-between
+      Fax Number
+      .in-between
+      = f.text_field :fax_number
+      .in-between
+      .in-between
+      = f.check_box :primary_contact, :label => false, inline_label: true
+      Primary Contact
+      .in-between
+      .in-between
+      = f.check_box :billing_notifications, :label => false, inline_label: true
+      Billing Notifications
+      .in-between
+      = f.check_box :event_notifications, :label => false, inline_label: true
+      Event Notifications
+      .in-between
+      = f.check_box :feedback_notifications, :label => false, inline_label: true
+      Feedback Notifications
+      .in-between
+      = f.check_box :sms, :label => false, inline_label: true
+      SMS
+      .in-between
+      %h5 Contact Type:
+      = f.input :contact_type, label: false, collection: ContactTypes.available_values.collect{|c| [c.titleize, c]}, as: :radio_buttons
+
+    .modal-footer
+      = f.submit submit_button_text, :class => "btn btn-primary"
+  

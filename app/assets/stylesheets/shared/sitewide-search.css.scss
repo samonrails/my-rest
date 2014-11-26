@@ -1,0 +1,25 @@
+@import "variables";
+
+#sitewide-search {
+  position: relative;
+
+  .search-results {
+    position: absolute;
+    background: #fff;
+    width: 300px;
+    border-radius: 0px 0px 4px 4px;
+    box-shadow: 0 0 6px #333;
+  }
+
+  .search-result {
+    padding-left: 8px;
+    margin-bottom: $baseLineHeight / 2;
+    &.selected {
+      background: $highlightColor;
+    }
+  }
+
+  .margin_top_0px {
+    margin-top: 0px;
+  }
+}

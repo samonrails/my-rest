@@ -1,0 +1,8 @@
+.well
+  %h3 On Account Information
+  .row-fluid
+    .span6
+      %h4= @event.account.name
+    .span6
+      %h4 Billing Address
+      =@event.account.address.to_html

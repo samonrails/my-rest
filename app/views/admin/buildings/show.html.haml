@@ -1,0 +1,15 @@
+%p
+  #notice= notice
+  
+  %b Name:
+  = @building.name
+  %b Insurance required:
+  = @building.insurance_required
+  %b Parking information:
+  = @building.parking_information
+  %b Loading information
+  = @building.loading_information
+  %b Site direction
+  = @building.site_directions
+
+= link_to 'Edit', edit_admin_building_path(@building)

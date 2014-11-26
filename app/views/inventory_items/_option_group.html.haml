@@ -1,0 +1,46 @@
+- @inventory_item.option_groups.each do |group|
+  .update_option_group_form.modal.auto_size_modal.hide.fade{"id"=>"update_option_group_form_" + group.id.to_s}
+    = render :partial => "inventory_items/edit_option_group", :locals => {option_group: group}
+
+.new_inventory_item_option_group_form.modal.auto_size_modal.hide.fade{"id"=>"new_inventory_item_option_group_form"}
+  = render :partial => "inventory_items/new_option_group", :locals => {vendor: @vendor, inventory_item: @inventory_item}
+
+
+%h3.center Inventory Item Options
+
+%a.btn.btn-small.btn-success.toggle-modal.pull-right.add_inventory_item#new-option-group{"data-target"=>"#new_inventory_item_option_group_form"}
+  %i.icon.icon-plus.icon-white
+  Option Group
+
+%br
+%br
+
+.row-fluid
+  .span12
+    %table.table.table-striped.condensed.table-bordered
+      %thead
+        %tr
+          %th 
+            Option Group
+            %br
+            %i.indent Item (Premium COGS, Non-included-option COGS)
+          %th Number of Included Options
+          %th Number of Required Options
+          %th Max Number of Options
+          %th Remove
+      %tbody
+        - @inventory_item.option_groups.each do |group|
+          %tr 
+            %td
+              %a.pointer.toggle-modal{"data-target"=>"#update_option_group_form_" + group.id.to_s}#{group.name}
+              - group.inventory_items.map do |ii|
+                %i.indent
+                  %br
+                  = "#{ii.name_vendor} ($#{ii.premium_price}, $#{ii.cogs})"
+
+            %td= group.included
+            %td= group.required
+            %td= group.max.nil? ? "Unlimited" : group.max 
+            %td
+              %a.btn.btn-mini.btn-danger{:href=> delete_option_group_vendor_inventory_item_path(@vendor, @inventory_item, option_group_id: group.id), :"data-method" => "post", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove

@@ -1,0 +1,18 @@
+%table.table.table-striped.vertical-aligned-text.table-condensed
+  %thead
+    %tr
+      %th Name
+      %th Email
+      %th Created By
+      %th System Role
+
+  %tbody
+    - @inactive_users.each_with_index do |user, index|
+      %tr
+        %td= user.full_name
+        %td= user.email
+        %td= user.created_by.nil? ? '-' : user.created_by
+        %td= user.roles.map(&:titleize).join(', ')
+        %td{style: "width:80px; padding-top: 4px;"}
+          = link_to 'Restore', restore_user_admin_user_path(user.id), method: :put, action: :destroy,  data: { confirm: "Are you sure?" }, class: "btn btn-warning pull-right-m-20"
+= paginate @inactive_users , :theme => 'twitter-bootstrap', :param_name => "inactive_users", :params => {:selected => 'inactive_users'}

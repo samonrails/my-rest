@@ -1,0 +1,34 @@
+.section-header
+  %h1.center Events
+  %hr
+- params[:meta_data] = "events"
+= render :partial => "shared/search_events_form", :locals => {searchable:  params[:searchable], klass: :vendors, elements_to_hide: {markets: 1, account_executive: 1, status: 1 }, meta_data: params[:meta_data]  }
+
+.results
+  %table.table.table-striped.table-condensed{"id"=>"infinite_items"}
+    %thead
+      %tr
+        %th Event ID
+        %th
+          =search_event_arrow( "event_start_time", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(vendor_path( @vendor ), "event_start_time", params)} Date
+        %th
+          =search_event_arrow( "event_start_times", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(vendor_path( @vendor ), "event_start_time", params)} Event Time
+        %th Contact
+        %th
+          =search_event_arrow( "product", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(vendor_path( @vendor ), "product", params)} Product
+        %th
+          =search_event_arrow( "account_names", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(vendor_path( @vendor ), "account_names", params)} Account
+        %th Location
+        %th Vendor(s)
+        %th
+          =search_event_arrow( "status", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(vendor_path( @vendor ), "status", params)} Status
+    %tbody.page
+      - @events.each do |e|
+        = render :partial => 'vendors/partials/event', :locals => {event: e}
+ 
+    = paginate @events, :theme => 'twitter-bootstrap'

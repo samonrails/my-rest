@@ -1,0 +1,47 @@
+%tr{:style => style}
+  - if column_display(@view_parameters, "Account")
+    %td
+  - if column_display(@view_parameters, "Date")
+    %td
+  - if column_display(@view_parameters, "Event ID")
+    %td
+  - if column_display(@view_parameters, "Sales Rep")
+    %td
+  - if column_display(@view_parameters, "Account Executive")
+    %td
+  - if column_display(@view_parameters, "Product")
+    %td
+  - if column_display(@view_parameters, "Vendors")
+    %td= allow_links ? link_to(event_vendor.vendor.name, vendor_path(event_vendor.vendor)) : (event_vendor.vendor.name)
+  - if column_display(@view_parameters, "Group Size")
+    %td= event_vendor.participation
+  - if column_display(@view_parameters, "COGS")
+    %td= number_to_currency(cogs, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Account Delivery Fees")
+    %td
+  - if column_display(@view_parameters, "Vendor Delivery Fees")
+    %td= number_to_currency delivery_fee
+  - if column_display(@view_parameters, "Subtotal")
+    %td
+  - if column_display(@view_parameters, "Gratuity")
+    %td
+  - if column_display(@view_parameters, "Enterprise Fee")
+    %td
+  - if column_display(@view_parameters, "Revenue")
+    %td
+  - if column_display(@view_parameters, "Vouchers Purchased")
+    %td
+  - if column_display(@view_parameters, "Tax")
+    %td
+  - if column_display(@view_parameters, "Total Billing")
+    %td
+  - if column_display(@view_parameters, "Payment Method")
+    %td
+  - if column_display(@view_parameters, "GP")
+    %td
+  - if column_display(@view_parameters, "GP%")
+    %td
+  - if column_display(@view_parameters, "Status")
+    %td
+  - if column_display(@view_parameters, "Order Method")
+    %td

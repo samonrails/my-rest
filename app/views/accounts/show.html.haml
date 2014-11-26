@@ -1,0 +1,93 @@
+-provide(:title, "Account | #{@account.pretty_id}")
+
+#account_status_update.auto_size_modal.modal.hide.fade
+  .modal-wrapper
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Account Status
+
+    .modal-body.auto_size_modal_body
+      = simple_form_for @account, remote: false do |a|
+        = a.input :active, inline_label: "Active", label: false
+
+        .modal-footer
+          = a.button :submit, "Update Account Status", class: "btn btn-primary"
+
+-if @account.can_destroy?
+  #confirmation-delete-modal.modal.hide.fade
+    .modal-header
+      %button.close{:type=>"button", "data-dismiss"=>"modal"}
+        &times;
+      %h3.center The Danger Zone
+    .modal-body
+      %p Are you sure you want to delete this account? This action cannot be reversed. 
+    .modal-footer
+      %a.btn.btn-danger{:href=>account_path(@account), :"data-method" => "delete" }
+        Yes, Delete this account
+      %a.btn{"data-dismiss"=>"modal"}
+        No, Return to the account.
+
+- content_for :head do
+  = stylesheet_link_tag "accounts"
+
+#account-details
+  .row-fluid
+    .span12
+      %h1.center 
+        = @account.name
+  .row-fluid
+    .span12
+      - if @account.active
+        .label.label-success.pointer.toggle-modal{"data-target"=>"#account_status_update"} Active
+      - else
+        .label.label-warning.pointer.toggle-modal{"data-target"=>"#account_status_update"} Inactive
+      %br
+      %b.account-id
+        ID: 
+        = @account.pretty_id
+  .row-fluid
+    .span12
+      %hr
+
+  = simple_form_for(@account) do |f|
+    .row-fluid
+      .span2
+        = image_tag(@account.image, size: "100%x100%", alt: @account.name)
+        = f.input :image, :as => :file, label: false
+      .span8
+        %h4 Account Details
+        .row-fluid
+          .span4
+            = f.input :name
+            = f.input :account_type, collection: AccountType.available_values.collect{|c| [c.titleize, c]}, label: "Account Type"
+            = f.input :website
+            = f.input :tax_exempt, :label => false, inline_label: true
+
+          .span4
+            = f.input :account_manager_id, collection: User.fooda_employee, label_method: :name, value_method: :id, label: "Account Manager"
+            = f.input :account_exec_id, collection: User.fooda_employee, label_method: :name, value_method: :id, label: "Account Executive"
+            = f.input :sales_rep_id, collection: User.fooda_employee, label_method: :name, value_method: :id, label: "Sales Representative"
+            = f.input :active_popup_vouchers, :label => false, :inline_label => "Can Purchase Pop Up Vouchers on Catering"
+
+          .span4
+            = f.simple_fields_for :account_email_lists do |e|
+              = e.hidden_field :id
+              = e.input :list_id, label: "Select Email List ID"
+              
+    .row-fluid
+      .span12
+        .form-actions
+          -if @account.can_destroy?
+            %a.btn.btn-danger.toggle-modal{"data-target"=>"#confirmation-delete-modal"}
+              %i.icon.icon-remove.icon-white{"data-target"=>"#confirmation-delete-modal"}
+              Delete
+          -else 
+            %a.btn.disabled
+              %i.icon.icon-remove.icon-white
+              Delete
+          .pull-right
+            = f.submit "Save Account", :class => "btn btn-primary"
+
+  = render 'accounts/menu'

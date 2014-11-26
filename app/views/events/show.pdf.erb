@@ -1,0 +1,341 @@
+<style type="text/css">
+
+    /* ==========
+    = NOTES
+    ============= */
+    /* Images are required to be hosted using a fully qualified URL */
+
+                         
+    /* ==========
+    = Resets
+    ============= */
+    body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,
+    fieldset,input,textarea,p,blockquote,th,td {margin:0; padding:0;}
+    table {border-collapse:collapse; border-spacing:0;}
+    fieldset,img {border:0;}
+    address,caption,cite,code,dfn,em,strong,th,var {font-style:normal; font-weight:normal;}
+    ol,ul {list-style:none;}
+    caption,th {text-align:left;}
+    abbr,acronym { border:0;}
+
+    /* [at][at]page is the syntax that docraptr uses, but because 
+    this is within Razor syntax we have to append it with another at sign.  
+    This allows it to simply output the [at]page definition, to which we can then set properties on. */
+    @page {
+        size: arch-c;
+        background: url('http://i.imgur.com/T8lmVee.jpg'); 
+    }
+
+    body {
+        position: relative;
+        background: #fff;
+        margin: 0px;
+        padding: 0px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;    
+    }
+
+    /* ==========
+    = Header
+    ============= */
+    .pdf {
+        overflow: hidden;
+        height: 2000px;
+        width: 1488px;
+    }
+
+   
+    /* ==========
+    = Main Content
+    ============= */
+    .item-wrapper {
+        position: relative;
+        width: 1300px;
+        height: 100%;
+        overflow: hidden;
+        text-align: center;
+        margin: 0 auto;
+        margin-bottom: 20px;
+    }
+
+    /* ==============
+    = Inside Content
+    ================= */
+    .inner-wrapper {
+        height: 100%;
+        text-align: left;
+        margin: 20px 20px;
+        padding-top: 40px;
+        padding-bottom: 20px;
+        display: block;
+    }
+
+    .individual-item {
+        width: 550px;
+        margin: 0 20px 20px 20px;
+        overflow: auto;
+        float: left;    
+        min-height: 80px;
+    }
+    .item-title {
+        width: 500px;
+    }
+
+    .item-description {
+        width: 600px;
+    }
+    .item-description {
+        width: 500px;
+    }
+
+    .item-title {
+        font-size: 25px;
+        text-transform: uppercase;
+        color: #262626;
+        float: left;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+
+    .item-description {
+        font-size: 18px;
+        color: #666666;
+        font-family: 'Segoe UI';
+        font-style: italic;
+        display: block;
+    }
+    
+    .item-tag {
+        background: #929292;
+        margin-right: 2px;
+        font-size: 14px;
+        color: #fff;
+        padding: 4px 4px 4px 4px;
+        -webkit-border-radius: 10px;
+        border-radius: 10px; 
+        position: relative;
+        top: -3px;
+    }
+    .item-price {
+        color: #f26522;
+        font-size: 20px;
+        float: right;
+        font-family: cursive;
+    }
+
+    .tasty-extras {
+        page-break-before: avoid;  
+    }
+
+    /* Helpers */
+    .center-margin { margin: 0 auto; }
+    .hidden { display: none; }
+
+    .grid-full {
+        text-align: center;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+    }
+
+    h1.logo {
+        background: url('http://i.imgur.com/KLlh5nO.png') -200px -1px no-repeat;
+        height: 315px;
+    }
+
+    h2.sub-title {
+        position: absolute;
+        top: 115px;
+        left: 640px;
+        width: 100px;
+    }
+
+    h2.menu-name {  
+        font-size: 50px;
+        text-align: center;
+        position: absolute;
+        width: 100%;
+        top: 175px;
+        font-family: Helvetica, arial, sans-serif;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .menu > img {
+        float: right;
+        width: 200px;
+        margin-top: -210px;
+        margin-right: 90px; 
+    }
+
+    h1.category-title {
+        background: url('http://i.imgur.com/7jjKW3k.png') no-repeat;
+        width: 300px;
+        height: 80px;
+        margin-left: 587px;
+        position: relative;
+        top: 40px;
+        color: #fff;
+        text-transform: uppercase;
+        padding-top: 10px;
+        z-index: 10;
+
+    }
+
+    .footer {
+        position: fixed; 
+        bottom: -1px;
+        background: url('http://i.imgur.com/nkgqdan.png') #f26522 0 0 no-repeat;
+        width: 100%;
+        height: 100px;
+    }
+
+    /*.pdf-grid {
+        margin-top: -60px;
+        overflow: visible;
+    }*/
+    .category-title.zero-item-title {
+        margin-top: -80px;
+        position: relative;
+        top: 50px;  
+    }
+    .category-title.first-item-title {
+        margin-top: -40px;
+        position: relative;
+        top: 60px;
+    }
+    .category-title.second-item-title {
+        margin-top: -100px;
+        position: relative;
+        top: 60px;
+    }
+    .category-title.third-item-title {
+        margin-top: -100px;
+        position: relative;
+        top: 60px;
+    }
+    .category-title.fourth-item-title {
+        margin-top: -120px;   
+        position: relative;
+        top: 75px;
+        padding-bottom: 20px;
+    }
+    .divider {
+        position: absolute;
+        width: 790px;
+        left: 260px;
+        height: 5px;
+        border-top: 5px #000 dotted;
+        padding-bottom: 10px;
+    }
+
+    .pricing-at-menu-level {
+        background: url('http://i.imgur.com/ho9tNxV.png') no-repeat;
+        width: 180px;
+        height: 80px;
+        color: #fff;
+        padding-top: 15px;
+        position: absolute;
+        left: 100px;
+        top: 180px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .menu-pricing-title {
+        position: absolute;
+        left: 132px;
+        top: 150px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .item-options {
+        font-style: normal;
+        font-size: 18px;
+    }
+    .menu-cuisine {
+        position: absolute; 
+        top: 240px;
+        left: 700px;
+        font-size: 25px;
+        font-style: italic;
+    }
+</style>
+
+<div class="pdf">
+    <div class="grid-full">
+        <h1 class="logo">
+            <span class="hidden">Fooda</span>
+        </h1>
+        <h2 class="sub-title">
+           www.fooda.com
+        </h2>
+        
+    <!--      
+        <div class="menu-pricing-title">
+            Menu Price
+        </div>
+        <div class="pricing-at-menu-level">
+            <span>$</span>@Model.MenuPrice
+        </div>            
+    -->
+
+        <div class="menu center-margin">
+            <h2 class="menu-name">
+                <%= @event.menu_name %>
+            </h2>
+            <h4 class="menu-cuisine">
+                <%= @cuisine %>
+            </h4>
+            <img src="@Model.LogoUrl" alt="Company logo here.">
+        </div>  
+
+    <div class="pdf-grid">
+        <% @event.menu_items.each do |item| %>
+            <% case item.inventory_item.meal_type 
+
+            when 'combinations' %>
+            <h1 class="category-title zero-item-title">
+                Combinations
+            </h1>
+                <div class="item-wrapper" style="border: 5px #000 dotted">
+                    <div class="inner-wrapper">
+                        <div class="individual-item">
+                            
+                            <div class="item-title">
+                                <span><%= item.inventory_item.name_public %></span>
+                            </div>
+
+                            <% item.inventory_item.tags.each do |tag| %>
+                                <span class="item-tag"><%= tag %></span>
+                            <% end %>
+
+                            <div class="item-price">
+                                <%= item.inventory_item.retail_price %>
+                            </div>
+                            
+                            <div class="item-description">
+                                <%= item.inventory_item.description %>
+                                <% item.inventory_item.options.each do |option| %>
+                                    <br /> <span>with </span>
+                                    <%= option %>
+                                <% end %>
+                            </div>
+
+                        </div> <!-- /individual-item -->
+                    </div>
+                </div> <!-- /item-wrapper -->
+            <% when 'entres' %>
+                <h1 class="category-title first-item-title">
+                    Entres
+                </h1>
+            <% when 'salads' %>
+                <h1 class="category-title second-item-title">
+                    Salads
+                </h1>
+            <% when 'sides' %>
+                <h1 class="category-title third-item-title">
+                    Tasty Extras
+                </h1>  
+            <% end %>
+        <% end %>

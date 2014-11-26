@@ -1,0 +1,39 @@
+.modal.hide.fade{"id"=>"new_preference_form"}
+  = render :partial => "accounts/preferences/new", :locals => {}
+
+.container.control-group
+  .row-fluid
+    .span12
+      .admin-buttons
+        %a.btn.btn-success.btn-small.toggle-modal#add_preference{"data-target"=>"#new_preference_form"}
+          %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_preference_form"}
+          Preference
+      %h3 Preferences
+
+  .row-fluid
+    .span12
+      %table.table.table-striped
+        %thead
+          %tr
+            %th Type
+            %th Preference
+            %th Disposition
+            %th 
+        %tbody
+          - @account.account_preferences.each do |p|
+            .modal.hide.fade{"id"=>"edit_preference_form_" + p.id.to_s}
+              = render :partial => "accounts/preferences/edit", :locals => {preference: p}
+            %tr{"data-record-id"=>p.id}
+              %td
+                %a.pointer.toggle-modal{"data-target"=>"#edit_preference_form_" + p.id.to_s}#{p.preference_type.titleize}
+              %td= p.preference
+              %td= p.disposition.titleize
+              %td
+                -if p.can_destroy?
+                  %a.btn.btn-mini.btn-danger{:href=>account_account_preference_path(@account, p), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                    %i.icon.icon-white.icon-remove
+                -else
+                  %a.btn.btn-mini.disabled
+                    %i.icon.icon-white.icon-remove
+
+

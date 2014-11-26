@@ -1,0 +1,18 @@
+- provide :title, "Managed Service Reports"
+.section-header
+  %h1.center Managed Service Reporting
+  %hr
+
+  = ssp_search_form Event, 
+    [{ :name => :outer_group, :as => :select, :collection => ["Sales Rep", "Date", "Account", "Vendor", "Account Executive"]},
+    { :name => :status, :as => :multi_select, :collection => Status::Event.available_values, :nil_means_all => true},
+    { :name => :inner_group, :as => :select, :collection => ["Sales Rep", "Date", "Account", "Vendor", "Account Executive"]},
+    { :name => :product, :as => :multi_select, :collection => Product.get_available_products(ProductType.managed_services), :nil_means_all => true},
+    { :name => :vendor, :as => :string, :wildcard => :both },
+    { :name => :account, :as => :string, :wildcard => :both },
+    { :name => :col, :label => "Columns", :as => :multi_select, :collection => ["Account", "Date", "Event ID", "Sales Rep", "Product", "Vendors", "Group Size", "COGS", "Account Delivery Fees", "Vendor Delivery Fees", "Subtotal", "Gratuity", "Enterprise Fee", "Revenue", "Vouchers Purchased", "Tax", "Total Billing", "Payment Method", "GP", "GP%", "Status", "Account Executive", "Order Method"], :nil_means_all => true},
+    { :name => :market, :as => :multi_select, :collection => Market.all.map{|m| m.name}, :nil_means_all => true},
+    { :name => :account_executive, :as => :select, :collection => User.fooda_employee.map(&:email)},
+    { :name => :order_method, :as => :select, :collection => ["Self Service"]},], {:ssp_persistence => "managed_services_reports"}
+
+= render :partial => "admin/managed_services_reports/table", :locals => {allow_links: true}

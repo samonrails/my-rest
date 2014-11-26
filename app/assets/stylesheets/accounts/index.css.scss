@@ -1,0 +1,23 @@
+#billing-section {
+  h5 {
+    font-size: 1.2em;
+  }
+  .odd {
+    background-color: rgba(240,240,240,1);
+  }
+  .control-group.container {
+    border-bottom: 1px solid #e3e3e3;
+  }
+
+  .product-selectors .control-group {
+    float: left;
+    margin-right: 25px;
+    text-align: center;
+    input {
+    }
+  }
+}
+
+.center {
+  text-align: center;
+}

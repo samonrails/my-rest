@@ -1,0 +1,77 @@
+#billing-address-section.form-actions
+  = form_for(@vendor, :remote => true, :data => {type: :json}) do |f|
+    %input{:type=>"hidden",:name=>"_method",:value=>"PUT"}
+
+    .container.control-group
+      .row-fluid
+        .span6
+          %h3 Billing Address
+          = f.simple_fields_for :address do |a|
+            = a.input :address1, 
+              input_html: { style: 'width: 335px' },
+              label: false,
+              placeholder: "Address Line 1"
+            = a.input :address2, 
+              input_html: { style: 'width: 335px' },
+              label: false,
+              placeholder: "Address Line 2"
+            = a.input :city, 
+              input_html: { maxlength: 30}, 
+              wrapper_html: { class: "inline_field_wrapper" },
+              label: false,
+              placeholder: "City"
+            = a.input :state, 
+              input_html: { style: 'width: 35px'},
+              wrapper_html: { class: "inline_field_wrapper" },
+              label: false,
+              placeholder: "State"
+            = a.input :zip_code, 
+              wrapper_html: { class: "inline_field_wrapper" }, 
+              input_html: { style: 'width: 58px'},
+              label: false,
+              placeholder: "Zip Code"
+            = a.input :country, 
+              wrapper_html: { class: "inline_field_wrapper" },
+              label: false,
+              include_blank: "Country"
+        .span6
+          %h3 Self Service Catering Delivery Fee
+          .span12
+            .span3
+              %label{:for => "vendor_is_fixed_true"}
+                = f.radio_button :is_fixed, true, class: 'radio radio-fee', style: 'margin-top:0px;'
+                Fixed Amount
+            .span3
+              %label{:for => "vendor_is_fixed_false"}
+                = f.radio_button :is_fixed, false, class: 'radio radio-fee', style: 'margin-top:0px;'
+                Percentage
+          .span12
+            #fixed-amt.hide
+              .span3.form-inline
+                = f.number_field :fee, class: 'input-mini', placeholder: '$', disabled: true
+                dollars
+            #percent-amt.hide
+              .span3.form-inline
+                = f.number_field :fee, class: 'input-mini', placeholder: '%', disabled: true, id: 'vendor_fee_percent'
+                \%
+              .span6.form-inline{style: 'margin-left:0px;'}
+                = f.label :cap, "Capped at"
+                = f.number_field :cap, class: 'input-mini', style: 'margin-left:5px;', placeholder: '$', disabled: true
+                Dollars
+                %span{style: 'position:absolute;margin-top:32px;margin-left:-112px;'}
+                  (optional)
+          .span8
+            = f.submit "Save", :class => "btn btn-primary pull-right", style: 'margin-top:75px;'
+
+:javascript
+  window.addEventListener('load', function () {
+    var is_fixed = $('input[name="vendor[is_fixed]"]:checked').val();
+    if(is_fixed == "true"){
+      $('#fixed-amt input').removeAttr('disabled')
+      $('#fixed-amt').show();
+    }
+    else{
+      $('#percent-amt input').removeAttr('disabled')
+      $('#percent-amt').show();
+    }
+  });

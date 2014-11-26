@@ -1,0 +1,65 @@
+# This is how we control senstive data in Snappea. Talk to DrMavenRebe if 
+# you think you want to add something to the list. To get Snappea running 
+# copy this file to config/application.yml and uncomment the credentials below.
+
+# The first set of credentials are defaulted through every environment unless specified. 
+
+# These AWS credentials are for the Fooda Snappea default bucket. Please change them to an 
+# appropriate bucket if you wish to keep the data you send to AWS as there is no 
+# guarantee we won't delete it without warning. They should get you off the ground though.
+
+AWS_ACCESS_KEY_ID: AKIAIR774KUKSZFLNOFA
+AWS_SECRET_ACCESS_KEY: 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
+AWS_DEFAULT_REGION: us-east-1
+AWS_S3_PUBLIC_BUCKET: snappea-default
+AWS_S3_PRIVATE_BUCKET: snappea-default
+AWS_S3_PRIVATE_WINDOW: 86400
+CONSUMER_KEY: 'eFXWcGHItahMA-cbdJTyqg'
+CONSUMER_SECRET: 'bm0e4mmXApG6mu1GBT4UYjr9ZXM'
+TOKEN: 'xhwNhM4GmuMePniU6JDUDaFfak3W9YE_'
+TOKEN_SECRET: 'lnP0ax2Xd-qzw8zBD6uO_bhsByY'
+
+REDIS_URL: http://localhost:6379
+RESQUE_USERNAME: admin
+RESQUE_PASSWORD: correctHorseBatteryStaple
+
+#Braintree creds
+BRAINTREE_ENV: sandbox
+BRAINTREE_MERCHANT_ID: fjzstnd8pqxm5h5m
+BRAINTREE_PUBLIC_KEY: qzf3qtz3wck9wtbm
+BRAINTREE_PRIVATE_KEY: fc829bedbd9c2c7f7b0835511bfd9c9c
+
+# Sign up for one
+MAILCHIMP_KEY: 
+
+# Any SMTP will do. For Heroku, add a mail add-on (like Mandril) and show grab the credentails 
+# from the page. We use mailtrap.io to ensure we're not sending emails in development.
+SMTP_USERNAME: none
+SMTP_PASSWORD: none
+
+SEGMENT_IO_SECRET:
+
+# These credentials overwrite the above defaults for the test environment.
+test:
+
+  BRAINTREE_ENV: sandbox
+  BRAINTREE_MERCHANT_ID: qdvdxcqzgpnxy4rj
+  BRAINTREE_PUBLIC_KEY: wrc7n3vvm7r76q58
+  BRAINTREE_PRIVATE_KEY: c6288b6c30df85d8c552a12e1920b6cc
+
+# These credentials overwrite the above defaults for the production environment. If you want to deploy to Heroku to test it out 
+# you can grab the AWS keys above. 
+production:
+
+  # For Heroku, add a redis add-on (like Redis-To-Go) and shove the url here. For Example: 
+  # REDIS_URL: redis://redistogo:17a5f0a1dd2b135fd3552352abbqwe8b5fd@squawfish.redistogo.com:9740
+  REDIS_URL:
+
+  SMTP_USERNAME: 
+  SMTP_PASSWORD:
+
+  #Braintree creds for production
+  BRAINTREE_ENV: 
+  BRAINTREE_MERCHANT_ID: 
+  BRAINTREE_PUBLIC_KEY: 
+  BRAINTREE_PRIVATE_KEY: 

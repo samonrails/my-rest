@@ -1,0 +1,41 @@
+- if li.payable_party == party && (li.line_item_sub_type != "Menu-Item" || include_menu_items)
+  %tr{"data-record-id"=>li.id}
+    %td{:nowrap => ""}= li.line_item_type
+    %td{:nowrap => ""}= li.line_item_sub_type
+    %td{:nowrap => ""}= li.sku_display
+    - if li.include_price_in_expense
+      %td= li.name_with_links_display
+    - else
+      %td{:style => "padding-left:50px"}= li.name_with_links_display
+    %td= li.inventory_item.meal_type.titleize unless !defined?(li.inventory_item.meal_type)
+    %td= li.notes
+    %td= li.quantity_display
+    %td= li.unit_price_expense_display false
+    %td= li.total_expense_display false
+    %td= li.tax_rate_expense_display
+    %td
+      - if li.document.nil?
+        .btn-group
+          %a.btn.btn-mini.btn-danger{:href=>event_line_item_path(@event, li), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+            %i.icon.icon-white.icon-remove
+
+- if li.billable_party == party && (li.line_item_sub_type != "Menu-Item" || include_menu_items)
+  %tr{"data-record-id"=>li.id}
+    %td{:nowrap => ""}= li.line_item_type
+    %td{:nowrap => ""}= li.line_item_sub_type
+    %td{:nowrap => ""}= li.sku_display
+    - if li.include_price_in_revenue
+      %td= li.name_with_links_display
+    - else
+      %td{:style => "padding-left:50px"}= li.name_with_links_display
+    %td= li.inventory_item.meal_type.titleize unless !defined?(li.inventory_item.meal_type)
+    %td= li.notes
+    %td= li.quantity_display
+    %td= li.unit_price_revenue_display true
+    %td= li.total_revenue_display true
+    %td= li.tax_rate_revenue_display
+    %td
+      - if li.document.nil?
+        .btn-group
+          %a.btn.btn-mini.btn-danger{:href=>event_line_item_path(@event, li), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+            %i.icon.icon-white.icon-remove

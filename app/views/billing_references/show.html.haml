@@ -1,0 +1,17 @@
+#notice= notice
+  
+.row-fluid
+  .span6
+    %h3
+      = @reference.name
+
+  .row-fluid
+    .span6
+      %hr
+    .span6
+
+  .row-fluid
+    .span6
+      = link_to 'Edit', edit_account_billing_reference_path(@account, @reference)
+      |
+      = link_to 'Back to Account', @account

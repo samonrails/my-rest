@@ -1,0 +1,40 @@
+- amount = @event.revenue_total_by_party(@event.account)
+
+.modal-wrapper
+  = form_tag event_transactions_path(@event) do
+    = hidden_field_tag :card, card.token
+    = hidden_field_tag :user_id, @event.event_transaction_method.user_id
+    .modal-header
+      %button.close{:type=>"button", "data-dismiss"=>"modal"}
+        &times;
+      %h3 Create A New Transaction
+    
+    .modal-body
+      .row-fluid
+        .span6
+          %h4
+            = image_tag card.image_url, style: 'height:20px;'
+            Card Information
+          %p
+            =card.cardholder_name
+            %br="XXXX-XXXX-XXXX-#{card.last_4}"
+            ="Expires: #{card.expiration_month}/#{card.expiration_year}"
+
+        .span6
+          %h4 Billing Address 
+          = Card.html_address card.billing_address
+
+      .row-fluid
+        .form-inline.span5{:style => "margin-left: 10px; width: 92%;"}
+          .span12
+            %hr
+            %h4 Amount
+            %br= number_field_tag :amount, amount, :step => 0.01, :min => 0.01, :max => amount
+            %br
+
+            %label{:for => "settlement_amount" }
+              = check_box_tag :settle, true, true, :id => "settlement_amount" 
+              Submit For Settlement
+    .modal-footer
+      = submit_tag "Create", class: 'btn btn-primary'
+      %button.btn{"data-dismiss"=>"modal"} Cancel

@@ -1,0 +1,19 @@
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button", "data-dismiss"=>"modal"}
+      &times;
+
+    %h3 Add Order - Choose User
+
+  .modal-body.auto_size_modal_body
+    .row-fluid
+
+    .row-fluid
+      = simple_form_for :select_order, url: select_select_orders_path do |f|
+        .row-fluid
+          = f.input :user, collection: existing_account_users( @select_event )
+          = f.hidden_field :select_event_id, value: @select_event.id
+          = f.hidden_field :status, value: :cart
+        %br
+        = f.submit "Start Order", :class => "btn btn-primary pull-right"
+

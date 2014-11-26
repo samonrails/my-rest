@@ -1,0 +1,9 @@
+%tr
+  %td= issue.subject.class
+  %td= issue.title
+  %td= link_to issue.subject.to_s, issue.subject
+  %td= issue.assigner.name
+  %td= issue.open_date.to_date.strftime("%m-%d-%Y")
+  %td= issue.due_date.to_date.strftime("%m-%d-%Y") if issue.due_date
+  %td= issue.priority
+  %td= link_to "view", issue, :id => "new_issue"

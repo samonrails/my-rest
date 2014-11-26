@@ -1,0 +1,31 @@
+%h4 Account Billing References
+%table.table.table-condensed.table-bordered.table-striped
+  %thead
+    %th Collection
+    %th Choice
+    %th Required
+    %th Actions
+  - @event.account.billing_references.each do |account_br|
+    - e = @event.billing_references.select{|br| br.name == account_br.name}
+    - if e.count > 0
+      - e.each do |event_br|
+        .modal.hide.fade{"id"=>"edit_event_billing_reference_form_" + event_br.id.to_s}
+          = render :partial => "billing_references/form_for_event", :locals => {reference: event_br, tag_list: account_br[:data], required: account_br.required}
+        %tr{"data-record-id"=>event_br.id}
+          %td
+            %a.pointer.toggle-modal{"data-target"=>"#edit_event_billing_reference_form_" + event_br.id.to_s}#{event_br.name}
+          %td= event_br.humanized_data
+          %td
+            = content_tag :i, nil, class: account_br.required? ? 'icon-ok' : 'icon-remove'
+          %td
+            %a.btn.btn-mini.btn-danger{:href=>event_billing_reference_path(@event, event_br), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+    - else
+      .modal.hide.fade{"id"=>"add_event_billing_reference_form_" + account_br.id.to_s}
+        = render :partial => "billing_references/form_for_event", :locals => {reference: BillingReference.new(:name => account_br.name), tag_list: account_br[:data], required: account_br.required}
+      %tr{"data-record-id"=>account_br.id}
+        %td
+          %a.pointer.toggle-modal{"data-target"=>"#add_event_billing_reference_form_" + account_br.id.to_s}#{account_br.name}
+        %td
+        %td
+        %td

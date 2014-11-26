@@ -1,0 +1,276 @@
+-provide(:title, "Event | #{@event.pretty_id}")
+
+- @event.line_items.each do |li|
+  .auto_size_modal.modal.hide.fade{"id"=>"edit_line_item_form_" + li.id.to_s}
+    = render :partial => "line_items/edit", :locals => {line_item: li, commit_text: "Edit Line Item"}
+.auto_size_modal.modal.hide.fade{"id"=>"new_event_vendor_form"}
+  = render :partial => "event_vendors/new", :locals => {}
+.duplicate_event_form.modal.hide.fade{"id"=>"duplicate_event_form"}
+  = render :partial => "events/duplicate_non_financial_event", :locals => {event: @event}
+
+-if @event.can_destroy?
+  #confirmation-delete-modal.modal.hide.fade
+    .modal-header
+      %button.close{:type=>"button", "data-dismiss"=>"modal"}
+        &times;
+      %h3.center The Danger Zone
+    .modal-body
+      %p Are you sure you want to delete this event? This action cannot be reversed. 
+    .modal-footer
+      %a.btn.btn-danger{:href=>event_path(@event), :"data-method" => "delete" }
+        Yes, Delete this event
+      %a.btn{"data-dismiss"=>"modal"}
+        No, Return to the event.
+
+#event-details
+  .row-fluid
+    .span12
+      %h2 Event Details
+      - if @event.order
+        .pull-right.label.label-info
+          Ordered Online
+      %b.event-id
+        %br
+        ID: 
+        = @event.pretty_id
+        .pull-right
+          Created by: 
+          = @event.created_by.nil? ? "-" : (link_to @event.created_by.name, edit_admin_user_path(@event.created_by.id))
+        %br
+        Product Type: 
+        = Product.find_parent(@event.product).titleize
+        .pull-right
+          Created on: 
+          = @event.created_at.strftime("%m/%d/%y")
+      %hr
+
+  .row-fluid
+    .span6
+      = simple_form_for(@event) do |f|
+        .row-fluid
+          .span6
+            %h4 General
+            = f.input :name, label: "Event Name"
+            = f.input :meal_period, collection: MealPeriod::available_values.collect{|c| [c.titleize, c]}
+            = f.input :status, collection: @event.status == Status::Event.auto_generated ? Status::Event.available_values.collect{|c| [c.titleize, c]} : Status::Event.available_values_for_user.collect{|c| [c.titleize, c]}, disabled: !@event.location.building.is_approved?
+            = f.input :product, collection: Product.get_available_products(Product.find_parent(@event.product)).collect{|c| [c.titleize, c]}, disabled: @event.vendors.any?
+            %div{class:"js-event-cancellation-reason", style: (@event.status == Status::Event.canceled) ? "" : "display: none;"} 
+              = f.input :cancellation_reason, collection: CancellationReason.get_available_reasons(Product.find_parent(@event.product)).collect{|c| [c.titleize, c]}
+              = f.input :canceled_within_24_hours, inline_label: "Canceled Within 24 Hours", label: false
+          .span6
+            %h4 Account Details
+            = f.input :account, 
+              input_html: {value: @event.account.name},
+              wrapper_html: { class: "inline_field_wrapper" }, 
+              as: :string,
+              readonly: true,
+              label: "Account name"
+            %a{"href" => account_path(@event.account)}
+              = image_tag('/images/default_account.png', style: "width:13%; margin: 0 0 10px -11px;")
+            = f.association :location, include_blank: true, collection: @event.account.locations
+            %table
+              %td 
+                - contact_list =  (@event.account.contacts + @event.created_by.try(:contacts)).sort{|x,y| x.name <=> y.name }.uniq
+                = f.association :contact, include_blank: true, collection: contact_list
+              %td
+              %td
+                %a{"href" => account_path(@event.account, :selected => "contacts")}
+                  = image_tag('/images/address_icon.png', size: "100%x100%")
+            = f.input :quantity, label: "Account Participation"
+            = f.association :event_owner, include_blank: true, collection: User.fooda_employee
+        .row-fluid
+          .span12
+            %hr
+            %h4 Schedule
+        .row-fluid
+          .span6
+            %label
+              Event Start Time
+            .input-append.date.form_datetime
+              %input{:size => "16", :type => "text", :name => "event[event_start_time]", :value => "#{@event.event_start_time.strftime("%d %B %Y - %I:%M %p") unless @event.event_start_time.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+          .span6
+            %label
+              Event End Time
+            .input-append.date.form_datetime
+              %input{:size => "16", :type => "text", :name => "event[event_end_time]", :value => "#{@event.event_end_time.strftime("%d %B %Y - %I:%M %p") unless @event.event_end_time.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+
+        .row_fluid
+          .span6
+            %label
+              Setup Start Time
+            .input-append.date.form_datetime
+              %input{:size => "16", :type => "text", :name => "event[setup_start_time]", :value => "#{@event.setup_start_time.strftime("%d %B %Y - %I:%M %p") unless @event.setup_start_time.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+          .span6
+            %label
+              Setup End Time
+            .input-append.date.form_datetime
+              %input{:size => "16", :type => "text", :name => "event[setup_end_time]", :value => "#{@event.setup_end_time.strftime("%d %B %Y - %I:%M %p") unless @event.setup_end_time.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+
+        %br
+        %br
+        %br
+        .form-actions
+          -if @event.can_destroy?
+            %a.btn.btn-danger.toggle-modal{"data-target"=>"#confirmation-delete-modal"}
+              %i.icon.icon-remove.icon-white{"data-target"=>"#confirmation-delete-modal"}
+              Delete
+          -else 
+            %a.btn.disabled
+              %i.icon.icon-remove.icon-white
+              Delete
+          .pull-right.clearfix
+            %a.btn.toggle-modal{"data-target"=>"#duplicate_event_form"}
+              Duplicate Event
+            = f.submit "Save Event", :class => "btn btn-primary"
+    .span6
+      .row-fluid
+        .pull-right
+          %a#add_event_vendor.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#new_event_vendor_form"}
+            %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_event_vendor_form"}
+            Vendor
+        %h4 Vendor Details
+
+        %table.table.table-striped.table-bordered.table-condensed
+          %thead
+            %tr
+              %th Vendor
+              %th Menu Template
+              %th Vendor Participation
+              %th Pricing Type
+              %th Actions
+          %tbody
+            - @event.event_vendors.each do |ev|
+              %tr{"data-record-id"=>ev.id}
+                %td= link_to ev.vendor.name, vendor_path(ev.vendor)
+                %td= ev.menu_template.name
+                %td= ev.participation
+                %td= MenuPricingType.friendly_name(ev.pricing_type)
+                %td
+                  .btn-group
+                    %a.btn.btn-mini{:href=>edit_event_event_vendor_path(@event, ev)}
+                      %i.icon.icon-edit
+                    - if !ev.invoiced_line_items?
+                      %a.btn.btn-mini.btn-danger{:href=>event_event_vendor_path(@event, ev), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                        %i.icon.icon-white.icon-remove
+                    - else
+                      %a.btn.btn.btn-mini.disabled
+                        %i.icon.icon-remove.icon-white
+      .row-fluid
+        %br
+        %br
+        %br
+        =render :partial => "events/partials_financials/financials_billing_references"
+        %br
+        %h4 Event Feedback
+        %p
+          - sent_after_time = GlobalSetting.review_sent_after * 60
+          - if @event.feedback_status.nil? and @event.contact and @event.contact.feedback_notifications? and (Status::Event.values_for_feedback_email.include? @event.status) and Time.now < @event.event_start_time + sent_after_time.minutes
+            Feedback email will be automatically sent on 
+            %b #{(@event.event_start_time + sent_after_time.minutes).strftime("%B %d, %Y")}
+            at 
+            %b #{(@event.event_start_time + sent_after_time.minutes).strftime("%I:%M %p")}
+        %a.btn.btn-small.btn-success.toggle-modal{"href"=>event_send_feedback_email_path(@event), "data-method" => "POST"}
+          - if !@event.feedback_status.nil?
+            Resend Feedback Email
+          - elsif @event.contact and @event.contact.feedback_notifications?
+            Manually Send Feedback Email
+          - else
+            Force Send Feedback Email
+        %br
+        %br
+          - if !@event.feedback_status.nil?
+            Feedback Status: 
+            %span{class: feedback_status_label(@event.feedback_status)}
+              #{@event.feedback_status.titleize}
+            - if (@event.feedback_status == "reviewed" or @event.feedback_status == "sent") and @event.feedback_updated_at
+              %span
+                on 
+                %b #{@event.utc_to_local_with_no_timezone(@event.feedback_updated_at).strftime("%B %d, %Y")}
+                at
+                %b #{@event.utc_to_local_with_no_timezone(@event.feedback_updated_at).strftime("%I:%M %p")}
+          - elsif @event.contact and !@event.contact.feedback_notifications?
+            Feedback Status: 
+            %span{class: "label label-info"}
+              Opted Out
+          - if @event.feedback_status == "reviewed"
+            %h5 Food Rating
+            - event_reviews = @event.event_reviews.map(&:rating)
+            %table
+              %tr
+                %td
+                  .inventory_rating{"data-rating" => average_rating(event_reviews)}
+                %td
+                  #{average_rating(event_reviews)} (#{event_reviews.size} #{"Item".pluralize(event_reviews.size)})
+            %h5 Event Ratings
+            - if @event.event_ratings.blank?
+              No Review Provided
+            - else
+              - @event.event_ratings.each do |event_rating|
+                %table
+                  %tr
+                    %td.span7
+                      #{event_rating.additional_event_ratings}
+                    %td
+                      .inventory_rating{"data-rating" => event_rating.rating}
+  %ul#section-tab-navigation.nav.nav-tabs
+    %li{class: params[:selected].nil? || params[:selected] == "notes" ? 'active' : ''}
+      %a{:href=>"#notes"} Instructions
+    %li{class: params[:selected] == "menu" ? 'active' : ''}
+      %a{:href=>"#menu"} Menu
+    %li{class: params[:selected] == "financials" ? 'active' : ''}
+      %a{:href=>"#financials"} Financials
+    %li{class: params[:selected] == "payment" ? 'active' : ''}
+      %a{:href=>"#payment" } Payment
+
+    %li{class: params[:selected] == "issues" ? 'active' : ''}
+      %a{:href=>"#issues"} Issues
+
+  #section-tabs
+
+    #notes.section-tab{style: params[:selected].nil? || params[:selected] == "notes" ? '' : 'display:none'}
+      = render :partial => "events/notes", :locals => {event: @event}
+      
+    #menu.section-tab{style: params[:selected] == "menu" ? '' : 'display:none'}
+      - if !@event.event_vendors.nil?
+        - @event.event_vendors.each do |ev|
+          = render :partial => "events/menu", :locals => {event: @event, vendor: ev.vendor}
+
+    #financials.section-tab{style: params[:selected] == "financials" ? '' : 'display:none'}
+      - if Product.find_parent(@event.product) == "managed_services"
+        .row
+          .span6.offset3
+            #break
+              = render :partial => "events/partials_financials/financials_summary"
+        = render :partial => "events/partials_financials/financials_revenue", :locals => {event: @event, title: "Account Revenue", party: @event.account, include_menu_items: true, event_transaction_method: @event.event_transaction_method}
+        - unless @event.event_vendors.nil?
+          - @event.event_vendors.each do |ev|
+            %br
+            = render :partial => "events/partials_financials/financials_expense", :locals => {event: @event, title: "Cost of Goods Sold", party: ev.vendor, include_menu_items: true, event_transaction_method: ev.event_transaction_method, tax_rate: ((defined? @event.location.building.market.default_tax_rate) ? @event.location.building.market.default_tax_rate : 0)}
+
+        = render "events/partials_financials/vouchers"
+
+        .refresh_document
+          = render 'events/partials_financials/documents'
+
+    #payment.section-tab{style: params[:selected] == "payment" ? '' : 'display:none'}
+      = render :partial => "events/payment"
+
+    #issues.section-tab{style: params[:selected] == "issues" ? '' : 'display:none'}
+      = render :partial => "issues/issues", :locals => {subject: @event}
+

@@ -1,0 +1,4 @@
+- if Product.financial_values.include?(@event.product)
+  = render :partial => "events/show_financial"
+- else
+  = render :partial => "events/show_non_financial"

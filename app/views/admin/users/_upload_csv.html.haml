@@ -1,0 +1,42 @@
+
+= simple_form_for :csv, :url => {:action => "csv_upload"}, multipart: true do |f|
+
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h3 Upload CSV
+  .modal-body
+    .in-between
+    .row
+      .span
+        %label
+          CSV File
+        = f.input :file, as: :file, label: false
+        #error_note
+    .in-between
+      .form-inline
+        %label{:for => 'send_email'}
+          = check_box_tag :send_email, nil, nil, style: 'margin-top:0px;'
+          Send Welcome Email to All
+    %br
+    .in-between
+    .row
+      .span3
+        %label 
+          User Role(s)
+        = select(:csv, :roles, options_for_select(UserRoles.available_values(current_user).map{|r| [r.titleize, r]}, ["catering_foodizen", "foodizen"]), {include_blank: false }, {class: 'multiselect', multiple: true, style: 'display:none;'})
+    %br
+    .in-between
+    .row
+      .span3
+        %label
+          Accounts
+        = select(:csv, :accounts, options_for_select(Account.all.collect{|a| [a.to_s, a]}), {}, {:class => "multiselect", :multiple => true, :style => "display:none"})
+    %br
+    .row
+      .span5
+        Note: Selected CSV should have headers as a first row and must contain first_name, last_name & email.
+  .modal-footer
+    #upload_csv
+      = f.submit "Import", class: "btn btn-primary"

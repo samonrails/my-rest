@@ -1,0 +1,78 @@
+- event_vendor = EventVendor.new(:event_id => @event.id)
+
+- if @event.location.building.is_approved?
+  - initial_vendors = Vendor.vendors_by_product_and_market(@event.product, @event.location.building.market.name) - @event.event_vendors.map{|ev| ev.vendor}
+- else
+  - initial_vendors = []
+- vendors_favorite = @event.account.favorite_vendors.sort & initial_vendors
+- vendors_do_not_schedule = @event.account.do_not_schedule_vendors.sort & initial_vendors
+- vendors_neutral = initial_vendors - vendors_favorite - vendors_do_not_schedule
+
+- vendor_ids = [ (initial_vendors.map{|v| v.id } )]
+- available_cuisines = Tagging.includes(:tag).where( taggable_id: vendor_ids, context: 'cuisines' )
+- available_cuisines =  (available_cuisines.map{|v| v.tag.name }.flatten.uniq).sort
+/ - available_cuisines = (initial_vendors.map{|v| v.cuisine_list}.flatten.uniq).sort
+- cuisines_favorite = @event.account.cuisines_favorite.sort & available_cuisines
+- cuisines_do_not_schedule = @event.account.cuisines_do_not_schedule.sort & available_cuisines
+- cuisines_neutral = available_cuisines - cuisines_favorite - cuisines_do_not_schedule
+
+- initial_menu_templates = (initial_vendors.count > 0 ? (vendors_favorite+vendors_neutral+vendors_do_not_schedule).first.menu_templates_by_product(@event.product) : [])
+
+.modal-wrapper
+  .modal-header
+
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h2 #{@event.name}
+    %br
+
+  .modal-body
+    = form_for [@event, event_vendor] do |f|
+      = f.hidden_field :product, value: @event.product
+      = f.hidden_field :account_id, value: @event.account_id
+      = f.hidden_field :market, value: @event.location.building.market.name if @event.location.building.is_approved?
+
+      %label
+        Filter Vendors by Cuisine
+      %select{:id => "event_vendor_cuisine", :name => "event_vendor[cuisine]", :class => "selectpicker"}
+        %option{ :value => "Any" }Any
+        - if cuisines_favorite.count > 0
+          %optgroup{:label=>"Favorites"}
+            - cuisines_favorite.each do |c|
+              %option{ :value => c }= c
+        - if cuisines_neutral.count > 0
+          %optgroup{:label=>"Neutral"}
+            - cuisines_neutral.each do |c|
+              %option{ :value => c }= c
+        - if cuisines_do_not_schedule.count > 0
+          %optgroup{:label=>"Do Not Schedule"}
+            - cuisines_do_not_schedule.each do |c|
+              %option{ :value => c }= c
+
+      %label
+        Possible Vendors
+      %select{:id => "event_vendor_vendor", :name => "event_vendor[vendor]", :class => "selectpicker"}
+
+        - if vendors_favorite.count > 0
+          %optgroup{:label=>"Favorites"}
+            - vendors_favorite.each do |c|
+              %option{ :value => c.id }= c
+        - if vendors_neutral.count > 0
+          %optgroup{:label=>"Neutral"}
+            - vendors_neutral.each do |c|
+              %option{ :value => c.id }= c
+        - if vendors_do_not_schedule.count > 0
+          %optgroup{:label=>"Do Not Schedule"}
+            - vendors_do_not_schedule.each do |c|
+              %option{ :value => c.id }= c
+
+
+      %label
+        Possible Menu Templates
+      = select(:event_vendor, :menu_template, options_for_select(initial_menu_templates.collect{|c| [c.name, c.id]}, nil), {:include_blank => false})
+
+      = f.label "Participation (leave blank for Event default)"
+      = f.number_field :participation
+      .modal-footer
+        = f.submit "Add Vendor", :class => "btn btn-primary"

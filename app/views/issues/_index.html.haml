@@ -1,0 +1,50 @@
+.container
+  #accordion2.accordion
+    .accordion-group
+      .accordion-heading
+        %a.accordion-toggle{"data-parent" => "#accordion2", "data-toggle" => "collapse", :href => "#collapse1"}
+          %span
+            = "Open (#{current_user.opened_assigned_issues.length})"
+      #collapse1.accordion-body.collapse.in
+        .accordion-inner
+          - if @open_issues.any?
+            %table.table.table-striped.table-condensed
+              %thead
+                %tr
+                  %th Type
+                  %th Title
+                  %th Subject
+                  %th Assigned By
+                  %th Opened
+                  %th Due
+                  %th Priority
+                  %th Notes
+              %tbody#open_issues
+                = render @open_issues
+
+            #paginator
+              = paginate @open_issues, :theme => 'twitter-bootstrap', :remote => true, :param_name => "open_page"
+    .accordion-group
+      .accordion-heading
+        %a.accordion-toggle{"data-parent" => "#accordion2", "data-toggle" => "collapse", :href => "#collapse2"}
+          %span
+            = "Closed (#{current_user.closed_assigned_issues.length})"
+      #collapse2.accordion-body.collapse
+        .accordion-inner
+          - if @closed_issues.any?
+            %table.table.table-striped.table-condensed
+              %thead
+                %tr
+                  %th Type
+                  %th Title
+                  %th Subject
+                  %th Assigned By
+                  %th Opened
+                  %th Due
+                  %th Priority
+                  %th Notes
+              %tbody#closed_issues
+                = render @closed_issues
+
+            #paginator1
+              = paginate @closed_issues, :theme => 'twitter-bootstrap', :remote => true, :param_name => "closed_page"

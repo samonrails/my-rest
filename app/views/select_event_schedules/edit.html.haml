@@ -1,0 +1,15 @@
+-provide :title, "Select Event Schedule"
+
+#event-schedule
+  .row-fluid
+    .span12
+      %h1.center Edit Select Event Schedule
+      %b.event-id
+        ID: 
+        = pretty_id( @select_event_schedule.id )
+        .pull-right
+          Created by: 
+          = @select_event_schedule.created_by.nil? ? '-' : @select_event_schedule.created_by.name
+      %hr
+
+=render 'form', :locals => {account: @account, event_schedule: @select_event_schedule}

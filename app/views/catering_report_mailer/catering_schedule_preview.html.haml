@@ -1,0 +1,127 @@
+!!!
+%html
+  %head 
+    :css
+      h1 {
+        padding: 0px;
+        margin: 0px 0px 10px 0px;
+        font-size 
+      }
+
+      h2 {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      h3 {
+        padding: 0px;
+        margin-bottom: 0px;
+      }
+
+      p {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      table {
+        padding-top:20px;
+        width: 100%;
+      }
+
+      table tr th {
+        background: #eee;
+      }
+
+      table tr td {
+        text-align: center;
+        border-bottom: 1px #ccc solid;
+      }
+
+      p.pos_left {
+        padding-left: 30px;
+        /position:relative;
+      }
+
+      .pull-right {
+        float:right;
+        position:relative;
+        padding-top: 15px;
+      }
+
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    .pull-right
+      = image_tag("logo.png")
+    %h1 Fooda Managed Services 
+    %h2 Catering Preview Report
+
+  %hr
+    %h3 Generation:
+    %p.pos_left
+      %b Method:
+      = @method
+      %br
+      %b By:
+      = @full_name
+      %br
+      %b At:
+      = DateTime.now.strftime("%m/%d/%Y at %I:%M%p") 
+
+    %h3 Filters: 
+    %p.pos_left
+      %b Product Type: 
+      Managed Services 
+      %br
+      %b Event Date:
+      = @preview_date
+      %br
+      %b Statuses: 
+      = @status.map { |s| s }.join(", ")
+
+    %table.table.table-striped
+      %thead
+        %tr
+          %th Event ID
+          %th Event Time
+          %th Status
+          %th Account
+          %th Account Billing Address
+          %th Account Contact
+          %th Vendor(s)
+          %th Delivery Service
+          %th Delivery Time
+
+      %tbody
+        - @events.each do |ev|
+          %tr{"data-record-id"=>ev.id}
+            %td= ev.pretty_id
+            %td
+              - unless ev.event_start_time.nil?
+                = ev.event_start_time.strftime("%m/%d/%Y") 
+                %br
+                = ev.event_start_time.strftime("%I:%M%p") 
+            %td= ev.status 
+            %td= ev.account.name unless ev.account.nil?
+            %td= ev.account.html_address unless ev.account.nil? or ev.account.address.nil?
+                
+            %td= ev.contact.name unless ev.contact.nil?
+            %td= ev.event_vendors.map { |v| v.vendor.name }.join(", ") unless ev.event_vendors.nil?
+            %td N/A
+            %td
+              = ev.setup_start_time.strftime("%m/%d/%Y") unless ev.setup_start_time.nil?
+              %br
+              = ev.setup_start_time.strftime("%I:%M%p - ") + ev.setup_end_time.strftime("%I:%M%p") unless (ev.setup_start_time.nil? or ev.setup_end_time.nil?)
+
+    %br
+
+    Total Events: 
+    =@events.count
+
+    %hr
+
+    %p
+      Confidential Information - Do Not Distribute.
+      %br
+      Copyright © 
+      = Date.today.year 
+      Fooda Inc. All rights reserved.

@@ -1,0 +1,3 @@
+- if @valid_vouchers.any?
+  %h4 Valid Vouchers
+  = render :partial => "admin/dashboard/vouchers", locals: {vouchers: @valid_vouchers, redeem_all_form: redeem_all_form}

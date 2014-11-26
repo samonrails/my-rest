@@ -1,0 +1,4 @@
+---
+:queues:
+  - [default, 5]
+  - [cron, 7]

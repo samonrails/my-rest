@@ -1,0 +1,15 @@
+%table.table.table-striped
+  %thead
+    %tr
+      %th Product
+      %th Pricing Tier Name
+      %th Gross Profit (%)
+  %tbody
+    - @account_pricing_tiers.each do |apt|
+      .modal.hide.fade{"id"=>"edit_account_pricing_tier_form_" + apt.id.to_s}
+        = render :partial => "admin/account_pricing_tiers/edit", :locals => {account_pricing_tier: apt}
+      %tr{"data-record-id"=>apt.id}
+        %td
+          %a.pointer.toggle-modal{"data-target"=>"#edit_account_pricing_tier_form_" + apt.id.to_s}#{apt.product.titleize}
+        %td= apt.pricing_tier.name unless apt.pricing_tier.nil?
+        %td= apt.pricing_tier.gross_profit unless apt.pricing_tier.nil?

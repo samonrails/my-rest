@@ -1,0 +1,51 @@
+.span12
+  .row-fluid{style: "id=select_event_notification_div"}
+    = form_for select_event, :url => select_event_update_campaign_path(select_event), :html => { :id => "select_event_notification_form" } do |f|
+      %h2 Email Notifications
+      .row-fluid
+        .div{style: "margin-left: 19px;"}
+          %strong Email List ID:
+          %br
+          %input{:size => 3, :type => "text", :name => "select_event[email_list_id]", :value => email_list_id( @select_event )}
+      .well{style: " width:400px;"}
+        .row-fluid
+          %strong Send Introduction Email (#{time_zone_abbreviation( @select_event.location.building )}):
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "select_event[introduction_email_time]", :value => default_introduction_email_time( @select_event ) }
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+        .row-fluid
+          %strong Send Final Email (#{time_zone_abbreviation( @select_event.location.building )}):
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "select_event[final_email_time]", :value => default_final_email_time( @select_event) }
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+        Notice: Only the two most recent campaigns
+        %br
+        will be scheduled for delivery. 
+        Clicking the 
+        %br
+        "Schedule Email"  button multiple times will
+        %br
+        place all past campaigns into draft mode
+        %br
+        and inhibit them from sending.
+        %br
+        %br
+        %input{:type=>"hidden", :value=> @select_event.id, :id=>"select_event_id_for_campaign"}
+        %button.btn.btn-primary#save_notification Schedule Emails
+
+      .row-fluid
+        %div{id: "create_campaign_msg"}
+      
+      .row-fluid
+        =render :partial => "select_events/notifications_table"
+                
+
+

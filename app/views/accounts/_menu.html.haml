@@ -1,0 +1,12 @@
+%ul#section-tab-navigation.nav.nav-tabs
+  - account_tabs.each do |tab|
+    %li{class: tab_selected?(tab, :active)}
+      %a{href: "##{tab}"}= account_tab_name(tab)
+
+#section-tabs
+  - account_tabs.each do |tab|
+    %div.section-tab{id: tab, style: tab_selected?(tab, :visibility)}
+      - if tab == "issues"
+        = render partial: "issues/issues", locals: {subject: @account}
+      - else
+        = render partial: "accounts/#{tab}", locals: {account: @account}

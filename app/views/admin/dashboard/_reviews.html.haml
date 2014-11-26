@@ -1,0 +1,167 @@
+.span11.margin_left_0
+  .well
+    = form_tag admin_global_settings_path do |f|
+      .span4.form-inline
+        = label_tag 'review_sent_after', "Review Sent After (in Hours)"
+        = number_field_tag "global_setting[review_sent_after]", GlobalSetting.review_sent_after, step: 0.5, min: 0.5, class: 'input-mini'
+      = submit_tag "Save Settings", class: 'btn btn-primary'
+  .well{style: "height:850px;padding:0px;"}
+    - colors = ["#E05D62", "#ED8560", "#F3AF64", "#DDCA61", "#D3A75E"]
+    .btn-group{"data-toggle" => "buttons-radio", style: "margin:20px;"}
+      %button.btn.btn-set-vendor.btn-primary{:type => "button", :id => "managed_services"} Managed Services
+      %button.btn.btn-set-vendor{:type => "button", :id => "perks"} Perks
+      %button.btn.btn-set-vendor{:type => "button", :id => "select"} Select
+
+    - product_type = ["managed_services", "perks", "select"]
+    - product_type.each do |pt|
+      - events = []
+      - events = Event.select{|e| Product.find_parent(e.product) == pt}
+      %div{class: "category_#{pt} div_admin_charts", style: pt == "managed_services" ? "display:block;" : "display:none;"}
+        - unless events.blank?
+          .btn-group{"data-toggle" => "buttons-radio", style: "margin:20px;"}
+            %button.btn.btn-set-event.btn-primary{:type => "button", :id => "Presentation_#{pt}"} Food Presentation
+            %button.btn.btn-set-event{:type => "button", :id => "Accuracy_#{pt}"} Order Accuracy
+            %button.btn.btn-set-event{:type => "button", :id => "Delivery_#{pt}"} On Time Delivery
+            %button.btn.btn-set-event{:type => "button", :id => "Ordering_#{pt}"} Ease Of Ordering
+            %button.btn.btn-set-event{:type => "button", :id => "Service_#{pt}"} Customer Service
+          %br
+          %br
+          - event_ratings = ["Food Presentation", "Order Accuracy", "On Time Delivery", "Ease of Ordering", "Customer Service"]
+          - event_ratings.each_with_index do |er, i|
+            - reviews = Review.find(:all, :conditions => ["reviewable_id in (?) and reviewable_type = ? and additional_event_ratings = ?", events.map(&:id), "Event", er])
+            - rating_array = reviews.map(&:rating)
+            %div{class: "#{er}_#{pt} div_charts", style: er == "Food Presentation" ? "display:block;" : "display:none;"}
+              - if rating_array.size > 0
+                .span6.margin_left_0
+                  .span4
+                    %h5
+                      %a{:href=>"#{reviews_rollups_path(level: er, product_type: pt, index: i)}", :class => "#{er}_#{pt}_refresh admin_bar_graph_title", "data-index" => i, "data-product" => pt, "data-level" => er.split(" ")[0]}
+                        #{er} Reviews
+                  %br
+                  - ratings = []
+                  - avg_ratings = {}
+                  - (1..5).each do |i|
+                    - ratings << reviews.count{|r| r.rating == i}
+                  
+                  - (1.month.ago.to_date..Date.today).each do |date|
+                    - reviews_upto_date = reviews.select {|r| r.created_at.to_date <= date}.map(&:rating)
+                    - rate = average_rating(reviews_upto_date)
+                    - (avg_ratings[date.strftime("%b %-d")] = rate) if rate
+                  .span3.div1
+                    %div{:id => "barchart#{i}_#{pt}"}
+                    %table
+                      %tr
+                        %td
+                          .inventory_rating{"data-rating" => average_rating(rating_array)}
+                        %td
+                          #{average_rating(rating_array)} (#{rating_array.size})
+                        %td{style: "width:47px;"}
+                          .pull-right
+                            %a{:href => export_bar_graph_data_admin_user_path(current_user, event_review_type: er, product_type: pt, format: :xls)}
+                              = image_tag('/images/Office-Excel-icon.png', size: "25x25")
+                  .span3{:id => "linechart#{i}_#{pt}", :style => "margin-left: -10px;"}
+                  = content_for(:local_data) do
+                    :javascript
+                      $( function() {
+                        $('#barchart#{i}_#{pt}').highcharts({
+                          chart: {
+                            type: 'bar',
+                            width: 200,
+                            height: 200,
+                            events: {
+                              click: function(event) {
+                                $.fetch_reviews_data('#{reviews_rollups_path(level: er, product_type: pt, index: i)}', '#{er.split(" ")[0]}');
+                                chart_obj = $('#barchart#{i}_#{pt}').highcharts();
+                                for (var i = 0; i < 5; i++) {
+                                  chart_obj.series[0].data[i].update({ borderColor: null }, true, false);
+                                }
+                              }
+                            }
+                          },
+                          title: {
+                            text: 'Rating Distribution',
+                            style: {
+                              fontSize: '12px'
+                            }
+                          },
+                          xAxis: {
+                            type: 'integer',
+                            categories: ['1 Star', '2 Star', '3 Star', '4 Star', '5 Star']
+                          },
+                          yAxis: {
+                            title: {
+                              text: ''
+                            }
+                          },
+                          plotOptions: {
+                            series: {
+                              showInLegend: false,
+                              pointWidth: 18,
+                              pointPadding: 0,
+                              cursor: 'pointer',
+                              point: {
+                                events: {
+                                  click: function() {
+                                    $.fetch_reviews_data('#{reviews_rollups_path(level: er, product_type: pt, index: i)}&rating=' + this.category[0], '#{er.split(" ")[0]}');
+                                    chart_obj = $('#barchart#{i}_#{pt}').highcharts();
+                                      for (var i = 0; i < 5; i++) {
+                                      chart_obj.series[0].data[i].update({ borderColor: null }, true, false);
+                                    }
+                                    this.update({ borderColor: 'Black' }, true, false)
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          series: [{
+                            name: 'Count',
+                            data: [{y: #{ratings[0]}, color: "#{colors[4]}"},
+                                  {y: #{ratings[1]}, color: "#{colors[3]}"},
+                                  {y: #{ratings[2]}, color: "#{colors[2]}"},
+                                  {y: #{ratings[3]}, color: "#{colors[1]}"},
+                                  {y: #{ratings[4]}, color: "#{colors[0]}"}]
+                            }]
+                        });
+                        $('#linechart#{i}_#{pt}').highcharts({
+                          chart: {
+                            type: 'line',
+                            width: 300,
+                            height: 200
+                          },
+                          title: {
+                            text: '30 Day Trailing Average of Ratings',
+                            style: {
+                              fontSize: '12px'
+                            }
+                          },
+                          xAxis: {
+                            tickInterval: #{(avg_ratings.length + 4)/5},
+                            categories: #{avg_ratings.keys}
+                          },
+                          yAxis: {  
+                            title: {
+                              text: 'Rating'
+                            }
+                          },
+                          plotOptions: {
+                            series: {
+                              showInLegend: false
+                            }
+                          },
+                          series: [{
+                            name: 'Rating',
+                            color: '#F3AF64',
+                            data: #{avg_ratings.values}
+                            }
+                          ]
+                        });
+                      });
+                  %br
+                  %br
+                .span5.margin_left_0{id: "data_pane_#{er.split(" ")[0]}"}
+              - else
+                .span4
+                  No Feedback Yet
+        - else
+          .span4
+            No events found for this product type

@@ -1,0 +1,85 @@
+- if @malformed_locations_count > 0
+  .alert.alert-block.alert-error.fade.in
+    %button.close{"data-dismiss" => "alert", type: "button"} ×
+    %h4.alert-heading 
+      = "Oh snap! You got an error! (1000-#{@account.pretty_id})"      
+    %p
+      %b 
+        = @account.name 
+      currently has
+      = "#{pluralize(@malformed_locations_count, 'data malformed location')}."
+      Please inform Fooda Development about this error. The account locations below should not be affected by this error.
+    %br
+    %p
+      = mail_to "FoodaDev@fooda.com", 'Inform a Fooda Development', subject: "SnapPea Bug Report", class: "btn"
+
+.pull-right
+  %a#add_building.btn.btn-success.btn-small{ :href => '/admin/buildings/new?referrer=' + request.path_info + "?selected=locations" }
+    %i.icon.icon-plus.icon-white
+    Building
+  %a#add_location.btn.btn-success.btn-small{ :href => new_account_location_path(@account) }
+    %i.icon.icon-plus.icon-white 
+    Location
+
+%h3 Spot Locations
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Status
+      %th Name
+      %th Address
+      %th Building Name
+      %th Participation
+      %th Default Site Fee
+      %th Privacy
+      %th Contact
+  %tbody
+    - @account.locations.with_deleted.where(:location_type => "spot").each do |l|
+      %tr{"data-record-id"=>l.id}
+        - unless l.contact.nil?
+          .modal.hide.fade{"id"=>"edit_location_contact_form_" + l.contact.id.to_s}
+            = render :partial => "contacts/edit", :locals => {party: @account, contact: l.contact}
+        %td
+          - if l.destroyed?
+            %span.label.label-important Removed by Account
+          - else
+            %span.label.label-success Active
+        %td= link_to l.name, edit_account_location_path(@account, l)
+        %td= l.html_address
+        %td= link_to l.building.name, edit_admin_building_path(l.building)
+        %td= l.expected_participation
+        %td= humanized_money_with_symbol l.default_site_fee
+        %td= l.privacy.titleize unless l.privacy.nil?
+        %td
+          -unless l.contact.nil?
+            %a.pointer.toggle-modal{"data-target"=>"#edit_location_contact_form_" + l.contact.id.to_s}#{l.contact}
+
+
+%h3 Delivery Locations
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Status
+      %th Name 
+      %th Address
+      %th Building Name
+      %th Contact
+  %tbody
+    - @account.locations.with_deleted.where(:location_type => "delivery").each do |l|
+      %tr{"data-record-id"=>l.id}
+        - unless l.contact.nil?
+          .modal.hide.fade{"id"=>"edit_location_contact_form_" + l.contact.id.to_s}
+            = render :partial => "contacts/edit", :locals => {party: @account, contact: l.contact}
+        %td
+          - if l.destroyed?
+            %span.label.label-important Removed by Account
+          - else
+            %span.label.label-success Active
+        %td= link_to l.name, edit_account_location_path(@account, l)
+        %td= l.html_address
+        %td= link_to l.building.name, edit_admin_building_path(l.building)
+        %td
+          - unless l.contact.nil?
+            %a.pointer.toggle-modal{"data-target"=>"#edit_location_contact_form_" + l.contact.id.to_s}#{l.contact}

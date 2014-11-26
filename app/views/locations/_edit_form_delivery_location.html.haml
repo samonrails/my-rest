@@ -1,0 +1,47 @@
+= simple_form_for [@account, @location] do |f|
+  .row-fluid
+    .span3
+      %h5 Details
+      = f.association :building, 
+        include_blank: "Building"
+      = f.association :contact, 
+        collection: Contact.where(account_id: @account.id), 
+        include_blank: "Contact"
+    .span5
+      = render 'edit_location_address', f: f, location: @location
+  %hr
+  .row-fluid
+    .span4
+      = f.input :service_event_instructions, 
+        as: :text, 
+        input_html: {style: 'width: 90%', :rows => 5}, 
+        label: "Service Event Instructions"
+    .span4
+      = f.input :connectivity_instructions, 
+        as: :text, 
+        input_html: {style: 'width: 90%', :rows => 5}, 
+        label: "Connectivity Instructions"
+    .span4
+      = f.input :delivery_event_instructions, 
+        as: :text, 
+        :input_html => {:style=> 'width: 90%', :rows => 5}, 
+        label: "Delivery Event Instructions"
+  %hr
+  - unless @location.deleted?
+    .row-fluid
+      .span12
+        = f.submit "Update Location", :class => "btn btn-primary"
+        .pull-right
+          - unless @location.deleted?
+            %a.btn.btn-warning{:href=>account_location_path(@account, @location), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+              Account (Soft) Delete
+
+- if @location.deleted?
+  .row
+    .span12
+      .pull-right
+        %a.btn.btn-warning.disabled
+          %i.icon.icon-white.icon-remove
+          Account (Soft) Delete
+      %button.btn.btn-primary.disabled Update Location

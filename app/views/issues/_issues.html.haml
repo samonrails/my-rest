@@ -1,0 +1,87 @@
+- issues = subject.issues
+- @open_issues = issues.select {|i| !i.status }
+- @closed_issues = issues.select {|i| i.status }
+
+.new-issue-form.modal.hide.fade
+  = render :partial => "issues/new", :locals => {subject: subject}
+
+.pull-right
+  %a#create_issue.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-issue-form"}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-issue-form"}
+    Issue
+
+%br
+%br
+
+#accordion2.accordion
+  .accordion-group
+    .accordion-heading
+      %a.accordion-toggle{"data-parent" => "#accordion2", "data-toggle" => "collapse", :href => "#collapse1"}
+        = "Open (#{@open_issues.length})"
+    #collapse1.accordion-body.collapse.in
+      .accordion-inner
+        - if @open_issues.any?
+          %table.table.table-striped.table-condensed
+            %thead
+              %tr
+                %th Title
+                %th Assigned To
+                %th Assigned By
+                %th Opened
+                %th Due
+                %th Priority
+                %th Notes
+                %th Edit
+            - @open_issues.each do |issue|
+              .modal.hide.fade{"id"=>"edit_issue_form_" + issue.id.to_s}
+                = render :partial => "issues/edit", :locals => {subject: subject, issue: issue}
+              %tr
+                %td= issue.title
+                %td= issue.assignee.name
+                %td= issue.assigner.name
+                %td= issue.open_date.to_date.strftime("%m-%d-%Y")
+                %td= issue.due_date.to_date.strftime("%m-%d-%Y") if issue.due_date
+                %td= issue.priority
+                %td= link_to "view", issue, :id => "view_open_issue"
+                %td
+                  .btn-group
+                    %a.btn.btn-mini.toggle-modal{"data-target"=>"#edit_issue_form_" + issue.id.to_s}
+                      %i.icon.icon-edit.toggle-modal{"data-target"=>"#edit_issue_form_" + issue.id.to_s}
+  .accordion-group
+    .accordion-heading
+      %a.accordion-toggle{"data-parent" => "#accordion2", "data-toggle" => "collapse", :href => "#collapse2"}
+        = "Closed (#{@closed_issues.length})"
+    #collapse2.accordion-body.collapse
+      .accordion-inner
+        - if @closed_issues.any?
+          %table.table.table-striped.table-condensed
+            %thead
+              %tr
+                %th Title
+                %th Assigned To
+                %th Assigned By
+                %th Opened
+                %th Due
+                %th Priority
+                %th Notes
+                %th Edit
+            - @closed_issues.each do |issue|
+              .modal.hide.fade{"id"=>"edit_issue_form_" + issue.id.to_s}
+                = render :partial => "issues/edit", :locals => {subject: subject, issue: issue}
+              %tr
+                %td= issue.title
+                %td= issue.assignee.name
+                %td= issue.assigner.name
+                %td= issue.open_date.to_date.strftime("%m-%d-%Y")
+                %td= issue.due_date.to_date.strftime("%m-%d-%Y") if issue.due_date
+                %td= issue.priority
+                %td= link_to "view", issue
+                %td
+                  .btn-group
+                    %a.btn.btn-mini.toggle-modal{"data-target"=>"#edit_issue_form_" + issue.id.to_s}
+                      %i.icon.icon-edit.toggle-modal{"data-target"=>"#edit_issue_form_" + issue.id.to_s}
+- if params[:new_issue] == "true"
+  :javascript
+    window.addEventListener('load', function () {
+      $('.new-issue-form').modal('show');
+    });

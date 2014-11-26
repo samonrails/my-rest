@@ -1,0 +1,12 @@
+/ %p#notice= notice
+%p
+%p
+  %b Name:
+  = @pricing_tier.name
+%p
+  %b Percent Above Cost:
+  = @pricing_tier.gross_profit
+
+= link_to 'Edit', edit_pricing_tier_path(@pricing_tier)
+|
+\#{link_to 'Back to Pricing Tiers', pricing_tiers_path}

@@ -1,0 +1,17 @@
+#notice= notice
+  
+.row-fluid
+  .span6
+    %h3
+      = @preference.name
+
+  .row-fluid
+    .span6
+      %hr
+    .span6
+
+  .row-fluid
+    .span6
+      = link_to 'Edit', edit_vendor_preference_path(@vendor, @preference)
+      |
+      = link_to 'Back to Vendor', @vendor

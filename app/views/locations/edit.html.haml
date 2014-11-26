@@ -1,0 +1,31 @@
+-provide :title, "Account | #{@account.pretty_id} | Location"
+
+.locations.row-fluid.span12
+  - if @location.location_type == LocationType.spot
+    %h1.center Edit Spot Location
+    %b.event-id
+      .pull-right
+        Created by: 
+        = @location.created_by.nil? ? '-' : @location.created_by.email
+      ID: 
+      = @location.pretty_id
+      
+    %hr
+    = render 'soft_delete_notification' if @location.destroyed?
+    = render 'edit_form_spot_location'
+  
+  - elsif @location.location_type == LocationType.delivery
+    %h1.center Edit Delivery Location
+    %b.event-id
+      .pull-right
+        Created by: 
+        = @location.created_by.nil? ? '-' : @location.created_by.email
+      ID: 
+      = @location.pretty_id
+
+    %hr
+    = render 'soft_delete_notification' if @location.destroyed?
+    = render 'edit_form_delivery_location'
+
+  %hr
+= render partial: "assets/index", locals: {enclosing_resource: @location}

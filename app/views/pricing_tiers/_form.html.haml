@@ -1,0 +1,19 @@
+.modal-wrapper
+  = form_for [pricing_tier] do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 #{title}
+
+    .modal-body
+      = f.label "Pricing Tier Name"
+      = f.text_field :name
+      .in-between
+      = f.label :gross_profit
+      = f.text_field :gross_profit
+
+    .modal-footer
+      = f.submit (pricing_tier.id.nil? ? "Create Pricing Tier" : "Save Pricing Tier"), :class => "btn btn-primary"
+

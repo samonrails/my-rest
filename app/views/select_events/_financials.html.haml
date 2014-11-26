@@ -1,0 +1,109 @@
+.span12
+  = form_for [select_event] do |f|
+    .well{style: " width:1070px;"}
+      %h2 Financials
+      .row-fluid
+        .span4
+          %strong Gratuity
+          %br
+          .btn-group{style: "margin: 5px 0px;"}
+            %button.btn.btn-set-gratuity{:type => "button", :id => "user_gratuity", :class => select_event[:gratuity_payer] == 'user' ? "btn-primary" : "",  :value => "user"} User Pays
+            %button.btn.btn-set-gratuity{:type => "button", :id => "account_gratuity", :class => select_event[:gratuity_payer] == 'account' ? "btn-primary" : "",  :value => "account"} Account Pays
+          Default: 
+          %input{:size => "16", :type => "text", :style => "width: 45px; margin-bottom: 0px", :name => "select_event[default_gratuity]", :value => select_event[:default_gratuity] }
+          \%
+      .row-fluid
+        .span8
+          %label.check_box{ :for => "hide_gratuity_from_site", :class => "checkbox"}
+            = f.check_box :hide_gratuity_from_site, label: false, inline_label: true, class: "checkbox"
+            Hide From Checkout
+        %br
+        %br
+      .row-fluid
+        .span3
+          %strong Delivery Fee
+          %br
+          .btn-group{style: "margin: 5px 0px;"}
+            %button.btn.btn-set-delivery{:type => "button", :id => "user_delivery", :class => select_event[:delivery_fee_payer] == 'user' ? "btn-primary" : "",  :value => "user"} User Pays
+            %button.btn.btn-set-delivery{:type => "button", :id => "account_delivery", :class => select_event[:delivery_fee_payer] == 'account' ? "btn-primary" : "",  :value => "account"} Account Pays
+        .span3
+          %strong Tax
+          %br
+          .btn-group{style: "margin: 5px 0px;"}
+            %button.btn.btn-set-tax{:type => "button", :id => "user_pays_tax",  :class => select_event[:tax_payer] == 'user' ? "btn-primary" : "", :name => "tax_payer", :value => "user"} User Pays
+            %button.btn.btn-set-tax{:type => "button", :id => "account_pays_tax",  :class => select_event[:tax_payer] == 'account' ? "btn-primary" : "", :name => "tax_payer", :value => "account"} Account Pays
+        %br
+        %br
+      .row-fluid
+        .span3
+          %label.check_box{ :for => "hide_delivery_fee_from_site", :class => "checkbox"}
+            = f.check_box :hide_delivery_fee_from_site, label: false, inline_label: true, class: "checkbox"
+            Hide From Checkout
+        .span3
+          %label.check_box{ :for => "hide_tax_from_site", :class => "checkbox"}
+            = f.check_box :hide_tax_from_site, label: false, inline_label: true, class: "checkbox"
+            Hide From Checkout
+      %br
+      .row-fluid
+        .span6
+          %strong Subsidy
+          %br
+          .btn-group{style: "margin: 5px 0px;"}
+            %button.btn.btn-set-subsidy{:type => "button", :id => "none", :class => ( select_event[:subsidy] == 'none' or select_event[:subsidy].nil?) ? "btn-primary" : "",  :value => "none"} None
+            %button.btn.btn-set-subsidy{:type => "button", :id => "percentage",  :class => select_event[:subsidy] == 'percentage' ? "btn-primary" : "",  :value => "percentage"} Percentage
+            %button.btn.btn-set-subsidy{:type => "button", :id => "subsidy_fixed_amount", :class => select_event[:subsidy] == 'fixed_amount' ? "btn-primary" : "", :value => "fixed_amount"} Fixed Amount
+            %button.btn.btn-set-subsidy{:type => "button", :id => "fully_subsidized", :class => select_event[:subsidy] == 'fully_subsidized' ? "btn-primary" : "",  :value => "fully_subsidized"} Fully Subsidized
+          %br
+          %br
+      .row-fluid
+        .div{id: "cap_options_for_percentage", style: select_event[:subsidy] != 'percentage' ? 'display:none' : ''}
+          .span1
+            %label{:for => "is_subsidy_percentage_capped_false"}
+            = f.radio_button :is_subsidy_percentage_capped, false, class: 'radio radio-fee', style: 'margin-top:0px;'
+            No Cap
+          .span2
+            %label{:for => "is_subsidy_percentage_capped_true"}
+            = f.radio_button :is_subsidy_percentage_capped, true, class: 'radio radio-fee', style: 'margin-top:0px;'
+            Capped
+
+          %br
+          %br
+      
+          .row-fluid
+            .span6
+              .span3.form-inline
+                = f.number_field :subsidy_percentage_cap, class: 'input-mini', placeholder: '%',  id: 'subsidy_percentage_cap', min: 0
+                \%
+              .span4.form-inline{id: "subsidy_percentage_fixed_amount_cap_span"}
+                up to 
+                = f.number_field :subsidy_percentage_fixed_amount_cap, class: 'input-mini', placeholder: '$'
+                dollars
+        .div{id: "subsidy_fixed_amount_option", style: select_event[:subsidy] != 'fixed_amount' ? 'display:none' : ''}
+          .span
+            = f.number_field :subsidy_fixed_amount, class: 'input-mini', placeholder: '$', min: 0
+            dollars
+
+      .row-fluid
+        .div{id: "minimum_user_contribution", style: select_event[:subsidy] == 'none' ? 'display:none' : ''}
+          .span6
+            %br
+            %label.check_box{ :for => "user_contribution_required", :class => "checkbox"}
+              = f.check_box :user_contribution_required, id: 'user_contribution_checkbox', label: false, inline_label: true, class: "checkbox"
+              Minimum User Contribution Required
+            .div{id: "user_contribution_div", style: select_event[:user_contribution_required] == false ? 'display:none' : ''}
+              = f.number_field :user_contribution, id: 'user_contribution_cents', class: 'input-mini', placeholder: '$'
+              dollars
+
+
+      %input{:type => "hidden", :id => "gratuity_payer_hidden",  :value => select_event[:gratuity_payer], :name => "select_event[gratuity_payer]"}
+      %input{:type => "hidden", :id => "delivery_fee_payer_hidden", :value => select_event[:delivery_fee_payer], :name => "select_event[delivery_fee_payer]"}
+      %input{:type => "hidden", :id => "tax_payer_hidden", :value => select_event[:tax_payer], :name => "select_event[tax_payer]"}
+      %input{:type => "hidden", :id => "subsidy_payer_hidden", :value => select_event[:subsidy], :name => "select_event[subsidy]"}
+
+      = f.submit "Save", :class => "btn btn-primary pull-right", style: 'margin-top:-20px;'
+            
+
+
+
+          
+      

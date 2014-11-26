@@ -1,0 +1,134 @@
+# SnapPea
+
+![master](https://circleci.com/gh/Fooda/SnapPea.png?circle-token=8c4161938e53e803fa70b160ff52328d77b60107)
+
+[![Coverage Status](https://coveralls.io/repos/Fooda/SnapPea/badge.png?branch=correct_tests)](https://coveralls.io/r/Fooda/SnapPea?branch=correct_tests)
+## Development Setup
+*Note: We are running OS X 10.8.4 on Airs. I've seen it run on Windows and CentOS but I can't promise these instructions will work there*
+
+On a fresh machine, you'll need SnapPea basics:
+ - [Mac Dev Tools](http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/).
+ - [ruby-1.9.3-p394](http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/)
+ - [rails 3.2.12](http://railsapps.github.io/installing-rails.html)
+ - [Don't use railsinstaler.org on a Mac but I've heard it will work on Windows.](http://railsinstaller.org/)
+ - Install the heroku [tool belt](https://toolbelt.heroku.com/) & [foreman](https://github.com/ddollar/foreman)
+
+***
+
+### Databases
+
+#### Redis
+We only use redis for [sidekiq](https://github.com/mperham/sidekiq). We do not persist anything to it or use it as a cache.
+
+```bash
+# Install
+$ brew install redis
+# Run
+$ redis-server
+```
+
+###### Trouble Shooting
+```bash
+# Permission issues? try:
+$ sudo chmod g+w /usr/local/var/
+```
+*Careful*: If redis-server or any sidekiq workers are running, they can cache your rails environment even if you restart your rails server. You have to shut down the redis-server, restart the workers and restart the rails server to get a fresh copy of your source. :(
+
+#### Memcached
+```bash
+# Install
+$ brew install memcached
+# Run
+$ memcached -vv
+```
+
+#### Postgres
+We use postgres as our relation database for all persistence. 
+[General install notes:](http://www.moncefbelyamani.com/how-to-install-postgresql-on-a-mac-with-homebrew-and-lunchy/)
+ - Copy config/database.yml.example to config/database.yml and edit with the settings for your machine.
+ - We have a postgresql user named `admin` but you can use whatever you'd like as long as you have one.
+
+```bash
+$ psql -d postgres
+postgres=# create role admin with createdb login password 'password';'
+```
+- start and stop with lunchy `$ lunchy start postgres` or add it to your .bashrc
+- We have a lot of required data in the system. `rake db:seed` will set you up but a production snapshot is best.
+
+#### ElasticSearch
+We use ElasticSearch to maintain the indexes for Event and SelectEvent, which we use for search and display purposes throughout the application. 
+
+```bash
+$ brew install elasticsearch
+$ ln -sfv /usr/local/opt/elasticsearch/*.plist ~/Library/LaunchAgents
+$ launchctl load ~/Library/LaunchAgents/homebrew.mxcl.elasticsearch.plist
+```
+Once installed, it will be running on http://localhost:9200, which you will have to specify for your environment with config/application.yml:
+
+```bash
+ELASTICSEARCH_URL: http://localhost:9200
+```
+After installing ElasticSearch, you will need to create the index for both SelectEvent and Event:
+
+```bash
+$ rake elasticsearch:create_indexes
+```
+
+### 3rd Party Services
+- Sign up for a [Braintree Sandbox](https://www.braintreepayments.com/get-started) and add the credentials to you development application.yml
+- verify the AWS s3 bucket
+
+### Source
+General:
+- You'll need [catering](https://github.com/Fooda/catering) for the public catering site to sit in the same directory as SnapPea. Adjust the Gemfile accordingly.
+
+Contractors: 
+- Fork the project
+- `clone` your repo and plan on pull request for code reviews
+- If we don't tell you a branch to pull request into, please ask us first.
+
+Foodizens Techs:
+- 'clone` this project. Don't fork. 
+- Plan on pull requests for code review.
+
+#### Setup
+- Set a bash environment for your Rails env in ~/.bashrc: `RAILS_ENV=DEVELOPMENT`
+- Copy config/application.yml.example to config/application.yml accordingly
+- Copy config/database.yml.example to config/database.yml accordingly
+
+
+***
+
+### Run
+
+```bash
+$ bundle install
+
+# Setup your postgresql (make sure it's running before)
+# From Scratch
+$ rake db:create
+$ rake db:migrate
+$ rake db:schema:dump
+$ rake db:test:prepare
+$ rake db:seed
+
+# Or with a db dump
+$ pg_restore --verbose --clean --no-acl --no-owner -h localhost -U [USER NAME] -d snappea_core [PG DUMP NAME]
+
+
+# Two ways to start the web server (finally...):
+
+# 1. For the full heroku web environment
+# Check out the Procfile (in app root) for the processes & jobs that foreman starts.
+$ foreman start
+
+## OR ##
+
+# 2. If you don't need redis/sidekiq you can just start the server:
+$ rails s
+```
+
+Catering is nested as a subdomain. Since localhost:3000 won't support subdomain you have to access it at:  `catering.lvh.me:3000` 
+
+
+

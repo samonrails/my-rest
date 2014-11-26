@@ -1,0 +1,45 @@
+- if events.any?
+  %table.table.table-striped.table-condensed.table-bordered.Grid
+    %thead.grey-header
+      %tr
+        %th
+          .center
+            EventID
+        %th
+          .center
+            Created Date/Time
+        %th
+          .center
+            Market
+        %th
+          .center
+            Event Date/Time
+        %th
+          .center
+            Account
+        %th
+          .center
+            User
+        %th
+          .center
+            Vendor(s)
+        %th
+          .center
+            Total
+        %th
+          .center
+            Account Participation
+        %th
+          .center
+            Event Status
+        %th
+          .center
+            Account Owner
+        %th
+          .center
+            = type == 'my_events' ? 'Actions' : 'Event Owner'
+    %tbody{id: "#{id}_events"}
+      = render partial: 'events/partials_dashboard/event', locals: {type: type, events: events}
+
+  %div{id: "paginate_#{id}_events"}
+    = paginate eval("@#{id}_events") , :theme => 'twitter-bootstrap', :remote => true, :param_name => "#{id}_events"

@@ -1,0 +1,114 @@
+- @event ||= Event.new(:product => Product.catering, :meal_period => MealPeriod.lunch, :service_style => ServingStyle.drop_off)
+- @event.account = account unless defined?(account).nil?
+- @event.location = account.locations.first unless defined?(account.locations.first).nil?
+- @event.contact = account.contacts.first unless defined?(account.contacts.first).nil?
+
+- location_choices = (defined?(account.locations) ? account.locations : {})
+- contact_choices = (defined?(account.contacts) ? account.contacts : {})
+
+.modal-wrapper
+  = form_for @event, remote: false do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      - if financial
+        %h3 New Financial Event
+      - else
+        %h3 New Event
+
+    .modal-body.auto_size_modal_body
+
+      Account
+      %br
+      = select_tag "event[account_id]", options_for_select(Account.all.select{|a| a.active}.collect{|c| [c.name, c.id]}, @event.account_id), :include_blank => true
+      %br
+      - if !financial
+        Location
+        %br
+        = select_tag "event[location_id]", options_for_select(location_choices.collect{|c| [c.name, c.id]}, nil)
+        %br
+        Contact
+        %br
+        = select_tag "event[contact_id]", options_for_select(contact_choices.collect{|c| [c.name, c.id]}, nil)
+        %br
+      Product
+      %br
+      - if financial
+        = select_tag "event[product]", options_for_select(Product.financial_values.collect{|c| [c.titleize, c]}.sort, @event.product)
+      - else
+        = select_tag "event[product]", options_for_select(Product.non_financial_values.collect{|c| [c.titleize, c]}.sort, @event.product)
+      %br
+      Name
+      %br
+      = f.text_field :name, :label => "Event Name"
+      %br
+      - if !financial
+        Quantity
+        %br
+        = f.number_field :quantity, as: :integer, min: 0, :label => "Account Participation"
+        %br
+        Meal Period
+        %br
+        = select_tag "event[meal_period]", options_for_select(MealPeriod.available_values.collect{|c| [c.titleize, c]}, @event.meal_period)
+        %br
+        Service Style
+        %br
+        = select_tag "event[service_style]", options_for_select( ServingStyle::available_values.collect{|c| [c.titleize, c]}, @event.service_style)
+        %br
+
+      .row
+        .span
+          - if financial
+            Time
+          - else
+            Event Start Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "event[event_start_time]"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th#start_date
+        .span{style: financial ? 'display:none' : ''}
+          Event End Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "event[event_end_time]"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+
+      .row
+        .span{style: financial ? 'display:none' : ''}
+          Setup Start Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "event[setup_start_time]"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+        .span{style: financial ? 'display:none' : ''}
+          Setup End Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "event[setup_end_time]"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+
+      Event Owner
+      %br
+      = select_tag "event[event_owner_id]", options_for_select(User.fooda_employee.collect{|c| [c.name, c.id]}, current_user.id)
+      %br
+
+      Status
+      %br
+      = select_tag "event[status]", options_for_select(Status::Event.available_values_for_user.collect{|c| [c.titleize, c]}, Status::Event.scheduled)
+      %br
+
+    .modal-footer
+      = f.submit(:class => "btn btn-primary")

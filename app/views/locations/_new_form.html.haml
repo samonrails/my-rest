@@ -1,0 +1,63 @@
+= simple_form_for [@account, @location] do |f|
+  .row-fluid
+    .span4
+      = f.input :location_type, collection: LocationType::available_values.collect{|c| [c.titleize, c]}, include_blank: "Location Type", label: false, :input_html => {:style=> 'width: 100%'}
+    .span8
+  %hr
+  .row-fluid.js-event-toggle-location-type{:style => "display:block;"}
+    .span3
+      %h5 Details
+      = f.association :building, include_blank: "Building", label: "Building"
+      = f.association :contact, collection: Contact.where(account_id: @account.id), include_blank: "Contact", label: "Contact"
+
+    .span5
+      .well.center{style: "width: 54%; margin-left: 23%; border-radius: 8%;"}
+        = f.simple_fields_for :building do |b|
+          = b.simple_fields_for :address do |a|
+            .row-fluid
+              %b
+                Building:
+              %br
+              %br
+              %b
+                #building_html_address
+                  = @location.building.html_address if @location.building
+            .span10{style: "margin-left: 9%; margin-top: 12%;"}
+              %h5{style: "line-height: 120%;"}
+                Enter a Delivery Drop-Off Point in this Building
+            %br
+        = f.input :building_address_notes,
+          input_html: { style: 'width: 82%; margin-bottom: 0%;' },
+          placeholder: "Drop-Off Point", 
+          label: false
+          
+    .js-event-toggle-location-type-spot{:style => @location.location_type =='spot' ? 'display:block;' : 'display:none;'}
+      .span3
+        %h5 Privacy
+        = f.input :privacy, collection: LocationPrivacy.available_values.collect{|c| [c.titleize, c]}, as: :radio_buttons, :label => false
+        %br
+        %h5 Expected Participation
+        = f.input :expected_participation, as: :integer, label: false, placeholder: "Expected Participation"
+
+        %h5 Default Site Fee
+        = f.input :default_site_fee, as: :decimal, label: false, placeholder: 0.0
+
+    .row-fluid
+      .span12
+        %hr
+        %h5 Notes
+    .row-fluid
+      .span4
+        = f.input :service_event_instructions, as: :text, :input_html => {:style=> 'width: 90%', :rows => 5}, label: "Service Event Instructions"
+      .span4
+        = f.input :connectivity_instructions, as: :text, :input_html => {:style=> 'width: 90%', :rows => 5}, label: "Connectivity Instructions"
+      .span4 
+        = f.input :delivery_event_instructions, as: :text, as: :text, :input_html => {:style=> 'width: 90%', :rows => 5}, label: "Delivery Event Instructions"
+    .row-fluid
+      .span12
+        = f.simple_fields_for :assets_attributes, multipart: true do |b|
+          = render partial: "assets/new", locals: {:field_name => "location[assets_attributes][][resource]", :ff => b }
+    .row-fluid
+      .span12
+        %hr
+        = f.submit(:class => "btn btn-primary")

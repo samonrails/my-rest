@@ -1,0 +1,86 @@
+- searchable ||= {}
+- elements_to_hide ||= {}
+- meta_data ||= ''
+- ( event_start_time_from, event_start_time_to ) = default_event_start_times( searchable[:event_start_time_from], searchable[:event_start_time_to])
+.searchable-sortable-pagination-form
+  = form_for klass, :html => { :method => :get }  do |f|
+    .row
+      %div{:class => "span12", :style => "margin-left:0px"}
+        .span3
+          .search-option
+            .range
+              %label
+                Event Start Time
+              .input-append.date.form_date-start
+                = text_field :searchable, "event_start_time_from", :value => event_start_time_from
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+              %label 
+                Event End Time
+              .input-append.date.form_date-end
+                = text_field :searchable, "event_start_time_to", :value => event_start_time_to
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+        - if !elements_to_hide[:account].present?
+          .span3
+            .search-option
+              %label
+                Account
+              = text_field :searchable, "account", :value => searchable[:account] 
+
+        .span3
+          .search-option
+            %label
+              Vendor
+            = text_field :searchable, "vendor", :value => searchable[:vendor] 
+
+        - if !elements_to_hide[:markets].present?
+          .span3
+            .search-option
+              %div{:style => "height:65px"}
+                %label
+                  Market
+                - markets = Market.all.map{|m| m.name}
+                - markets_selected = searchable[:market].nil? ? markets : searchable[:market]
+                = select(:searchable, "market", options_for_select( markets.collect{|c| [c.titleize, c]}, markets_selected), {},  {:class => "multiselect", :multiple => true} )
+
+        .span3
+          .search-option
+            %div{:style => "height:65px"}
+              %label
+                Status
+              - status = Status::Event.available_values
+              - status_selected = searchable[:status].nil? ? status : searchable[:status]
+              = select(:searchable, "status", options_for_select( status.collect{|c| [c.titleize, c]}, status_selected), {},  {:class => "multiselect", :multiple => true} )
+
+        - if !elements_to_hide[:account_executive].present?
+          .span3
+            .search-option
+              %div{:style => "height:65px"}
+                %label
+                  Account Executive
+                - emails = User.fooda_employee.map(&:email)
+                = select(:searchable, "account_executive", options_for_select( emails.collect{|c| [c.titleize, c]}, searchable[:account_executive]), { :include_blank => true} )
+
+        - if !elements_to_hide[:product_types].present?
+          .span3
+            .search-option
+              %div{:style => "height:65px"}
+                %label
+                  Product
+                - products = Product.available_values
+                - products_selected = searchable[:product].nil? ? products : searchable[:product]
+                = select(:searchable, "product", options_for_select( products.collect{|c| [c.titleize, c]}, products_selected), {},  {:class => "multiselect", :multiple => true} )
+
+
+    .row
+      .span12
+        - if meta_data
+          %input{:type => "hidden", :name => "meta_data", :id => "meta_data", :value => meta_data }
+          
+        %input{:type => "submit", :value => 'Filter', :class => "btn btn-small", :name => "filter"}
+        %input{:type => "submit", :value => 'Export to XLS', :class => "btn btn-small btn-info", :name => "xls"}

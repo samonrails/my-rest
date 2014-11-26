@@ -1,0 +1,26 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: snappea_development
+  pool: 5
+  username: nickd
+  password:
+  host: localhost
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: snappea_test
+  pool: 5
+  username: nickd
+  password:
+  host: localhost
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: snappea_production
+  pool: 5
+  username: nickd
+  password:
+  host: localhost

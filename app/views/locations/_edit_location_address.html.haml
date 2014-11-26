@@ -1,0 +1,22 @@
+.well.center{style: "width: 54%; margin-left: 23%; border-radius: 8%;"}
+  = f.simple_fields_for :building do |b|
+    = b.simple_fields_for :address do |a|
+      .row-fluid
+        %b
+          Building:
+        %br
+        %br
+        %b
+          #building_html_address
+            = location.building.html_address
+      .span10{style: "margin-left: 9%; margin-top: 12%;"}
+        %h5{style: "line-height: 120%;"}
+          Enter a Delivery Drop-Off Point in this Building
+      %br
+  = f.input :building_address_notes,
+    input_html: { style: 'width: 82%; margin-bottom: 0%;' },
+    placeholder: "Drop-Off Point", 
+    label: false
+  
+  %p{style: "font-size: 71%; line-height: 0%;"}
+    ie. Floor 2, Suite 443, Front Desk, Loading Dock

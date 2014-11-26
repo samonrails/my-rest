@@ -1,0 +1,48 @@
+#notice= notice
+  
+.row-fluid
+  .span6
+    %h3
+      = @contact.name
+  .span12
+  .row-fluid
+    .span4
+      .row-fluid
+        %b Position:
+        = @contact.position
+      .row-fluid
+        %b Email:
+        = mail_to(@contact.email, @contact.email)
+      .row-fluid
+        %b Phone Number:
+        = @contact.phone_number
+      .row-fluid
+        %b Mobiel Number:
+        = @contact.mobile_number
+      .row-fluid
+        %b Fax Number: 
+        = @contact.fax_number 
+    .span2
+      .row-fluid
+        %b Primary Contact:
+        = friendly_boolean @contact.primary_contact
+      .row-fluid
+        %b Billing Information:
+        = friendly_boolean @contact.billing_notifications
+      .row-fluid
+        %b Event Notification:
+        = friendly_boolean @contact.event_notifications
+      .row-fluid
+        %b SMS Notification:
+        = friendly_boolean @contact.sms
+
+  .row-fluid
+    .span6
+      %hr
+    .span6
+
+  .row-fluid
+    .span6
+      = link_to 'Edit', edit_account_contact_path(@account, @contact)
+      |
+      = link_to 'Back to Account', @account

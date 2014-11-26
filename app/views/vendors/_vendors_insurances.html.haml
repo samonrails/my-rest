@@ -1,0 +1,38 @@
+.new-vendor-insurance-form.modal.hide.fade
+  = render :partial => "vendor_insurances/new", :locals => {party: @vendor}
+
+.pull-right
+  %a#add_coi.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-vendor-insurance-form"}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-vendor-insurance-form"}
+    Building COI
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Building Name
+      %th Address
+      %th Waiver of Subrogation
+      %th Effective Date
+      %th Expiration Date
+      %th Last Updated by
+      %th Date Updated
+      %th Status
+  %tbody
+    - @vendor.vendor_insurances.each do |vendor_insurance|
+      %tr{"data-record-id"=>vendor_insurance.id}
+        %td= vendor_insurance.building.name
+        %td= vendor_insurance.building.address.to_s
+        %td.center
+          - if vendor_insurance.waiver_subrogation == "1"
+            %i.icon.icon-ok
+        %td= vendor_insurance.insurance_effective_date.strftime("%m-%d-%Y")
+        %td= vendor_insurance.insurance_expiration_date.strftime("%m-%d-%Y")
+        %td= vendor_insurance.user.name
+        %td= vendor_insurance.updated_at.strftime("%m-%d-%Y")
+        %td= ((Time.now.strftime("%Y-%m-%d").to_date < vendor_insurance.insurance_effective_date) ? "Not Yet Effective" :(Time.now.strftime("%Y-%m-%d").to_date >= vendor_insurance.insurance_expiration_date) ? "Expired" : "Current")
+        %td
+          .btn-group
+            %a#edit_coi.btn.btn-mini{:href=>edit_vendor_vendor_insurance_path(@vendor, vendor_insurance)}
+              %i.icon.icon-edit
+            %a#delete_coi.btn.btn-mini.btn-danger{:href=>vendor_vendor_insurance_path(@vendor, vendor_insurance), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove

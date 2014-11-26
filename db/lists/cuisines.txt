@@ -1,0 +1,34 @@
+American
+Asian
+Barbecue
+Brazilian
+Cajun
+Caribbean
+Chinese
+Cuban
+Deli
+French
+German
+Greek
+Healthy
+Indian
+Irish
+Italian
+Jamaican
+Japanese
+Korean
+Latin American
+Mediterranean
+Mexican
+Middle Eastern
+Philippine
+Pizza
+Polish
+Seafood
+Spanish
+Sushi
+Tex-Mex
+Thai
+Vegan
+Vegetarian
+Vietnamese

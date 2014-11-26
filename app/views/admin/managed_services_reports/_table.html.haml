@@ -1,0 +1,366 @@
+.results
+  %table.table.table-condensed{:style => "font-size:10px"}
+    %thead
+      %tr
+        - if column_display(@view_parameters, "Account")
+          %th= allow_links ? (ssp_sort_link :account) : "Account"
+        - if column_display(@view_parameters, "Date")
+          %th= allow_links ? (ssp_sort_link :date) : "Date"
+        - if column_display(@view_parameters, "Event ID")
+          %th= allow_links ? (ssp_sort_link :id, {title: "Event ID"}) : "Event ID"
+        - if column_display(@view_parameters, "Sales Rep")
+          %th Sales Rep
+        - if column_display(@view_parameters, "Account Executive")
+          %th Account Executive
+        - if column_display(@view_parameters, "Product")
+          %th= allow_links ? (ssp_sort_link :product) : "Product"
+        - if column_display(@view_parameters, "Vendors")
+          %th Vendors
+        - if column_display(@view_parameters, "Group Size")
+          %th= allow_links ? (ssp_sort_link :quantity, {title: "Group Size"}) : "Group Size"
+        - if column_display(@view_parameters, "COGS")
+          %th COGS
+        - if column_display(@view_parameters, "Account Delivery Fees")
+          %th Account Delivery Fees
+        - if column_display(@view_parameters, "Vendor Delivery Fees")
+          %th Vendor Delivery Fees
+        - if column_display(@view_parameters, "Subtotal")
+          %th Subtotal
+        - if column_display(@view_parameters, "Gratuity")
+          %th Gratuity
+        - if column_display(@view_parameters, "Enterprise Fee")
+          %th Enterprise Fee
+        - if column_display(@view_parameters, "Revenue")
+          %th Revenue
+        - if column_display(@view_parameters, "Vouchers Purchased")
+          %th Vouchers Purchased
+        - if column_display(@view_parameters, "Tax")
+          %th Tax
+        - if column_display(@view_parameters, "Total Billing")
+          %th Total Billing
+        - if column_display(@view_parameters, "Payment Method")
+          %th Payment Method
+        - if column_display(@view_parameters, "GP")
+          %th GP
+        - if column_display(@view_parameters, "GP%")
+          %th GP %
+        - if column_display(@view_parameters, "Status")
+          %th= allow_links ? (ssp_sort_link :status) : "Status"
+        - if column_display(@view_parameters, "Order Method")
+          %th Order Method
+    %tbody
+      - quantity_sum1 = 0
+      - revenue_sum1 = Money.new(0)
+      - cogs_sum1 = Money.new(0)
+      - delivery_charge_to_account_sum1 = Money.new(0)
+      - delivery_charge_to_vendor_sum1 = Money.new(0)
+      - total_billing_sum1 = Money.new(0)
+      - total_tax_sum1 = Money.new(0)
+      - subtotal_sum1 = Money.new(0)
+      - gratuity_sum1 = Money.new(0)
+      - enterprise_fee_sum1 = Money.new(0)
+      - vouchers_purchased_amount1 = Money.new(0)
+
+      - quantity_sum2 = []
+      - revenue_sum2 = []
+      - cogs_sum2 = []
+      - delivery_charge_to_account_sum2 = []
+      - delivery_charge_to_vendor_sum2 = []
+      - total_billing_sum2 = []
+      - total_tax_sum2 = []
+      - subtotal_sum2 = []
+      - gratuity_sum2 = []
+      - enterprise_fee_sum2 = []
+      - count2 = []
+      - vouchers_purchased_amount2 = []
+
+      - quantity_sum2.push(0)
+      - revenue_sum2.push(Money.new(0))
+      - cogs_sum2.push(Money.new(0))
+      - delivery_charge_to_account_sum2.push(Money.new(0))
+      - delivery_charge_to_vendor_sum2.push(Money.new(0))
+      - total_billing_sum2.push(Money.new(0))
+      - total_tax_sum2.push(Money.new(0))
+      - subtotal_sum2.push(Money.new(0))
+      - gratuity_sum2.push(Money.new(0))
+      - enterprise_fee_sum2.push(Money.new(0))
+      - count2.push(0)
+      - vouchers_purchased_amount2.push(Money.new(0))
+
+      - quantity_sum3 = []
+      - revenue_sum3 = []
+      - cogs_sum3 = []
+      - delivery_charge_to_account_sum3 = []
+      - delivery_charge_to_vendor_sum3 = []
+      - total_billing_sum3 = []
+      - total_tax_sum3 = []
+      - subtotal_sum3 = []
+      - gratuity_sum3 = []
+      - enterprise_fee_sum3 = []
+      - vouchers_purchased_amount3 = []
+
+      - quantity_sum3.push(0)
+      - revenue_sum3.push(Money.new(0))
+      - cogs_sum3.push(Money.new(0))
+      - delivery_charge_to_account_sum3.push(Money.new(0))
+      - delivery_charge_to_vendor_sum3.push(Money.new(0))
+      - total_billing_sum3.push(Money.new(0))
+      - total_tax_sum3.push(Money.new(0))
+      - subtotal_sum3.push(Money.new(0))
+      - gratuity_sum3.push(Money.new(0))
+      - enterprise_fee_sum3.push(Money.new(0))
+      - vouchers_purchased_amount3.push(Money.new(0))
+
+      - event = []
+      - revenue = []
+      - cogs = []
+      - delivery_charge_to_account = []
+      - delivery_charge_to_vendor =  []
+      - total_billing =  []
+      - total_tax = []
+      - subtotal = []
+      - gratuity = []
+      - enterprise_fee = []
+      - vouchers_purchased_amount = []
+
+      - case @levels
+      - when 0
+        - @events.each do |e|
+
+          - event.push(e)
+          - if e.event_managed_services_rollup
+            - revenue.push(e.event_managed_services_rollup.revenue)
+            - cogs.push(e.event_managed_services_rollup.cogs)
+            - delivery_charge_to_account.push(e.event_managed_services_rollup.delivery_charge_to_account)
+            - delivery_charge_to_vendor.push(e.event_managed_services_rollup.delivery_charge_to_vendor)
+            - total_billing.push(e.event_managed_services_rollup.total_billing)
+            - total_tax.push(e.event_managed_services_rollup.total_tax)
+            - subtotal.push(e.event_managed_services_rollup.subtotal)
+            - gratuity.push(e.event_managed_services_rollup.gratuity)
+            - enterprise_fee.push(e.event_managed_services_rollup.enterprise_fee)
+            - vouchers_purchased_amount.push(e.event_managed_services_rollup.vouchers_purchased)
+          - else
+            - revenue.push(Money.new(0))
+            - cogs.push(Money.new(0))
+            - delivery_charge_to_account.push(Money.new(0))
+            - delivery_charge_to_vendor.push(Money.new(0))
+            - total_billing.push(Money.new(0))
+            - total_tax.push(Money.new(0))
+            - subtotal.push(Money.new(0))
+            - gratuity.push(Money.new(0))
+            - enterprise_fee.push(Money.new(0))
+            - vouchers_purchased_amount.push(Money.new(0))
+
+          - quantity_sum1 += e.quantity
+          - revenue_sum1 += revenue.last
+          - cogs_sum1 += cogs.last
+          - delivery_charge_to_account_sum1 += delivery_charge_to_account.last
+          - delivery_charge_to_vendor_sum1 += delivery_charge_to_vendor.last
+          - total_billing_sum1 += total_billing.last
+          - total_tax_sum1 += total_tax.last
+          - subtotal_sum1 += subtotal.last
+          - gratuity_sum1 += gratuity.last
+          - enterprise_fee_sum1 += enterprise_fee.last
+          - vouchers_purchased_amount1 += vouchers_purchased_amount.last
+
+        = render :partial => "admin/managed_services_reports/summary_row", :formats => [:html], :locals => {title: "Event Count: " + revenue.count.to_s, quantity: quantity_sum1, revenue: revenue_sum1, cogs: cogs_sum1, delivery_charge_to_account: delivery_charge_to_account_sum1, delivery_charge_to_vendor: delivery_charge_to_vendor_sum1, total_billing: total_billing_sum1, total_tax: total_tax_sum1, subtotal: subtotal_sum1, gratuity: gratuity_sum1, enterprise_fee: enterprise_fee_sum1, vouchers_purchased: vouchers_purchased_amount1, style: "background: #eee8aa; font-weight: bold;"}
+
+        - event.each do |e|
+          = render :partial => "admin/managed_services_reports/event_row", :formats => [:html], :locals => {allow_links: allow_links, event: e, revenue: revenue.shift, cogs: cogs.shift, delivery_charge_to_account: delivery_charge_to_account.shift, delivery_charge_to_vendor: delivery_charge_to_vendor.shift, total_billing: total_billing.shift, total_tax: total_tax.shift, subtotal: subtotal.shift, gratuity: gratuity.shift, enterprise_fee: enterprise_fee.shift, vouchers_purchased: vouchers_purchased_amount.shift, style: "background: " + ((revenue.count & 1).zero? ? "#eee9e9;" : "#ffffff;")}
+
+          - if e.event_vendors.count > 1
+            - e.event_vendors.each do |ev|
+              - delivery_fee = - e.revenue_by_party_and_line_item_subtype(ev.vendor, "Delivery Fee")
+              = render :partial => "admin/managed_services_reports/event_vendor_row", :formats => [:html], :locals => {allow_links: allow_links, event_vendor: ev, cogs: e.catering_cogs_by_vendor(ev.vendor), delivery_fee: delivery_fee, style: "background: " + ((revenue.count & 1).zero? ? "#eee9e9;" : "#ffffff;")}
+
+      - when 1
+        - @events.sort.each do |k, v|
+
+          - v.each do |e|
+
+            - event.push(e)
+            - if e.event_managed_services_rollup
+              - revenue.push(e.event_managed_services_rollup.revenue)
+              - cogs.push(e.event_managed_services_rollup.cogs)
+              - delivery_charge_to_account.push(e.event_managed_services_rollup.delivery_charge_to_account)
+              - delivery_charge_to_vendor.push(e.event_managed_services_rollup.delivery_charge_to_vendor)
+              - total_billing.push(e.event_managed_services_rollup.total_billing)
+              - total_tax.push(e.event_managed_services_rollup.total_tax)
+              - subtotal.push(e.event_managed_services_rollup.subtotal)
+              - gratuity.push(e.event_managed_services_rollup.gratuity)
+              - enterprise_fee.push(e.event_managed_services_rollup.enterprise_fee)
+              - vouchers_purchased_amount.push(e.event_managed_services_rollup.vouchers_purchased)
+            - else
+              - revenue.push(Money.new(0))
+              - cogs.push(Money.new(0))
+              - delivery_charge_to_account.push(Money.new(0))
+              - delivery_charge_to_vendor.push(Money.new(0))
+              - total_billing.push(Money.new(0))
+              - total_tax.push(Money.new(0))
+              - subtotal.push(Money.new(0))
+              - gratuity.push(Money.new(0))
+              - enterprise_fee.push(Money.new(0))
+              - vouchers_purchased_amount.push(Money.new(0))
+
+            - quantity_sum1 += e.quantity
+            - revenue_sum1 += revenue.last
+            - cogs_sum1 += cogs.last
+            - delivery_charge_to_account_sum1 += delivery_charge_to_account.last
+            - delivery_charge_to_vendor_sum1 += delivery_charge_to_vendor.last
+            - total_billing_sum1 += total_billing.last
+            - total_tax_sum1 += total_tax.last
+            - subtotal_sum1 += subtotal.last
+            - gratuity_sum1 += gratuity.last
+            - enterprise_fee_sum1 += enterprise_fee.last
+            - vouchers_purchased_amount1 += vouchers_purchased_amount.last
+
+            - quantity_sum2[quantity_sum2.length-1] += e.quantity
+            - revenue_sum2[quantity_sum2.length-1] += revenue.last
+            - cogs_sum2[quantity_sum2.length-1] += cogs.last
+            - delivery_charge_to_account_sum2[quantity_sum2.length-1] += delivery_charge_to_account.last
+            - delivery_charge_to_vendor_sum2[quantity_sum2.length-1] += delivery_charge_to_vendor.last
+            - total_billing_sum2[quantity_sum2.length-1] += total_billing.last
+            - total_tax_sum2[quantity_sum2.length-1] += total_tax.last
+            - subtotal_sum2[quantity_sum2.length-1] += subtotal.last
+            - gratuity_sum2[quantity_sum2.length-1] += gratuity.last
+            - enterprise_fee_sum2[quantity_sum2.length-1] += enterprise_fee.last
+            - vouchers_purchased_amount2[quantity_sum2.length-1] += vouchers_purchased_amount.last
+
+          - quantity_sum2.push(0)
+          - revenue_sum2.push(Money.new(0))
+          - cogs_sum2.push(Money.new(0))
+          - delivery_charge_to_account_sum2.push(Money.new(0))
+          - delivery_charge_to_vendor_sum2.push(Money.new(0))
+          - total_billing_sum2.push(Money.new(0))
+          - total_tax_sum2.push(Money.new(0))
+          - subtotal_sum2.push(Money.new(0))
+          - gratuity_sum2.push(Money.new(0))
+          - enterprise_fee_sum2.push(Money.new(0))
+          - vouchers_purchased_amount2.push(Money.new(0))
+
+        = render :partial => "admin/managed_services_reports/summary_row", :formats => [:html], :locals => {title: "Event Count: " + revenue.count.to_s, quantity: quantity_sum1, revenue: revenue_sum1, cogs: cogs_sum1, delivery_charge_to_account: delivery_charge_to_account_sum1, delivery_charge_to_vendor: delivery_charge_to_vendor_sum1, total_billing: total_billing_sum1, total_tax: total_tax_sum1, subtotal: subtotal_sum1, gratuity: gratuity_sum1, enterprise_fee: enterprise_fee_sum1, vouchers_purchased: vouchers_purchased_amount1, style: "background: #eee8aa; font-weight: bold;"}
+
+        - @events.sort.each do |k, v|
+          = render :partial => "admin/managed_services_reports/summary_row", :formats => [:html], :locals => {title: k , count: v.count, quantity: quantity_sum2.shift, revenue: revenue_sum2.shift, cogs: cogs_sum2.shift, delivery_charge_to_account: delivery_charge_to_account_sum2.shift, delivery_charge_to_vendor: delivery_charge_to_vendor_sum2.shift, total_billing: total_billing_sum2.shift, total_tax: total_tax_sum2.shift, subtotal: subtotal_sum2.shift, gratuity: gratuity_sum2.shift, enterprise_fee: enterprise_fee_sum2.shift, vouchers_purchased: vouchers_purchased_amount2.shift, style: "background: #87ceeb; font-weight: bold;"}
+
+          - v.each do |e|
+
+            = render :partial => "admin/managed_services_reports/event_row", :formats => [:html], :locals => {allow_links: allow_links, event: e, revenue: revenue.shift, cogs: cogs.shift, delivery_charge_to_account: delivery_charge_to_account.shift, delivery_charge_to_vendor: delivery_charge_to_vendor.shift, total_billing: total_billing.shift, total_tax: total_tax.shift, subtotal: subtotal.shift, gratuity: gratuity.shift, enterprise_fee: enterprise_fee.shift, vouchers_purchased: vouchers_purchased_amount.shift, style: "background: " + ((revenue.count & 1).zero? ? "#eee9e9;" : "#ffffff;")}
+
+            - if e.event_vendors.count > 1
+              - e.event_vendors.each do |ev|
+                - delivery_fee = - e.revenue_by_party_and_line_item_subtype(ev.vendor, "Delivery Fee")
+                = render :partial => "admin/managed_services_reports/event_vendor_row", :formats => [:html], :locals => {allow_links: allow_links, event_vendor: ev, cogs: e.catering_cogs_by_vendor(ev.vendor), delivery_fee: delivery_fee, style: "background: " + ((revenue.count & 1).zero? ? "#eee9e9;" : "#ffffff;")}
+
+      - when 2
+        - @events.sort.each do |ko, vo|
+          
+          - vo.sort.each do |ki, vi|
+            
+            - vi.each do |e|
+
+              - event.push(e)
+              - if e.event_managed_services_rollup
+                - revenue.push(e.event_managed_services_rollup.revenue)
+                - cogs.push(e.event_managed_services_rollup.cogs)
+                - delivery_charge_to_account.push(e.event_managed_services_rollup.delivery_charge_to_account)
+                - delivery_charge_to_vendor.push(e.event_managed_services_rollup.delivery_charge_to_vendor)
+                - total_billing.push(e.event_managed_services_rollup.total_billing)
+                - total_tax.push(e.event_managed_services_rollup.total_tax)
+                - subtotal.push(e.event_managed_services_rollup.subtotal)
+                - gratuity.push(e.event_managed_services_rollup.gratuity)
+                - enterprise_fee.push(e.event_managed_services_rollup.enterprise_fee)
+                - vouchers_purchased_amount.push(e.event_managed_services_rollup.vouchers_purchased)
+              - else
+                - revenue.push(Money.new(0))
+                - cogs.push(Money.new(0))
+                - delivery_charge_to_account.push(Money.new(0))
+                - delivery_charge_to_vendor.push(Money.new(0))
+                - total_billing.push(Money.new(0))
+                - total_tax.push(Money.new(0))
+                - subtotal.push(Money.new(0))
+                - gratuity.push(Money.new(0))
+                - enterprise_fee.push(Money.new(0))
+                - vouchers_purchased_amount.push(Money.new(0))
+
+
+              - quantity_sum1 += e.quantity
+              - revenue_sum1 += revenue.last
+              - cogs_sum1 += cogs.last
+              - delivery_charge_to_account_sum1 += delivery_charge_to_account.last
+              - delivery_charge_to_vendor_sum1 += delivery_charge_to_vendor.last
+              - total_billing_sum1 += total_billing.last
+              - total_tax_sum1 += total_tax.last
+              - subtotal_sum1 += subtotal.last
+              - gratuity_sum1 += gratuity.last
+              - enterprise_fee_sum1 += enterprise_fee.last
+              - vouchers_purchased_amount1 += vouchers_purchased_amount.last
+
+              - quantity_sum2[quantity_sum2.length-1] += e.quantity
+              - revenue_sum2[quantity_sum2.length-1] += revenue.last
+              - cogs_sum2[quantity_sum2.length-1] += cogs.last
+              - delivery_charge_to_account_sum2[quantity_sum2.length-1] += delivery_charge_to_account.last
+              - delivery_charge_to_vendor_sum2[quantity_sum2.length-1] += delivery_charge_to_vendor.last
+              - total_billing_sum2[quantity_sum2.length-1] += total_billing.last
+              - total_tax_sum2[quantity_sum2.length-1] += total_tax.last
+              - subtotal_sum2[quantity_sum2.length-1] += subtotal.last
+              - gratuity_sum2[quantity_sum2.length-1] += gratuity.last
+              - enterprise_fee_sum2[quantity_sum2.length-1] += enterprise_fee.last
+              - count2[quantity_sum2.length-1] += 1
+              - vouchers_purchased_amount2[quantity_sum2.length-1] += vouchers_purchased_amount.last
+
+              - quantity_sum3[quantity_sum3.length-1] += e.quantity
+              - revenue_sum3[quantity_sum3.length-1] += revenue.last
+              - cogs_sum3[quantity_sum3.length-1] += cogs.last
+              - delivery_charge_to_account_sum3[quantity_sum3.length-1] += delivery_charge_to_account.last
+              - delivery_charge_to_vendor_sum3[quantity_sum3.length-1] += delivery_charge_to_vendor.last
+              - total_billing_sum3[quantity_sum3.length-1] += total_billing.last
+              - total_tax_sum3[quantity_sum3.length-1] += total_tax.last
+              - subtotal_sum3[quantity_sum3.length-1] += subtotal.last
+              - gratuity_sum3[quantity_sum3.length-1] += gratuity.last
+              - enterprise_fee_sum3[quantity_sum3.length-1] += enterprise_fee.last
+              - vouchers_purchased_amount3[quantity_sum3.length-1] += vouchers_purchased_amount.last
+
+            - quantity_sum3.push(0)
+            - revenue_sum3.push(Money.new(0))
+            - cogs_sum3.push(Money.new(0))
+            - delivery_charge_to_account_sum3.push(Money.new(0))
+            - delivery_charge_to_vendor_sum3.push(Money.new(0))
+            - total_billing_sum3.push(Money.new(0))
+            - total_tax_sum3.push(Money.new(0))
+            - subtotal_sum3.push(Money.new(0))
+            - gratuity_sum3.push(Money.new(0))
+            - enterprise_fee_sum3.push(Money.new(0))
+            - vouchers_purchased_amount3.push(Money.new(0))
+
+          - quantity_sum2.push(0)
+          - revenue_sum2.push(Money.new(0))
+          - cogs_sum2.push(Money.new(0))
+          - delivery_charge_to_account_sum2.push(Money.new(0))
+          - delivery_charge_to_vendor_sum2.push(Money.new(0))
+          - total_billing_sum2.push(Money.new(0))
+          - total_tax_sum2.push(Money.new(0))
+          - subtotal_sum2.push(Money.new(0))
+          - gratuity_sum2.push(Money.new(0))
+          - enterprise_fee_sum2.push(Money.new(0))
+          - count2.push(0)
+          - vouchers_purchased_amount2.push(Money.new(0))
+
+        = render :partial => "admin/managed_services_reports/summary_row", :formats => [:html], :locals => {title: "Event Count: " + revenue.count.to_s, quantity: quantity_sum1, revenue: revenue_sum1, cogs: cogs_sum1, delivery_charge_to_account: delivery_charge_to_account_sum1, delivery_charge_to_vendor: delivery_charge_to_vendor_sum1, total_billing: total_billing_sum1, total_tax: total_tax_sum1, subtotal: subtotal_sum1, gratuity: gratuity_sum1, enterprise_fee: enterprise_fee_sum1, vouchers_purchased: vouchers_purchased_amount1, style: "background: #eee8aa; font-weight: bold;"}
+
+        - @events.sort.each do |ko, vo|
+          = render :partial => "admin/managed_services_reports/summary_row", :formats => [:html], :locals => {title: ko, count: count2.shift, quantity: quantity_sum2.shift, revenue: revenue_sum2.shift, cogs: cogs_sum2.shift, delivery_charge_to_account: delivery_charge_to_account_sum2.shift, delivery_charge_to_vendor: delivery_charge_to_vendor_sum2.shift, total_billing: total_billing_sum2.shift, total_tax: total_tax_sum2.shift, subtotal: subtotal_sum2.shift, gratuity: gratuity_sum2.shift, enterprise_fee: enterprise_fee_sum2.shift, vouchers_purchased: vouchers_purchased_amount2.shift, style: "background: #87ceeb; font-weight: bold;"}
+        
+          - vo.sort.each do |ki, vi|
+            = render :partial => "admin/managed_services_reports/summary_row", :formats => [:html], :locals => {title: ki, count: vi.count, quantity: quantity_sum3.shift, revenue: revenue_sum3.shift, cogs: cogs_sum3.shift, delivery_charge_to_account: delivery_charge_to_account_sum3.shift, delivery_charge_to_vendor: delivery_charge_to_vendor_sum3.shift, total_billing: total_billing_sum3.shift, total_tax: total_tax_sum3.shift, subtotal: subtotal_sum3.shift, gratuity: gratuity_sum3.shift, enterprise_fee: enterprise_fee_sum3.shift, vouchers_purchased: vouchers_purchased_amount3.shift, style: "background: #a0a0a0; font-weight: bold;"}
+            
+            - vi.each do |e|
+
+              = render :partial => "admin/managed_services_reports/event_row", :formats => [:html], :locals => {allow_links: allow_links, event: e, revenue: revenue.shift, cogs: cogs.shift, delivery_charge_to_account: delivery_charge_to_account.shift, delivery_charge_to_vendor: delivery_charge_to_vendor.shift, total_billing: total_billing.shift, total_tax: total_tax.shift, subtotal: subtotal.shift, gratuity: gratuity.shift, enterprise_fee: enterprise_fee.shift, vouchers_purchased: vouchers_purchased_amount.shift, style: "background: " + ((revenue.count & 1).zero? ? "#eee9e9;" : "#ffffff;")}
+
+              - if e.event_vendors.count > 1
+                - e.event_vendors.each do |ev|
+                  - delivery_fee = - e.revenue_by_party_and_line_item_subtype(ev.vendor, "Delivery Fee")
+                  = render :partial => "admin/managed_services_reports/event_vendor_row", :formats => [:html], :locals => {allow_links: allow_links, event_vendor: ev, cogs: e.catering_cogs_by_vendor(ev.vendor), delivery_fee: delivery_fee, style: "background: " + ((revenue.count & 1).zero? ? "#eee9e9;" : "#ffffff;")}
+
+        

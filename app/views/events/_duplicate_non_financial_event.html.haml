@@ -1,0 +1,74 @@
+.modal-wrapper
+  = form_tag duplicate_event_event_path, remote: true do
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Duplicate Event
+    .modal-body
+      .row
+        .span3
+          Event Start Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "event_start_time"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+        .span3
+          Event End Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "event_end_time"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+      .row
+        .span3
+          Setup Start Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "setup_start_time"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+        .span3
+          Setup End Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "setup_end_time"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+      .row
+        .span3
+          Quantity
+          %br
+          .input
+            =number_field_tag 'quantity', nil
+        .span3
+          Meal Period
+          %br
+          .input
+            =select_tag 'meal_period', options_for_select(MealPeriod.available_values.collect{|c| [c.titleize, c]}) , :include_blank => true
+
+      .row
+        .span3
+          Event Name
+          %br
+          .input
+            %input{:type => "text", :name => "name"}
+
+      .row
+        .span3
+          Event Owner
+          %br
+          .input
+            = select_tag 'event_owner_id', options_for_select(User.fooda_employee.collect{|c| [c.name, c.id]}, current_user.id)
+            %br
+    .modal-footer
+      = submit_tag "Duplicate", :class => "btn btn-primary"

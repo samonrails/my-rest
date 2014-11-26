@@ -1,0 +1,59 @@
+-# Locals:
+-# select_order
+-# transaction
+-# refund_amount
+- transaction ||= nil
+.modal-wrapper
+  = simple_form_for :select_order_transaction, url: select_select_order_select_order_transactions_path(select_order, transaction), html: {method: :POST, id: :select_order_transaction} do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h3
+        Refund Transaction
+        &mdash; Refund
+
+    .modal-body
+      .clearfix
+        %span.label.label-important Refund
+        %span due to customer
+        %h2{:style => "color: #900"}= number_to_currency(refund_amount)
+      = f.hidden_field :select_order_id, value: select_order.id
+      = f.hidden_field :is_refund, value: true
+      = f.hidden_field :amount, value: refund_amount
+
+      / Display transaction details and pass transaction id as posted data if supplied 
+      = f.hidden_field :select_order_transaction_id, value: transaction.id
+      %table.table.table-striped
+        %tbody
+          %tr
+            %th Transaction
+            %td
+              #{transaction.transaction_id}
+              %span.label.label-info
+                #{transaction.status}
+          %tr
+            %th Card type
+            %td #{transaction.card_type}
+          %tr
+            %th Number
+            %td XXXX XXXX XXXX #{transaction.cc_last4}
+          %tr
+            %th Expiration
+            %td #{transaction.expiration_date}
+      %hr
+      %label.checkbox
+        = f.check_box :send_receipt, checked: true
+        Send updated receipt to
+        %strong #{select_order.user.name}
+        %em (#{select_order.user.email})
+
+    .modal-footer
+      .pull-left
+        .input-prepend
+          %span.add-on.muted
+            %small Notes
+          = f.text_field :notes, value: "Refund of "+number_to_currency(refund_amount)+" for select order #"+pretty_id(select_order.id), style: "width: 320px"
+      .pull-right
+        = f.submit "Refund", :class => "btn btn-primary", id: "submit-transaction"
+

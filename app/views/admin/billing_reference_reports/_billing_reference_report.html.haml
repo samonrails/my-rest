@@ -1,0 +1,21 @@
+- billing_reference_group = (defined? params[:searchable][:billing_reference_group]) ? params[:searchable][:billing_reference_group] : ""
+
+.row
+  .span12 
+    %h2.center Billing Reference Statement
+    %hr
+  .span12
+    = ssp_search_form Event,
+      [{ :name => :product, :as => :multi_select, :collection => Product.available_values, :nil_means_all => true},
+      { :name => :status, :as => :multi_select, :collection => Status::Event.available_values, :nil_means_all => true},
+      { :name => :account, :as => :select, :collection => Account.all.map{|a| a.name}},
+      { :name => :billing_reference_group, :as => :select, :collection => (@account.nil? ? [] : @account.billing_reference_groups) },
+      { :name => :order_method, :as => :select, :collection => ["Self Service"]},],
+      {:meta_data => "billing_references"}
+
+- if !@account.nil?
+  - params[:searchable][:account] = nil if defined?(params[:searchable][:account])
+  - events = Event.where(:account_id => @account.id).search_sort_paginate(params)
+  - events = events.includes(:order).where("catering_orders.event_id is not null") if defined? params[:searchable][:order_method] and params[:searchable][:order_method] == "Self Service"
+  = render partial: "billing_reference_report_table", locals: {billing_reference_group: billing_reference_group, events: events}
+

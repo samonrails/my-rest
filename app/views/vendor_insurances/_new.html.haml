@@ -1,0 +1,56 @@
+.modal-wrapper
+  - vendor_insurance ||= VendorInsurance.new
+  = simple_form_for [@vendor, vendor_insurance] do |f|
+    - vendor_insurance.errors.full_messages.each do |msg|
+      %ul
+        %li{:style => 'color: red;'}
+          = msg
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Building Insurance and Contracts
+    .modal-body
+      .in-between
+      Building Name
+      %br
+      = select(:vendor_insurance, :building_id, options_for_select(Building.where(:insurance_required => true).collect{|c| [c.name, c.id]}, nil), {:include_blank => false})
+      %br
+      = f.check_box :waiver_subrogation
+      Waiver of Subrogation
+      %br
+      %br
+      - if !vendor_insurance.new_record?
+        Status:
+        = (Time.now.strftime("%Y-%m-%d").to_date > @vendor_insurance.insurance_expiration_date) ? "Expired" : "Current"
+        %br
+        = text_field_tag :address1,'',placeholder: "Address Line 1", :value => "#{@vendor_insurance.building.address.address1}", :readonly => true
+        %br
+        = text_field_tag :address2,'',placeholder: "Address Line 2", :value => "#{@vendor_insurance.building.address.address2}", :readonly => true
+        %br
+        = text_field_tag :city,'',placeholder: "City", :value => "#{@vendor_insurance.building.address.city}", :readonly => true, :style => "width:100px;"
+        = text_field_tag :state,'',placeholder: "State", :value => "#{@vendor_insurance.building.address.state}", :readonly => true, :style => "width:35px;"
+        = text_field_tag :zip_code,'',placeholder: "Zip Code", :value => "#{@vendor_insurance.building.address.zip_code}", :readonly => true, :style => "width:100px;"
+        %br
+        = text_field_tag :country,'',placeholder: "Country", :value => "#{@vendor_insurance.building.address.country}", :readonly => true
+      .row
+        .span3
+          Effective Date
+          %br
+          .input-append.date.form_date
+            = f.text_field :insurance_effective_date
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+          Expiration Date
+          %br
+          .input-append.date.form_date
+            = f.text_field :insurance_expiration_date
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+    .modal-footer
+      = f.submit("Add Building",:class => "btn btn-primary")

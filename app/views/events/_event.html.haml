@@ -1,0 +1,13 @@
+%tr{:class => "infinite_item"}
+  %td= link_to event.pretty_id, event_path(event)
+  %td{:nowrap => ""}= event.event_start_time.nil? ? '?' : event.event_start_time.strftime("%Y-%m-%d")
+  %td
+    = event.event_start_time.strftime("%I:%M %p") unless event.event_start_time.nil?
+    = ' - ' + event.event_end_time.strftime("%I:%M %p") unless event.event_end_time.nil?
+  %td= event.contact
+  %td= event.product.titleize
+  %td= link_to event.account.name, account_path(event.account)
+  %td= event.location.html_address unless event.location.nil?
+  %td= raw event.event_vendors.map {|a| link_to a.vendor.name, vendor_path(a.vendor)}.join(", ")
+  %td= event.created_by.name unless event.created_by.nil?
+  %td= event.status.titleize

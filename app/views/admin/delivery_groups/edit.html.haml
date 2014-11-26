@@ -1,0 +1,50 @@
+- used = @delivery_group.try(:locations)
+
+.modal-wrapper
+  = form_for @delivery_group, url: admin_delivery_group_path(@delivery_group), remote: false do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Edit Delivery Group
+
+    .modal-body.auto_size_modal_body
+      #delivery-group
+        #name-pane
+          %label Name
+          = f.text_field :name, :label => "Name"
+
+        #available-accounts-pane
+          %strong Accounts
+          %ul#available-accounts
+            - current_user.accounts.each do |a|
+              %li
+                %strong= a.name
+                %ul.account
+                  - a.locations.reject{|l| used.include?(l)}.each do |l|
+                    %li{data: {id: l.id, account: a.name, location: l.name}}= l.name
+
+        #selected-accounts-pane
+          %strong Selected Accounts
+          %table#selected-accounts.table.table-striped
+            %thead
+              %tr
+                %th Location
+                %th Priority
+                %th &nbsp;
+
+            %tbody
+              - used.each_with_index do |l, i|
+                %tr{data: {id: l.id}}
+                  %td
+                    %strong= l.account.name
+                    = "(#{l.name})"
+                  %td.priority= i + 1
+                  %td
+                    %button.close.delete{type: "button"}
+                      &times;
+
+    .modal-footer
+      = f.submit "Save Delivery Group", id: "save-delivery-group", :class => "btn btn-primary"
+
+= javascript_include_tag "admin/delivery_groups"

@@ -1,0 +1,1 @@
+[{"name":"sql.active_record","payload":{"sql":"SELECT  \"catering_sessions\".* FROM \"catering_sessions\"  WHERE \"catering_sessions\".\"session_id\" = '419b21ab5241e8fc485a56b98c6ecbfd' LIMIT 1","name":"CACHE","connection_id":90114570},"time":"2014-10-21T16:52:00+05:30","transaction_id":"9bf92535573a71978b73","end":"2014-10-21T16:52:00+05:30","duration":0.017404556274414062}]

@@ -1,0 +1,24 @@
+-provide(:title, "User Management")
+
+#users-details
+  .page-header
+    %h1.center User Management
+    %br
+  
+    = ssp_search_form User,
+      [{ :name => :account, :as => :string, :wildcard => :both },
+      { :name => :last_name, :as => :string, :wildcard => :both },]
+  
+    %ul#section-tab-navigation.nav.nav-tabs
+      %li{class: params[:selected].nil? || params[:selected] == "active_users" ? 'active' : ''}
+        %a{:href=>"#active_users"} Active
+      %li{class: params[:selected] == "inactive_users" ? 'active' : ''}
+        %a{:href=>"#inactive_users"} Inactive
+  
+    #section-tabs
+  
+      #active_users.section-tab{style: params[:selected].nil? || params[:selected] == "active_users" ? '' : 'display:none'}
+        = render :partial => "admin/users/active_users"
+  
+      #inactive_users.section-tab{style: params[:selected] == "inactive_users" ? '' : 'display:none'}
+        = render :partial => "admin/users/inactive_users"

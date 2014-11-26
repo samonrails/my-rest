@@ -1,0 +1,47 @@
+- if @vouchers.any?
+  = simple_form_for :redeem_voucher, :url => redeem_all_vouchers_admin_vouchers_path, :method => :put do |redeem_all_form|
+    .pull-right
+      - if @vouchers.valid.any? or @vouchers.expired.any?
+        = redeem_all_form.submit("Redeem All", :class => "btn btn-small btn-primary", :id => "redeem_all_vouchers")
+    = render :partial => "admin/dashboard/valid_vouchers", locals: {redeem_all_form: redeem_all_form}
+    = render :partial => "admin/dashboard/expired_vouchers", locals: {redeem_all_form: redeem_all_form}
+    = render :partial => "admin/dashboard/redeemed_vouchers", locals: {redeem_all_form: redeem_all_form}
+- else
+  No voucher found
+
+- all_redeemed ||= nil
+.message_area_content.hide
+  - if @voucher.present?
+    .alert.alert-success{style: "margin-bottom:0px;"}
+      Alerts:
+      %button.close{"data-dismiss" => "alert", type: "button"} ×
+      %br
+      %br
+      %ul
+        %li
+          Voucher #{@voucher.token} redeemed successfully.
+  - elsif all_redeemed.present?
+    .alert.alert-success{style: "margin-bottom:0px;"}
+      Alerts:
+      %button.close{"data-dismiss" => "alert", type: "button"} ×
+      %br
+      %br
+      %ul
+        %li
+          All valid/expired vouchers are redeemed successfully.
+  - elsif @not_found.any? or @expired_vouchers.any? or @redeemed_vouchers.any?
+    .alert.alert-error{style: "margin-bottom:0px;"}
+      Alerts:
+      %button.close{"data-dismiss" => "alert", type: "button"} ×
+      %br
+      %br
+      %ul
+        - @not_found.each do |id|
+          %li
+            ID #{id} is not a known voucher, can't be found.
+        - @expired_vouchers.each do |voucher|
+          %li
+            ID #{voucher.token} is an expired voucher.
+        - @redeemed_vouchers.each do |voucher|
+          %li
+            ID #{voucher.token} was already redeemed.

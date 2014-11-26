@@ -1,0 +1,9 @@
+%tr{:class => "infinite_item"}
+  %td
+    = link_to account.name, account_path(account)
+    -unless account.active
+      = " - "
+      .label.label-warning.toggle-modal Inactive
+  %td= account.account_manager
+  %td= account.account_exec
+  %td= account.sales_rep

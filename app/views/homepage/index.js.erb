@@ -1,0 +1,18 @@
+    $('tbody#open_issues').html('<%= escape_javascript render(@open_issues) %>');
+    $('#paginator').html('<%= escape_javascript(paginate(@open_issues, :theme => 'twitter-bootstrap', :remote => true, :param_name => "open_page").to_s) %>');
+
+    $('tbody#closed_issues').html('<%= escape_javascript render(@closed_issues) %>');
+    $('#paginator1').html('<%= escape_javascript(paginate(@closed_issues, :theme => 'twitter-bootstrap', :remote => true, :param_name => "closed_page").to_s) %>');
+
+    $('tbody#unclaimed_events').html('<%= escape_javascript render partial: 'events/partials_dashboard/event', locals: {type: 'unclaimed_events', events: @unclaimed_events} %>');
+    $('#paginate_unclaimed_events').html('<%= escape_javascript(paginate(@unclaimed_events, :theme => 'twitter-bootstrap', :remote => true, :param_name => "unclaimed_events").to_s) %>');
+
+    $('tbody#my_events').html('<%= escape_javascript render partial: 'events/partials_dashboard/event', locals: {type: 'my_events', events: @my_events} %>');
+    $('#paginate_my_events').html('<%= escape_javascript(paginate(@my_events, :theme => 'twitter-bootstrap', :remote => true, :param_name => "my_events").to_s) %>');
+
+    $('tbody#completed_events').html('<%= escape_javascript render partial: 'events/partials_dashboard/event', locals: {type: 'my_events', events: @completed_events} %>');
+    $('#paginate_completed_events').html('<%= escape_javascript(paginate(@completed_events, :theme => 'twitter-bootstrap', :remote => true, :param_name => "completed_events").to_s) %>');
+
+    $('tbody#canceled_events').html('<%= escape_javascript render partial: 'events/partials_dashboard/event', locals: {type: 'my_events', events: @canceled_events} %>');
+    $('#paginate_canceled_events').html('<%= escape_javascript(paginate(@canceled_events, :theme => 'twitter-bootstrap', :remote => true, :param_name => "canceled_events").to_s) %>');
+

@@ -1,0 +1,36 @@
+.pull-right
+  %a#add_mt.btn.btn-success.btn-small{:href=>new_vendor_menu_template_path(@vendor)}
+    %i.icon.icon-plus.icon-white
+    Menu Template
+%table.table.table-striped
+  %thead
+    %tr
+      %th Name
+      %th Pricing Type
+      %th Start Date
+      %th Expiration Date
+      %th Product Type
+      %th Default Menu
+      %th All Items
+  %tbody
+    - @vendor.menu_templates.each do |menu_template|
+      %tr{"data-record-id"=>menu_template.id}
+        %td= link_to menu_template.name, edit_vendor_menu_template_path(@vendor, menu_template)
+        %td= menu_template.pricing_type.titleize
+        %td= menu_template.start_date && menu_template.start_date.strftime("%Y-%m-%d")
+        %td= menu_template.expiration_date && menu_template.expiration_date.strftime("%Y-%m-%d")
+        %td= menu_template.product_type && menu_template.product_type.titleize
+        %td.center
+          - if menu_template.is_default
+            %i.icon.icon-ok
+        %td.center
+          - if menu_template.all_items
+            %i.icon.icon-ok
+        %td
+          .btn-group
+            -if menu_template.can_destroy?
+              %a.btn.btn-mini.btn-danger#remove_mt{:href=>vendor_menu_template_path(@vendor, menu_template), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove
+            -else 
+              %a.btn.btn-mini.disabled
+                %i.icon.icon-white.icon-remove

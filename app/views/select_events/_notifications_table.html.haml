@@ -1,0 +1,51 @@
+%div{id: "select_event_notification_table"}
+  %br
+  %br
+  .span{style: "margin-left: 1000px"}
+    %a{:href => "#", :id => "update_select_event_notification_table",  "data-select_event_id" => @select_event.id}
+      %i.icon-refresh  
+      Refresh
+  %br
+  - if @select_event.select_event_campaigns.count > 0 
+    .well{style: " width:1070px;"}
+      %table.table.table-striped
+        %thead
+          %tr
+            %th Type
+            %th State
+            %th Campaign ID
+            %th Actions
+            %th List ID
+            %th Scheduled For
+            %th Created By
+            %th Scheduled At             
+        %tbody
+          - @select_event.select_event_campaigns.order('created_at desc, email_type desc').each do |li|
+            %tr{"data-record-id"=>li.id}
+              %td= li.email_type.capitalize
+              %td
+                - if li.state.present? and li.state == 'scheduled'
+                  %span.label.label-success Scheduled
+                - if li.state.present? and li.state == 'inactive'
+                  %span.label.label Inactive
+                - if li.state.present? and li.state == 'pending'
+                  %span.label.label-info Inactive
+                - if li.state.present? and li.state == 'failed'
+                  %span.label.label-important Failed
+              %td= li.campaign_id
+              %td
+                -if li.campaign_web_id.present?
+                  %a{:href => MailChimp::EDIT_CAMPAIGN_URL + li.campaign_web_id.to_s, :target => "_blank"}
+                    Edit &nbsp;
+                  %a{:href => MailChimp::VIEW_CAMPAIGN_URL + li.campaign_web_id.to_s, :target => "_blank"}
+                    View
+                -else
+                  - 
+              %td= li.email_list_id
+              %td= li.created_at.to_s(:full_date_time) + " " + time_zone_abbreviation( @select_event.location.building )
+              %td= created_by(li)
+              %td= li.scheduled_at.to_s(:full_date_time) + " " + time_zone_abbreviation( @select_event.location.building )
+
+
+%div{id: "select_event_notification_table_end"}
+  &nbsp;

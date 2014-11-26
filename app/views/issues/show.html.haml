@@ -1,0 +1,58 @@
+#issue-details
+  .row-fluid
+    .span12
+      %h1.center 
+        Issue Details
+  .row-fluid
+    .span12
+      %b.issue-id
+        ID: 
+        = @issue.pretty_id
+  .row-fluid
+    .span12
+      %hr
+
+  .row-fluid
+    .span12.offset2
+      .row-fluid
+        .span6
+          %h3.issue_container
+            = @issue.title
+          %br
+          .issue_container
+            = @issue.description.html_safe
+          %br
+          %b
+            = @issue.assigner.to_s 
+          created this issue 
+          = distance_of_time_in_words_to_now @issue.open_date
+          ago
+
+        .span6
+          %p
+            %b Status
+            &nbsp;
+            = link_to @issue.status? ? "Closed" : "Open", "#", class: "btn #{@issue.status? ? 'btn-danger' : 'btn-success'} disabled"
+          %p
+            %b Priority
+            &nbsp;&nbsp;
+            = show_priority @issue.priority
+          %p
+            -if @issue.due_date
+              Due Date: 
+              = @issue.due_date.strftime("%d %B %Y")
+
+    .span12
+      .span1
+      .span8
+        %hr
+      .span2
+
+  .row-fluid
+    .span12.offset2
+      .row-fluid
+        .span6
+          %b Comments:
+          = render partial: 'comment', collection: @issue.comments
+          .container
+            = render partial: 'comment_form'

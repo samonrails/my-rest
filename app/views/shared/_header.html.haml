@@ -1,0 +1,53 @@
+.navbar.navbar-fixed-top
+  .navbar-inner
+    .container-fluid
+      %a.btn.btn-navbar{"data-target" => ".nav-collapse", "data-toggle" => "collapse"}
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      .brand
+        = link_to image_tag("logo.png", :border => 0, size: "90x90"), root_url
+      .nav-collapse.collapse.navbar-responsive-collapse
+        - if user_signed_in?
+          %ul.nav
+            / %li{ :class => ('active' if request.path_info == "/")}
+            /   %a{:href => "/"} Home
+            %li{ :class => ('active' if request.path_info == "/") }
+              %a{:href => "/"} Dashboard
+            %li{ :class => ('active' if request.path_info.start_with? ('/vendors')) }
+              %a{:href => "/vendors"} Vendors
+            %li{ :class => ('active' if request.path_info.start_with? ('/accounts')) }
+              %a{:href => "/accounts"} Accounts
+            %li{ :class => ('active' if request.path_info.start_with? ('/events')) }
+              %a{:href => "/events"} Events
+            %li{:class => ('active' if request.path_info == "/admin/users") }
+              %a{:href => "/admin/users"} Users
+            - values = ["/admin/managed_services_reports", "/admin/billing_reference_reports", "/admin/general_reports"]
+            %li{:class => ('active' if (request.path_info == "/reports" or request.path_info.in? values)) }
+              %a{:href => "/reports"} Reports
+              
+        %ul.nav.pull-right
+          - if user_signed_in?
+            %li{:class=>"dropdown"}
+              %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+                = current_user.name
+                %b.caret
+              %ul.dropdown-menu
+                %li
+                  %a{:href => edit_admin_user_path(current_user)}
+                    %i.icon-user
+                    Profile
+                %li.divider
+                %li
+                  %a{:href => logout_path }
+                    %i.icon-off
+                    Logout
+            %li{:class => ('active' if request.path_info == "/admin")}
+              %a{:href => "/admin"} Admin Settings
+          - else
+            %li
+              = link_to "Login", login_path
+
+
+        - if user_signed_in?
+          = render :partial => "search/control"

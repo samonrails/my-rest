@@ -1,0 +1,39 @@
+.modal.hide.fade{"id"=>"new_market_form"}
+  = render :partial => "/admin/markets/new", :locals => {market: Market.new}
+
+.pull-right.admin-buttons
+  %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#new_market_form"}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_market_form"}
+    Markets
+
+%table.table.table-striped.table-condensed
+  %thead
+    %tr
+      %th Name
+      %th Default Tax Rate
+      %th Phone
+      %th Fax
+      %th Email
+      %th Address
+      %th Zip Codes
+      %th Action
+
+    - @markets.each do |market|
+      .modal.hide.fade{"id"=>"edit_market_form_" + market.id.to_s}
+        = render :partial => "/admin/markets/edit", :locals => {market: market}
+      %tr
+        %td
+          %a.pointer.toggle-modal{"data-target"=>"#edit_market_form_" + market.id.to_s}#{market.name}
+        %td= market.default_tax_rate
+        %td= market.office_default_phone
+        %td= market.office_default_fax
+        %td= market.office_default_email
+        %td= market.html_address
+        %td= market.humanized_zip_codes
+        %td
+          -if market.can_destroy?
+            %a.btn.btn-mini.btn-danger{:href=>admin_market_path(market), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+          -else 
+            %a.btn.btn.btn-mini.disabled
+              %i.icon.icon-remove.icon-white

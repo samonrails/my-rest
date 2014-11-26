@@ -1,0 +1,14 @@
+.modal.hide.fade#ph_void
+  .modal-wrapper
+    .modal-header
+      %button.close{:type=>"button", "data-dismiss"=>"modal"}
+        &times;
+      %h3
+        Confirm to void transaction
+      = form_tag void_event_transactions_path(@event) do
+        = hidden_field_tag :trans_id, nil, id: 'trans-id-void'
+        = hidden_field_tag :user_id, @user.try(:id)
+        .modal-footer
+          = submit_tag "Submit", :class => "btn btn-primary"
+          %a.btn{"data-dismiss"=>"modal"}
+            Cancel

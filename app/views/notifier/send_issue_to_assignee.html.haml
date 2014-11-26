@@ -1,0 +1,22 @@
+-# Required for controllers that have an underscore in them. eg: select_event
+- subject_url = "#{@issue.subject.class.name.underscore}_url"
+%h3= @issue.title
+%p
+  Subject:
+  = link_to @issue.subject.to_s, eval(subject_url+"(@issue.subject)")
+%p
+  Priority:
+  = @issue.priority
+- if @issue.due_date
+  %p
+    Due Date:
+    = @issue.due_date.to_date.strftime("%m-%d-%Y")
+%br
+%br= @issue.description.html_safe
+%p
+  Assigned by:
+  = @assigner.name
+%br
+%p
+  To see the issue, click
+  = link_to("Here", root_url)

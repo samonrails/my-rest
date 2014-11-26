@@ -1,0 +1,42 @@
+%html{:xmlns => "http://www.w3.org/1999/xhtml"}
+  %body
+    %table{:style => "width: 600px; background: #eeeeee; font-size: 16px", :cellpadding => "5", :cellspacing => "5"}
+      %tbody
+        %tr
+          %td{:style => "padding: 10px; text-align: center; color: #444;"}
+            %table{:style => "width: 100%", :cellpadding => "20px"}
+              %tbody
+                %tr
+                  %td{:style => "background: white;"}
+                    %img{:src => "https://s3.amazonaws.com/snappea-marketing/email/catering_welcome/logo_catering.png"}
+                    %br
+                    %br
+                    %h1{:style => "font-size: 32px; letter-spacing: -1px; line-height: 1.2em; color: #666; margin: 0; padding: 0;"}
+                      Welcome to
+                      %span{:style => "color: #f26522;"} Fooda
+                      Catering!
+                    %h3{:style => "font-size: 18px; color: #666; line-height: 1.2em; margin: 0; padding: 0;"}
+                      The easiest way to order catering for your office
+                    %br
+                    %br
+                    The login to your account is your email address.
+                    %br Once you've setup your account, you're ready to start ordering!
+                    %br
+                    - link = main_app.catering_recover_password_url(:initial => true, :reset_password_token => @user.reset_password_token, subdomain: Rails.configuration.catering_subdomain)
+                    %a{:href => link, :style => "font-size: 24px; text-decoration: underline;"}
+                      Click here to setup your account
+                    %br
+                    %br
+                %tr
+                  %td
+                    %strong We're always here to help!
+                    %br
+                    %span{:style => "font-size: 14px"}
+                      %a{:href => "https://catering.fooda.com/#chat"}
+                        Chat with Us
+                      |
+                      %a{:href => "mailto:info@fooda.com&subject=Questions+about+Welcome+email"}
+                        Email Us
+                      |
+                      312-662-6539
+

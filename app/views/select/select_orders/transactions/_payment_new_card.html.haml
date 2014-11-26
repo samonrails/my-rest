@@ -1,0 +1,45 @@
+-# Locals:
+-# f
+%a#show-new-payment-method.btn-mini.btn.btn-default{href: "#"}
+  %i.icon-plus
+  New Payment Method
+#new-payment-method-form.hidden
+  / New CC fields
+  %label Name on card
+  = f.text_field :name, class: "span4", value: "George Soros"
+  %label Card number
+  = f.text_field :ux_number, {class: "input-large", :encrypt => :select_order_transaction_number, value: "4242424242424242"}
+  = f.hidden_field :number
+  .row-fluid
+    .span6
+      %label Expiration date
+      - months = [['-- Month --', '']]
+      - (1..12).each {|m| months << ['('+m.to_s.rjust(2, '0')+') '+Date::MONTHNAMES[m], m.to_s.rjust(2, '0')]}
+      = f.select :expiration_month, months, {}, {class: "span8"}
+      - years = [['Year', '']]
+      - (Time.now.year..Time.now.year+9).each {|y| years << [y, y]}
+      = f.select :expiration_year, years, {}, {class: "span4"}
+    .span6
+      %label CVV
+      = f.text_field :ux_cvv, {class: "input-mini", :encrypt => :select_order_transaction_cvv, value: "123"}
+      = f.hidden_field :cvv
+  %hr
+  %label Address
+  = f.text_field :address, class: "input-large", value: "10 Cedar Park Ave"
+  .row-fluid
+    .span6
+      %label City
+      = f.text_field :city, class: "input-large", value: "Chicago"
+    .span3
+      %label State
+      = f.text_field :state, class: "input-mini", value: "IL"
+    .span3
+      %label Zipcode
+      = f.text_field :zipcode, class: "input-mini", value: "60654"
+
+  %hr
+  %a#hide-new-payment-method.btn-mini.btn.btn-default{href: "#"}
+    %i.icon-minus
+    Hide New Payment Method
+
+

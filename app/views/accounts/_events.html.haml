@@ -1,0 +1,46 @@
+.new_event_form.auto_size_modal.modal.hide.fade
+  = render :partial => "events/new", :locals => {account: @account, financial: false}
+.new_financial_event_form.auto_size_modal.modal.hide.fade
+  = render :partial => "events/new", :locals => {account: @account, financial: true}
+
+.section-header
+  %h1.center Events
+  %hr
+- params[:meta_data] = "events"
+= render :partial => "shared/search_events_form", :locals => {searchable:  params[:searchable], klass: :accounts, elements_to_hide: {account_executive: 1, markets: 1, account: 1, product_types: 1}, meta_data: params[:meta_data] }
+
+.create-buttons
+  %a.btn.btn-small.btn-success.toggle-modal{"data-target"=>".new_event_form"}
+    %i.icon.icon-plus-sign.icon-white{"data-target"=>".new_event_form"}
+    Event
+  %a.btn.btn-small.btn-success.toggle-modal{"data-target"=>".new_financial_event_form"}
+    %i.icon.icon-plus-sign.icon-white{"data-target"=>".new_financial_event_form"}
+    Financial Event
+
+.results
+  %table.table.table-striped.table-condensed{"id"=>"infinite_items"}
+    %thead
+      %tr
+        %th Event ID
+        %th
+          =search_event_arrow( "event_start_time", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(account_path(@account), "event_start_time", params)} Date
+        %th
+          =search_event_arrow( "event_start_times", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(account_path(@account), "event_start_time", params)} Event Time
+        %th Contact
+        %th
+          =search_event_arrow( "product", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(account_path( @account ), "product", params)} Product
+        %th Location
+        %th Vendor(s)
+        %th
+          =search_event_arrow( "status", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(account_path( @account ), "status", params)} Status
+          
+    %tbody.page
+      - @events.each do |e|
+        = render :partial => 'accounts/event', :locals => {event: e}
+         
+    = paginate @events, :theme => 'twitter-bootstrap'
+        

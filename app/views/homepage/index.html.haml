@@ -1,0 +1,17 @@
+- if user_signed_in?
+  -provide(:title, 'Home')
+  .section-header
+    %h1.center Dashboard
+  .well.margin-left-0.span12
+    = render :partial => "events/partials_dashboard/unclaimed_event_requests"
+    = render :partial => "events/partials_dashboard/my_events"
+  .well.margin-left-0.span12
+    %h3 My Issues
+    = render :partial => "issues/index"
+- else
+  -provide(:title, 'Welcome')
+  .row
+    .span6.offset3
+      #homepage.hero-unit 
+        %h2 Welcome to SnapPea!
+        The lightning fast tool that empowers Fooda.

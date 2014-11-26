@@ -1,0 +1,47 @@
+%tr{:style => style}
+  - if column_display(@view_parameters, "Account")
+    %td= ((title.class.name == "DateTime" || title.class.name == "Time") ? title.strftime("%a %m/%d/%y") : title) + (!defined?(count).nil? ? " (" + count.to_s + ")" : "")
+  - if column_display(@view_parameters, "Date")
+    %td
+  - if column_display(@view_parameters, "Event ID")
+    %td
+  - if column_display(@view_parameters, "Sales Rep")
+    %td
+  - if column_display(@view_parameters, "Account Executive")
+    %td
+  - if column_display(@view_parameters, "Product")
+    %td
+  - if column_display(@view_parameters, "Vendors")
+    %td
+  - if column_display(@view_parameters, "Group Size")
+    %td= quantity
+  - if column_display(@view_parameters, "COGS")
+    %td= number_to_currency(cogs, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Account Delivery Fees")
+    %td= number_to_currency(delivery_charge_to_account, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Vendor Delivery Fees")
+    %td= number_to_currency(delivery_charge_to_vendor, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Subtotal")
+    %td= number_to_currency(subtotal, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Gratuity")
+    %td= number_to_currency(gratuity, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Enterprise Fee")
+    %td= number_to_currency(enterprise_fee, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Revenue")
+    %td= number_to_currency(revenue, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Vouchers Purchased")
+    %td= number_to_currency(vouchers_purchased, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Tax")
+    %td= number_to_currency(total_tax, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Total Billing")
+    %td= number_to_currency(total_billing, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Payment Method")
+    %td
+  - if column_display(@view_parameters, "GP")
+    %td= number_to_currency(revenue - cogs, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "GP%")
+    %td= (revenue == 0 ? '0' : number_with_precision((revenue - cogs)/revenue * 100, precision: 2)) + '%'
+  - if column_display(@view_parameters, "Status")
+    %td
+  - if column_display(@view_parameters, "Order Method")
+    %td

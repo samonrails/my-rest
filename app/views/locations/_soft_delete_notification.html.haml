@@ -1,0 +1,10 @@
+.alert.alert-block.fade.in
+  %h4.alert-heading This location has been removed.
+  %hr
+  %p 
+    It was removed on 
+    = "#{@location.deleted_at}."
+    Right now, this location is only accessible to SnapPea users. Some Foodizens may see it in their records but they cannot act upon it. If this record was deleted by accident or you need to edit it, it can be restored below. 
+  %br
+  %p
+    = link_to 'Restore this location', "/accounts/#{@account.id}/locations/restore/#{@location.id}", method: :put, action: :default, class: "btn"

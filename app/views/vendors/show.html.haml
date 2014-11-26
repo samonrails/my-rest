@@ -1,0 +1,148 @@
+-provide(:title, "Vendor | #{@vendor.pretty_id}")
+
+- content_for :head do
+  = stylesheet_link_tag "vendors"
+
+-if @vendor.can_destroy?
+  #confirmation-delete-modal.modal.hide.fade
+    .modal-header
+      %button.close{:type=>"button", "data-dismiss"=>"modal"}
+        &times;
+      %h3.center The Danger Zone
+    .modal-body
+      %p Are you sure you want to delete this vendor? This action cannot be reversed. 
+    .modal-footer
+      %a.btn.btn-danger{:href=>vendor_path(@vendor), :"data-method" => "delete" }
+        Yes, Delete this vendor.
+      %a.btn{"data-dismiss"=>"modal"}
+        No, Return to the vendor.
+
+#vendor-details
+  .row-fluid
+    .span12
+      %h1.center= @vendor.name
+  .row-fluid
+    .span12
+      %b.vendor-id
+        ID: 
+        = @vendor.pretty_id
+  .row-fluid
+    .span12
+      %hr
+
+  = simple_form_for(@vendor) do |f|
+    .row-fluid
+      .span2
+        = image_tag(@vendor.image, size: "100%x100%", alt: @vendor.name)
+        %br
+        %br
+        %br
+        = f.input :image, :as => :file, label: false
+      .span8
+        %h4 Vendor Details
+        .row-fluid
+          .span4
+            = f.input :name
+            = f.input :legal_name
+            = f.input :market_list, label: "Markets", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.markets"}
+          .span4
+            = f.input :vendor_manager_id, :label => "Fooda Rep", collection: User.fooda_employee, label_method: :name, value_method: :id
+            = f.input :default_tax_rate, as: :float, label: "Default Tax Rate (%)"
+            = f.input :cuisine_list, label: "Cuisines (primary first)", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.cuisines"}
+
+        .row-fuild
+          .span8
+            %h5 Vendor Type:
+            = f.input :vendor_type, label: false, collection: VendorTypes.available_values.collect{|c| [c.titleize, c]}, as: :radio_buttons
+
+        .row-fluid
+          .span8
+            = f.input :description, label: "Internal Notes", as: :text, input_html: {style: 'width: 90%',rows: 5}
+    .row-fluid
+      .span12
+        .form-actions
+          -if @vendor.can_destroy?
+            %a.btn.btn-danger.toggle-modal#delete_vendor{"data-target"=>"#confirmation-delete-modal"}
+              %i.icon.icon-remove.icon-white{"data-target"=>"#confirmation-delete-modal"}
+              Delete
+          -else 
+            %a.btn.disabled
+              %i.icon.icon-remove.icon-white
+              Delete
+          .pull-right
+            = f.button :submit, "Save Vendor Details", :class => "btn btn-primary"
+
+
+    %ul#section-tab-navigation.nav.nav-tabs
+      %li{class: params[:selected].nil? || params[:selected] == "products" ? 'active' : ''}
+        %a{:href=>"#products"} Products
+      
+      %li{class: params[:selected] == "events" ? 'active' : ''}
+        %a{:href=>"#events"} Events
+      
+      %li{class: params[:selected] == "finance" ? 'active' : ''}
+        %a{:href=>"#finance"} Finance
+
+      %li{class: params[:selected] == "inventory_items" ? 'active' : ''}
+        %a{:href=>"#inventory_items"} Inventory Items
+      
+      %li{class: params[:selected] == "menu_templates" ? 'active' : ''}
+        %a{:href=>"#menu_templates"} Menu Templates
+      
+      %li{class: params[:selected] == "contacts" ? 'active' : ''}
+        %a{:href=>"#contacts"} Contacts
+
+      %li{class: params[:selected] == "preferences" ? 'active' : ''}
+        %a{:href=>"#preferences"} Preferences
+      
+      %li{class: params[:selected] == "insurances" ? 'active' : ''}
+        %a{:href=>"#insurances"} Building COIs
+      
+      %li{class: params[:selected] == "profile" ? 'active' : ''}
+        %a{:href=>"#profile"} Profile
+
+      %li{class: params[:selected] == "capacity" ? 'active' : ''}
+        %a{:href=>"#capacity"} Capacity
+
+      %li{class: params[:selected] == "issues" ? 'active' : ''}
+        %a{:href=>"#issues"} Issues
+
+      %li{class: params[:selected] == "reviews" ? 'active' : ''}
+        %a{:href=>"#reviews", :class => "reviews_tab"} Reviews
+
+    #section-tabs
+      #products.section-tab{style: params[:selected].nil? || params[:selected] == "products" ? '' : 'display:none'}
+        = render :partial => "vendors/product_type_config", :locals => {vendor: @vendor}
+
+      #finance.section-tab{style: params[:selected] == "finance" ? '' : 'display:none'}
+        = render :partial => "vendors/billing_address", :locals => {vendor: @vendor}
+
+      #inventory_items.section-tab{style: params[:selected] == "inventory_items" ? '' : 'display:none'}
+        = render :partial => "vendors/inventory_items", :locals => {vendor: @vendor}
+
+      #menu_templates.section-tab{style: params[:selected] == "menu_templates" ? '' : 'display:none'}
+        = render :partial => "vendors/menu_templates", :locals => {vendor: @vendor}
+
+      #contacts.section-tab{style: params[:selected] == "contacts" ? '' : 'display:none'}
+        = render :partial => "vendors/contacts", local: {vendor: @vendor}
+
+      #insurances.section-tab{style: params[:selected] == "insurances" ? '' : 'display:none'}
+        = render :partial => "vendors/vendors_insurances", local: {vendor: @vendor}
+      
+      #events.section-tab{style: params[:selected] == "events" ? '' : 'display:none'}
+        = render :partial => "vendors/events", local: {}
+
+      #preferences.section-tab{style: params[:selected] == "preferences" ? '' : 'display:none'}
+        = render :partial => "vendors/preferences", local: {}
+
+      #issues.section-tab{style: params[:selected] == "issues" ? '' : 'display:none'}
+        = render :partial => "issues/issues", locals: {subject: @vendor}
+      
+      #capacity.section-tab{style: params[:selected] == "capacity" ? '' : 'display:none'}
+        = render :partial => "vendors/capacity"
+      
+      #profile.section-tab{style: params[:selected] == "profile" ? '' : 'display:none'}
+        = render partial: "vendors/biography", locals: {vendor: @vendor}
+
+      #reviews.section-tab{style: params[:selected] == "reviews" ? '' : 'display:none'}
+        = render partial: "vendors/vendor_ratings", locals: {vendor: @vendor}

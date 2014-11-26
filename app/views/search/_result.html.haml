@@ -1,0 +1,7 @@
+.search-result{"data-result-id"=>result[:id],"data-model"=>result[:model]}
+  .heading
+    = link_to(result[:heading], result[:model].constantize.find(result[:id]))
+
+  - if result[:heading] != result[:preview]
+    .preview= result[:preview]
+

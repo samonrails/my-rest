@@ -1,0 +1,22 @@
+- @account ||= Account.new
+
+.modal-wrapper
+  = simple_form_for @account, remote: false  do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 New Account
+
+    .modal-body.auto_size_modal_body
+      = f.input :name
+      = f.input :account_type, collection: AccountType.available_values.collect{|c| [c.titleize, c]}
+      = f.input :account_manager_id, collection: User.fooda_employee, label_method: :name, value_method: :id, label: "Account Manager"
+      = f.input :account_exec_id, collection: User.fooda_employee, label_method: :name, value_method: :id, label: "Account Executive"
+      = f.input :sales_rep_id, collection: User.fooda_employee, label_method: :name, value_method: :id, label: "Sales Representative"
+      = f.input :active, :label => false, inline_label: true
+      = f.input :tax_exempt, :label => false, inline_label: true
+
+    .modal-footer
+      = f.submit(:class => "btn btn-primary")
+

@@ -1,0 +1,45 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+#  database: snappea_development_select
+  database: snappea_devel
+  pool: 5
+  username: enbake
+  password: enbake
+  host: localhost
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: snappea_test
+  pool: 5
+  username: enbake
+  password: enbake
+  host: localhost
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: snappea_production
+  pool: 5
+  username: enbake
+  password: enbake
+  host: localhost
+
+experimental:
+  adapter: postgresql
+  encoding: unicode
+  database: snappea_development_select
+  pool: 5
+  username: enbake
+  password: enbake
+  host: localhost
+
+staging:
+  adapter: postgresql
+  encoding: unicode
+  database: snappea_development_select
+  pool: 5
+  username: enbake
+  password: enbake
+  host: localhost

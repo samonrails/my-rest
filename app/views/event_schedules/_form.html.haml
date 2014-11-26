@@ -1,0 +1,151 @@
+- @event_schedule ||= EventSchedule.new(:product => Product.catering, :meal_period => MealPeriod.lunch, :account => @account, :days_to_schedule => 30)
+
+= simple_form_for [@account, @event_schedule] do |f|
+  .row-fluid
+    .span12.well
+      %h4 Event Details
+      .row-fluid
+        .span3
+          %h5 Account
+          = f.label "Account Name"
+          = f.hidden_field :account_id, :value => @account.id
+          %input{:size => "16", :type => "text", :value => "#{@account.name}", "readonly" => "true"}
+          = f.association :location, include_blank: "Choose a location", collection: @account.locations
+          = f.input :meal_period, :collection => MealPeriod.available_values.collect{|c| [c.titleize, c]}, :include_blank => false
+          = f.input :product, collection: Product.available_values.collect{|c| [c.titleize, c]}, :include_blank => false
+          = f.association :contact, include_blank: "Choose a contact" , collection: @account.contacts
+        .span3
+          %h5 Vendor
+          = f.label "Vendor Name"
+          %select{:id => "event_schedule_vendor_id", :name => "event_schedule[vendor_id]", :class => "selectpicker"}
+            - if !@event_schedule.location_id.nil?
+              - Vendor.get_vendors_by_cuisine_and_product_and_location_and_account("Any", @event_schedule.product, @event_schedule.location.id, @account.id).each do |k, v|
+                %option
+                %optgroup{:label=>"#{k}"}
+                  - v.each do |vendor|
+                    - if vendor == @event_schedule.vendor
+                      %option{ :value => vendor.id, :selected => 'selected' }= vendor
+                    - else
+                      %option{ :value => vendor.id }= vendor
+          = f.association :menu_template, :collection => @event_schedule.vendor ? @event_schedule.vendor.menu_templates : MenuTemplate.select{|mt| mt.id == 0}
+          = f.input :quantity, label: "Account Participation", min: 0
+          = f.input :event_schedule_owner_id, label: "Event Schedule Owner", collection: User.fooda_employee.collect{|c| [c.name, c.id]}, :selected => @event_schedule.event_schedule_owner ? @event_schedule.event_schedule_owner_id : current_user.id
+        .span6
+          %h5 Event Timetable 
+
+          .row-fluid
+            .span6
+              %label
+                * Event Start Time
+              .input-append.date.form_time
+                %input{:size => "16", :type => "text", :name => "event_schedule[event_start_time]", :value => "#{@event_schedule.event_start_time.strftime("%I:%M %p") unless @event_schedule.event_start_time.nil?}"}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+
+            .span6
+              %label
+                Event End Time
+              .input-append.date.form_time
+                %input{:size => "16", :type => "text", :name => "event_schedule[event_end_time]", :value => "#{@event_schedule.event_end_time.strftime("%I:%M %p") unless @event_schedule.event_end_time.nil?}"}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+
+          .row-fluid
+            .span6
+              %label
+                Setup Start Time
+              .input-append.date.form_time
+                %input{:size => "16", :type => "text", :name => "event_schedule[setup_start_time]", :value => "#{@event_schedule.setup_start_time.strftime("%I:%M %p") unless @event_schedule.setup_start_time.nil?}"}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+            .span6
+              %label
+                Setup End Time
+              .input-append.date.form_time
+                %input{:size => "16", :type => "text", :name => "event_schedule[setup_end_time]", :value => "#{@event_schedule.setup_end_time.strftime("%I:%M %p") unless @event_schedule.setup_end_time.nil?}"}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+
+  .row-fluid
+    .span6.well
+      %h4 Schedule Information
+      .row-fluid
+        .span12
+          .row-fluid
+            %label
+              * Repeat Frequency
+            = f.select_recurring :schedule
+          .row-fluid
+            .event-schedule-tool-tip
+              %label
+                %a{id: "tool-tip", title: "The Snappea event scheduler will automatically create events this many days in the future for this schedule." } 
+                  %i.icon.icon-info-sign
+                Number of Days to Auto Schedule
+            = f.number_field :days_to_schedule, label: false, min: 0, value: :none
+          .row-fluid
+            .event-schedule-tool-tip
+              %label
+                %a{id: "tool-tip", title: "This date is inclusive so if this schedule wants an event on this day, the scheduler will place the first scheduled event on this day." } 
+                  %i.icon.icon-info-sign
+                * Schedule Start Date
+          .row-fluid
+            .input-append.date.form_date
+              %input{:size => "16", :type => "text", :name => "event_schedule[schedule_start_date]", :value => "#{@event_schedule.schedule_start_date.strftime("%d %B %Y") unless @event_schedule.schedule_start_date.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+          .row-fluid
+            .event-schedule-tool-tip
+              %label
+                %a{id: "tool-tip", title: "This date is inclusive so if this schedule wants an event on this day, the scheduler will place the final scheduled event on this day." } 
+                  %i.icon.icon-info-sign
+                Schedule Final Date
+          .row-fluid
+            .input-append.date.form_date
+              %input{:size => "16", :type => "text", :name => "event_schedule[schedule_end_date]", :value => "#{@event_schedule.schedule_end_date.strftime("%d %B %Y") unless @event_schedule.schedule_end_date.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+
+    .span6.well
+      %h4 Pause Schedule
+      .row-fluid
+        .event-schedule-tool-tip
+          %label
+            %a{id: "tool-tip", title: "This date is inclusive so if you pause the schedule on this day and the schedule tried to schedule an event on this day, the scheduler will place the final scheduled event on this day. Be sure that your 'Number of days to auto-schedule' does not extended past this date or you will have to manually delete the extra events." } 
+              %i.icon.icon-info-sign
+            Pause Schedule at this Date
+      .row-fluid
+        .input-append.date.form_date
+          %input{:size => "16", :type => "text", :name => "event_schedule[pause_start_date]", :value => "#{@event_schedule.pause_start_date.strftime("%d %B %Y") unless @event_schedule.pause_start_date.nil?}"}
+          %span.add-on
+            %i.icon-remove
+          %span.add-on
+            %i.icon-th
+      .row-fluid
+        .event-schedule-tool-tip
+          %label
+            %a{id: "tool-tip", title: "This date is inclusive so if you resume the schedule on this day and the schedule tries to schedule an event on this day, the scheduler will place the first scheduled event on this day." } 
+              %i.icon.icon-info-sign
+            Resume Schedule at this Date
+      .row-fluid
+        .input-append.date.form_date
+          %input{:size => "16", :type => "text", :name => "event_schedule[pause_end_date]", :value => "#{@event_schedule.pause_end_date.strftime("%d %B %Y") unless @event_schedule.pause_end_date.nil?}"}
+          %span.add-on
+            %i.icon-remove
+          %span.add-on
+            %i.icon-th
+    
+  .row-fluid
+    .span12
+      = f.submit("Save Event Schedule", :class => "btn btn-primary")

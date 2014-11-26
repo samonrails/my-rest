@@ -1,0 +1,209 @@
+:javascript
+  Application.select_orders.data = {};
+  Application.select_orders.data.inventory_items = #{ @inventory_items.to_json.html_safe };
+  Application.select_orders.data.cse_key = "#{ Figaro.env.braintree_client_side_encryption_key }";
+
+.new_inventory_item.auto_size_modal.modal.hide.fade
+  = render :partial => "select/select_orders/new_inventory_item"
+
+#new-transaction-form.modal.hide.fade
+  / Filled by JS
+
+#select-order
+  .row-fluid
+    .span12
+      %h2 Select Order
+  .row-fluid
+    .span8
+      ID:
+      = pretty_id @select_order.id
+      |
+      = link_to @select_order.user.name, edit_admin_user_path(@select_order.user.id)
+      |
+      = link_to @select_order.user.email, edit_admin_user_path(@select_order.user.id)
+      |
+      = link_to "Select Event: #{pretty_id(@select_order.select_event.id)}", select_event_path(@select_order.select_event.id)
+
+    .span4
+      .pull-right{:style => "margin-left: 5px"}
+        / If the order is not in editing mode provide a mechanism to change the mode
+        - if @select_order.editing?
+          %span.label.label-warning
+            %big Adjust Order
+        - elsif Time.now > @select_order.select_event.ordering_window_end_time
+          %span.label.label-important
+            %big Order Window Ended
+        - else
+          = simple_form_for :select_order, url: select_select_order_path(@select_order), method: :PUT, html: {class: "form-inline pull-right", style: "margin-bottom: 0"} do |f|
+            = f.hidden_field :edit_mode, value: !@select_order.edit_mode
+            = f.submit "Adjust Order", class: "btn btn-success btn-mini"
+
+      .pull-right
+        / Display the status of the order
+        - if @select_order.status.nil?
+          %span.label.label-important Select order (incorrectly) has NO status!
+        - else
+          - label_class = ''
+          - label_class = 'label-info' if [:cart].include? @select_order.status.to_sym
+          - label_class = 'label-success' if [:checkout_complete, :completed].include? @select_order.status.to_sym
+          - label_class = 'label-inverse' if [:pending].include? @select_order.status.to_sym
+          - label_class = 'label-important' if [:canceled, :system_canceled].include? @select_order.status.to_sym
+          %span.muted Order status
+          %span.label{:class => label_class}
+            %big= pretty_status @select_order.status
+
+  %hr
+
+  - if @select_order.select_order_items.empty?
+    .well.muted
+      No menu items associated with this order.
+  - else
+    - item_status = :current
+    - if @select_order.editing?
+      - item_status = :provisioned
+    - @select_order.select_order_items.where(status: item_status).order(:inventory_item_id).each do |select_order_item|
+      = render :partial => "select/select_orders/select_order_item", :locals => {select_order_item: select_order_item}
+
+  %hr
+  .row-fluid
+    .span3
+      - if @select_order.editing?
+        %a.btn.btn-small.btn-success.toggle-modal#new_inventory_item{"data-target" => ".new_inventory_item"}
+          %i.icon.icon-plus-sign.icon-white{"data-target" => ".new_inventory_item"}
+          New Menu Item
+
+    .span3{:class => (@select_order.editing? ? :offset3 : :offset6)}
+      %table.table.table-bordered
+        %thead
+          %tr
+            %th Current Order
+        %tbody.page
+          - @select_order.select_order_items.where(status: :current).order(:inventory_item_id).each do |menu_item|
+            %tr
+              %td= menu_item.inventory_item.name_public
+              %td= menu_item.quantity
+              %td.align-right $#{SelectPricing.quantity_sum_sell_price_select_order_item menu_item}
+          %tr
+            %th{:colspan => 2} Sub-Total
+            %th.align-right $#{Money.new(@select_order.subtotal_amount_cents)}
+          %tr
+            %td{:colspan => 2} Delivery Fee
+            %td.align-right $#{Money.new(@select_order.delivery_amount_cents)}
+          %tr
+            %td{:colspan => 2} Gratuity
+            %td.align-right $#{Money.new(@select_order.gratuity_amount_cents)}
+          %tr
+            %td{:colspan => 2} Tax
+            %td.align-right $#{Money.new(@select_order.tax_amount_cents)}
+          %tr
+            %td{:colspan => 2} Employer Subsidy
+            %td.align-right $0.00
+          %tr
+            %th{:colspan => 2} Total
+            %th.align-right $#{Money.new(@select_order.total_amount_cents)}
+
+    - if @select_order.editing?
+      .span3
+        %table.table.table-bordered
+          %thead
+            %tr
+              %th Adjusted Order
+
+          %tbody.page
+            - @select_order.select_order_items.where(status: :provisioned).order(:inventory_item_id).each do |menu_item|
+              %tr
+                %td= menu_item.inventory_item.name_public
+                %td= menu_item.quantity
+                %td.align-right $#{SelectPricing.quantity_sum_sell_price_select_order_item menu_item}
+            - recalc_data = @select_order.recalc_totals :provisioned
+            %tr.odd
+              %th{:colspan => 2} Sub-Total
+              %th.align-right $#{recalc_data[:subtotal_amount_cents]}
+            %tr
+              %td{:colspan => 2} Delivery Fee
+              %td.align-right $#{recalc_data[:delivery_amount_cents]}
+            %tr
+              %td{:colspan => 2} Gratuity
+              %td.align-right $#{recalc_data[:gratuity_amount_cents]}
+            %tr
+              %td{:colspan => 2} Tax
+              %td.align-right $#{recalc_data[:tax_amount_cents]}
+            %tr
+              %td{:colspan => 2} Employer Subsidy
+              %td.align-right $0.00
+            %tr
+              %th{:colspan => 2} Total
+              %th.align-right $#{recalc_data[:total_amount_cents]}
+
+  - if @select_order.editing?
+    %hr
+    .row-fluid
+      .span3.offset7.align-right
+        %a.new-select-order-transaction.btn.btn-success.toggle-modal{"data-target" => "#new-transaction-form", :url => select_select_order_new_transaction_path(@select_order)}
+          %i.icon-check.icon-white
+          Save Adjusted Order
+      .span2
+        = simple_form_for :select_order, url: select_select_order_path(@select_order), method: :PUT, html: {class: "inline-form"}  do |f|
+          = f.hidden_field :edit_mode, value: !@select_order.edit_mode
+          = f.hidden_field :status, value: :canceled
+          = f.submit "Cancel Order", id: :cancel_select_order, message: "Cancel Select Order: #{pretty_id @select_order.id}: Are you sure?", class: "btn btn-danger"
+  %hr
+  .row-fluid
+    - unless @select_order.editing?
+      .pull-right
+        %br
+        %a.new-select-order-transaction.btn.btn-success.btn-mini.toggle-modal{"data-target" => "#new-transaction-form", :url => new_select_select_order_select_order_transaction_path(@select_order.id)}
+          %i.icon-plus.icon-white
+          New Transaction
+    %h3 Transaction Log
+  %table.table.table-bordered
+    %thead
+      %tr
+        %th #
+        %th TimeStamp
+        %th Payment Method &amp; Notes
+        %th.align-right Amount
+        %th Transaction ID
+        %th Initiated By
+        %th Status
+        %th &nbsp;
+
+    %tbody.page
+      / Create a row for each transaction on this select order
+      - total_amount = Money.new(0)
+      - select_order_transactions_desc(@select_order).each do |t|
+        %tr{:class => (t.superceded ? "muted" : "")}
+          %td #{t.id}
+          %td #{t.timestamp}
+          %td
+            =select_order_transaction_card_long(t)
+            %br
+            %small #{t.notes}
+          %td.align-right #{number_to_currency(t.amount.to_money)}
+          %td #{t.transaction_id}
+          %td #{t.user.name}
+          %td
+            - if t.superceded
+              %small.muted #{pretty_status t.status}
+            - elsif t.status
+              - label_class = ''
+              - label_class = 'label-info' if [:authorized].include? t.status.to_sym
+              - label_class = 'label-success' if [:submitted, :submitted_for_settlement, :settled].include? t.status.to_sym
+              - label_class = 'label-warning' if [:pending].include? t.status.to_sym
+              - label_class = 'label-important' if [:voided, :refunded].include? t.status.to_sym
+              %span.label{class: label_class} #{pretty_status t.status}
+          %td
+            - if t.superceded
+              %small.muted Superceded
+            - elsif !t.is_refund
+              - total_amount = total_amount + t.amount.to_money
+              %a.new-select-order-transaction.btn.btn-mini.btn-success.toggle-modal{"data-target" => "#new-transaction-form", :url => select_select_order_select_order_transaction_refund_path(@select_order.id, t.id)}
+                Refund
+    %tfoot
+      %tr
+        %td{colspan: 3}
+        %td.align-right
+          %strong #{number_to_currency(total_amount)}
+        %td{colspan: 4}
+
+

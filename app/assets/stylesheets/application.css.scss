@@ -1,0 +1,19 @@
+/*
+ *= require_self
+ *= require twitter/bootstrap
+ *= require twitter/bootstrap/_responsive
+ *= require select2
+ *= require datetimepicker
+ *= require iThing
+ *= require recurring_select
+ *= require jquery.fileupload-ui
+ *= require jquery.ui.all
+ *= require_tree ./shared
+ *= require_tree ./accounts
+ *= require_tree ./vendors
+ *= require_tree ./events
+ *= require_tree ./issues
+ *= require_tree ./assets
+*/
+
+@import "variables";

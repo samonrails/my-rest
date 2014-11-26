@@ -1,0 +1,156 @@
+- star = level.split(" ")[0]
+- product_type_for_href = @vendor ? product_type : pt
+- href = reviews_rollup ? reviews_rollup_path(reviews_rollup, level: level, index: i) : "#"
+.row
+  .span4
+    %h5
+      %a{:href => href, :id => @vendor ? "refresh_#{product_type}_#{star}" : "refresh_#{pt}_#{star}", :class => "bar_graph_title", "data-star" => star, "data-index" => i, "data-product" => product_type_for_href, "data-level" => level}
+        = level
+- if rating_array.size > 0
+  - ratings = []
+  - colors = ["#E05D62", "#ED8560", "#F3AF64", "#DDCA61", "#D3A75E"]
+  - avg_ratings = {}
+  - (1..5).each do |i|
+    - ratings << rating_array.count{|r| r == i}
+  - ratings.reverse!
+  - (1.month.ago.to_date..Date.today).each do |date|
+    - reviews_upto_date = reviews.select {|r| r.created_at.to_date <= date}.map(&:rating)
+    - rate = average_rating(reviews_upto_date)
+    - (avg_ratings[date.strftime("%b %-d")] = rate) if rate
+  .span3.div1
+    %div{:id => "barchart#{i}", :class => "barcharts_#{product_type_for_href}"}
+    %table
+      %tr
+        %td
+          .inventory_rating{"data-rating" => average_rating(rating_array)}
+        %td
+          #{average_rating(rating_array)} (#{rating_array.size} #{"Review".pluralize(rating_array.size)})
+        %td{style: "width:47px;"}
+          .pull-right
+            - if @vendor
+              %a{:href => export_bar_graph_data_vendor_path(@vendor, product_type: product_type, format: :xls, level: level)}
+                = image_tag('/images/Office-Excel-icon.png', size: "25x25")
+            - else
+              %a{:href => export_bar_graph_data_account_path(@account, product_type: pt, format: :xls, level: level)}
+                = image_tag('/images/Office-Excel-icon.png', size: "25x25")
+  .span3.margin_left_0{:id => "linechart#{i}"}
+  = content_for(:local_data) do
+    :javascript
+      $( function() {
+        $('#barchart#{i}').highcharts({
+          chart: {
+            type: 'bar',
+            width: 200,
+            height: 200,
+            events: {
+              click: function(event) {
+                $.fetch_reviews_data('#{reviews_rollup_path(reviews_rollup, level: level, index: i)}', '#{product_type_for_href}');
+                div_charts = $('.barcharts_#{product_type_for_href}')
+                for(var a = 0; a < div_charts.length; a++ ) {
+                  chart_obj = $("#"+div_charts[a].id).highcharts();
+                  chart_obj.chartBackground.css({
+                  color: '#FFFFFF'
+                  });
+                  for (var i = 0; i < 5; i++) {
+                    chart_obj.series[0].data[i].update({ borderColor: null }, true, false);
+                  }
+                }
+                this.chartBackground.css({
+                  color: '#FCFFC5'
+                  });
+              }
+            }
+          },
+          title: {
+            text: 'Rating Distribution',
+            style: {
+              fontSize: '12px'
+            }
+          },
+          xAxis: {
+            type: 'integer',
+            categories: ['5 Star', '4 Star', '3 Star', '2 Star', '1 Star']
+          },
+          plotOptions: {
+            series: {
+              showInLegend: false,
+              pointWidth: 18,
+              pointPadding: 0,
+              cursor: 'pointer',
+              point: {
+                events: {
+                  click: function() {
+                    $.fetch_reviews_data('#{reviews_rollup_path(reviews_rollup, level: level, index: i)}&rating=' + this.category[0], '#{product_type_for_href}');
+                    div_charts = $('.barcharts_#{product_type_for_href}')
+                    for(var a = 0; a < div_charts.length; a++ ) {
+                      chart_obj = $("#"+div_charts[a].id).highcharts();
+                      chart_obj.chartBackground.css({
+                      color: '#FFFFFF'
+                      });
+                      for (var i = 0; i < 5; i++) {
+                        chart_obj.series[0].data[i].update({ borderColor: null }, true, false);
+                      }
+                    }
+                    this.update({ borderColor: 'Black' }, true, false)
+                    $("#barchart#{i}").highcharts().chartBackground.css({color: '#FCFFC5'});
+                  }
+                }
+              }
+            }
+          },
+          yAxis: {
+            title: {
+              text: ''
+            }
+          },
+          series: [{
+            name: 'Count',
+            data: [{y: #{ratings[0]}, color: "#{colors[0]}"},
+                  {y: #{ratings[1]}, color: "#{colors[1]}"},
+                  {y: #{ratings[2]}, color: "#{colors[2]}"},
+                  {y: #{ratings[3]}, color: "#{colors[3]}"},
+                  {y: #{ratings[4]}, color: "#{colors[4]}"}]
+            }]
+        });
+        if ("#{level}" == "Event Level Food Ratings"){
+          $("#barchart#{i}").highcharts().chartBackground.css({color: '#FCFFC5'});
+        }
+        $('#linechart#{i}').highcharts({
+          chart: {
+            type: 'line',
+            height: 200,
+            width: 300
+          },
+          title: {
+            text: '30 Day Trailing Average of Ratings',
+            style: {
+              fontSize: '12px'
+            }
+          },
+          xAxis: {
+            tickInterval: #{(avg_ratings.length + 4)/5},
+            categories: #{avg_ratings.keys}
+          },
+          yAxis: {
+            title: {
+              text: 'Rating'
+            }
+          },
+          plotOptions: {
+            series: {
+              showInLegend: false
+            }
+          },
+          series: [{
+            name: 'Rating',
+            color: '#F3AF64',
+            data: #{avg_ratings.values}
+            }
+          ]
+        });
+      });
+  %br
+  %br
+  %br
+- else
+  .span4{:style => "font-size: 12px; font-style: italic;"}No Feedback Yet

@@ -1,0 +1,27 @@
+.modal.hide.fade{"id"=>"new_pricing_tier_form"}
+  = render :partial => "/pricing_tiers/new", :locals => {pricing_tier: PricingTier.new}
+
+.pull-right.admin-buttons
+  %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#new_pricing_tier_form"}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_pricing_tier_form"}
+    Pricing Tier
+    
+%table.table.table-striped.table-condensed
+  %thead
+    %tr
+      %th Name
+      %th Gross Profit
+    - @pricing_tiers.each do |pt|
+      .modal.hide.fade{"id"=>"edit_pricing_tier_form_" + pt.id.to_s}
+        = render :partial => "/pricing_tiers/edit", :locals => {pricing_tier: pt}
+      %tr
+        %td
+          %a.pointer.toggle-modal{"data-target"=>"#edit_pricing_tier_form_" + pt.id.to_s}#{pt.name}
+        %td= pt.gross_profit
+        %td
+          -if pt.can_destroy?
+            %a.btn.btn-mini.btn-danger{:href=>pricing_tier_path(pt), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+          -else 
+            %a.btn.btn.btn-mini.disabled
+              %i.icon.icon-remove.icon-white

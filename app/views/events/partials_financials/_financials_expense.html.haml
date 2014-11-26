@@ -1,0 +1,88 @@
+.update_transaction_method_form.modal.hide.fade{"id"=>"update_billing_method_form_" + party.class.name + "_" + party.id.to_s}
+  = render :partial => "events/partials_financials/update_billing_method", :locals => {party: party, event_transaction_method: event_transaction_method}
+.auto_size_modal.modal.hide.fade{"id"=>"new_line_item_form_"  + party.class.name + "_" + party.id.to_s}
+  = render :partial => "line_items/new", :locals => {payable_party_type: party.class.name, payable_party_id: party.id, billable_party_type: nil, billable_party_id: nil}
+
+
+
+.pull-right
+  %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#new_line_item_form_" + party.class.name + "_" + party.id.to_s}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_line_item_form_" + party.class.name + "_" + party.id.to_s}
+    Line Item
+%h2 #{title} (#{party})
+
+%table.table.table-striped.table-bordered.table-condensed
+  %thead
+    %tr
+      %th Type
+      %th Sub-Type
+      %th SKU
+      %th Name
+      %th Type
+      %th Prep. Notes
+      %th Quantity
+      %th Unit Price
+      %th Total Price
+      %th Tax Rate
+      %th
+  %tbody
+    - @event.line_items_per_person_charge_by_payable_party(party).each do |li|
+      = render :partial => "events/partials_financials/financials_expense_single_item", :locals => {event: @event, li: li, party: party, include_menu_items: include_menu_items}
+    - @event.line_items_no_price_menu_items_by_payable_party(party).each do |li|
+      = render :partial => "events/partials_financials/financials_expense_single_item", :locals => {event: @event, li: li, party: party, include_menu_items: include_menu_items}
+    - @event.line_items_with_price_menu_items_by_payable_party(party).each do |li|
+      = render :partial => "events/partials_financials/financials_expense_single_item", :locals => {event: @event, li: li, party: party, include_menu_items: include_menu_items}
+    - @event.line_items_non_menu_items_by_payable_party(party).each do |li|
+      = render :partial => "events/partials_financials/financials_expense_single_item", :locals => {event: @event, li: li, party: party, include_menu_items: include_menu_items}
+
+.row
+  .span3.event-document-buttons
+    %a.btn.btn-mini{id: "event-button-purchase-order", href: generate_event_path(event, doc_type: DocumentType::Event::purchase_order, party: party.id, party_type: party.class.name)}
+      %i.icon.icon-file
+      Purchase Order
+    %a.btn.btn-mini{id: "event-button-packing-slip", href: generate_event_path(event, doc_type: DocumentType::Event::packing_slip, party: party.id, party_type: party.class.name)}
+      %i.icon.icon-file
+      Packing Slip
+  .span3
+    %table.table.table-condensed
+      %tr
+        %td Billing method:
+        %td{"id"=>"transaction_method_" + party.class.name + "_" + party.id.to_s} #{event_transaction_method.transaction_method}
+        %td
+          %a.btn.btn-mini.toggle-modal{"data-target"=>"#update_billing_method_form_" + party.class.name + "_" + party.id.to_s}
+            %i.icon.icon-edit.toggle-modal{"data-target"=>"#update_billing_method_form_" + party.class.name + "_" + party.id.to_s}
+
+  .span2
+    %table.table.table-condensed
+      %tr
+        %td Tax Rate:
+        %td= number_with_precision(tax_rate, precision: 3)
+
+  .span4
+    %table.table.table-condensed
+      - subtotal = @event.expense_subtotal_by_party(party)
+      %tr
+        %td Sub Total:
+        %td #{number_to_currency(subtotal)}
+        %td
+      %tr
+        %td General Tax:
+        %td #{number_to_currency(@event.expense_general_tax_by_party(party))}
+        %td
+
+      - @event.line_items_after_subtotal_by_payable_party(party).select{|li| li.parent_id.nil? }.each do |li|
+        %tr
+          %td= li.name + ':'
+          %td= li.percentage_of_subtotal ? number_to_currency(li.expense_total_with_percentage(subtotal)) + ' (' + li.unit_price_expense.to_s + '%)' : number_to_currency(li.expense_total)
+          %td
+            - if li.document.nil?
+              .btn-group
+                %a.btn.btn-mini.toggle-modal{"data-target"=>"#edit_line_item_form_" + li.id.to_s}
+                  %i.icon.icon-edit.toggle-modal{"data-target"=>"#edit_line_item_form_" + li.id.to_s}
+                %a.btn.btn-mini.btn-danger{:href=>event_line_item_path(@event, li), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                  %i.icon.icon-white.icon-remove
+
+      %tr 
+        %td Total:
+        %td #{number_to_currency(@event.expense_total_by_party(party))}
+        %td

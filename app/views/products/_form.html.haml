@@ -1,0 +1,6 @@
+= simple_form_for @product do |f|
+  = f.input :name
+  .in-between
+    = f.label "Product Type"
+    = collection_select(:product, :product_type_id, @product_types, :id, :name, {:prompt => true})
+  = f.submit(:class => "btn btn-primary")

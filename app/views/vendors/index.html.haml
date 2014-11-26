@@ -1,0 +1,26 @@
+-provide(:title, 'Vendors')
+.new-vendor-form.auto_size_modal.modal.hide.fade
+  = render :partial => "vendors/partials/new"
+.section-header
+  %h1.center Vendors
+  %hr
+
+.create-buttons
+  %a#create_vendor.btn.btn-small.btn-success.toggle-modal{"data-target"=>".new-vendor-form"}
+    %i.icon.icon-plus-sign.icon-white{"data-target"=>".new-vendor-form"}
+    Vendor
+
+.vendors.results
+  %table.table.table-striped.table-condensed{:id => "infinite_items"}
+    %thead
+      %tr
+        %th Name
+        %th Cuisines
+        %th Markets
+        %th Active Products
+        %th Fooda Rep
+
+    %tbody.page
+      = render @vendors
+
+  = paginate @vendors, :theme => 'twitter-bootstrap'

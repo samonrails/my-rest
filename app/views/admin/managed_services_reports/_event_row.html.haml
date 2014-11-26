@@ -1,0 +1,50 @@
+%tr{:style => style}
+  - if column_display(@view_parameters, "Account")
+    %td= allow_links ? (link_to event.account.name, account_path(event.account)) : event.account.name
+  - if column_display(@view_parameters, "Date")
+    %td= event.event_start_time.strftime("%m/%d/%y")
+  - if column_display(@view_parameters, "Event ID")
+    %td= allow_links ? (link_to event.pretty_id, event_path(event)) : event.pretty_id
+  - if column_display(@view_parameters, "Sales Rep")
+    %td= event.account.sales_rep.name unless event.account.sales_rep.nil?
+  - if column_display(@view_parameters, "Account Executive")
+    %td= event.account.account_exec.name unless event.account.account_exec.nil?
+  - if column_display(@view_parameters, "Product")
+    %td= event.product.titleize
+  - if column_display(@view_parameters, "Vendors")
+    %td=  event.event_vendors.count > 1 ? "Multiple" : allow_links ? (raw event.event_vendors.map {|a| link_to(a.vendor.name, vendor_path(a.vendor) )}.join(", ")) : (event.event_vendors.map {|a| a.vendor.name}.join(", "))
+  - if column_display(@view_parameters, "Group Size")
+    %td= event.quantity
+  - if column_display(@view_parameters, "COGS")
+    %td= number_to_currency(cogs, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Account Delivery Fees")
+    %td= number_to_currency(delivery_charge_to_account, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Vendor Delivery Fees")
+    %td= number_to_currency(delivery_charge_to_vendor, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Subtotal")
+    %td= number_to_currency(subtotal, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Gratuity")
+    %td= number_to_currency(gratuity, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Enterprise Fee")
+    %td= number_to_currency(enterprise_fee, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Revenue")
+    %td= number_to_currency(revenue, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Vouchers Purchased")
+    %td= number_to_currency(vouchers_purchased, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Tax")
+    %td= number_to_currency(total_tax, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Total Billing")
+    %td= number_to_currency(total_billing, :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "Payment Method")
+    %td= event.event_transaction_method.transaction_method if defined?(event.event_transaction_method.transaction_method)
+  - if column_display(@view_parameters, "GP")
+    %td= number_to_currency((revenue - cogs), :negative_format => "(%u%n)")
+  - if column_display(@view_parameters, "GP%")
+    %td= (revenue == 0 ? '0' : number_with_precision((revenue - cogs)/revenue * 100, precision: 2)) + '%'
+  - if column_display(@view_parameters, "Status")
+    %td= event.status.titleize
+  - if column_display(@view_parameters, "Order Method")
+    - if event.order
+      %td= "Self Service"
+    -else
+      %td= "Phoned In"

@@ -1,0 +1,18 @@
+%h4 Redeem Voucher(s)
+
+.row-fluid
+  .span4
+    .well{style: "width: 80%; border-radius: 8%;"}
+      #search_vouchers_form
+        = simple_form_for :voucher, :url => admin_vouchers_path, :method => :get, remote: true do |f|
+          %b Enter one or many voucher IDs
+          %p{:style => 'margin:0px'} (one per line)
+          = f.text_area "ids", size: "30x10", style: "width: 277px;"
+          .pull-right
+            = f.submit("Search", :class => "btn btn-primary disabled search_vouchers")
+
+  .span5
+    #message_area
+%br
+
+#voucher_lists

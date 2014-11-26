@@ -1,0 +1,85 @@
+#event-details {
+  h2 {
+    text-align: center;
+  }
+
+  h4 {
+    margin: 0px 0px 20px 0px;
+    padding: 0px 0px 0px 0px;   
+  }
+
+  .event-id {
+    font-size: 14px;
+  }
+
+  hr {
+    margin: 0px 0px 20px 0px;
+    padding: 0px 0px 0px 0px;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .table {
+    margin: 45px 0px 0px 0px;
+  }
+
+  .event-document-buttons {
+      margin-top: 45px;
+  }
+
+} 
+
+#credit_card_box_meta {
+  min-height: 120px;
+}
+
+#payment_method_well {
+  min-height: 320px;
+}
+
+#break {
+  margin: 20px 0px 20px 0px;
+}
+
+#event-notes-section {
+  a {color: black;}
+  a:link {text-decoration:none; }
+  a:visited {text-decoration:none; }
+  a:hover {text-decoration:none; }
+  a:active {text-decoration:none; }
+
+  .center {
+    text-align: center;
+  }
+}
+
+.js-menu-fee-message {
+  padding: 0px 100px 0px 100px;
+}
+
+#confirmation-delete-modal {
+  h3 {
+    color: #ee5f5b;
+  }
+}
+
+#event-schedule {
+  hr {
+    margin: 0px 0px 20px 0px;
+    padding: 0px 0px 0px 0px;
+  }
+}
+
+#new_transaction_text {
+  display:none; 
+}
+
+#payment_method_change_warning {
+  display: none;
+}
+
+.invalid{
+  color: #900;
+}

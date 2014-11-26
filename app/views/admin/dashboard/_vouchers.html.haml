@@ -1,0 +1,73 @@
+- if vouchers.any?
+  %table.table.table-striped.table-condensed.table-bordered.Grid
+    %thead.grey-header
+      %tr
+        %th
+          .center
+            Voucher ID
+        %th
+          .center
+            User
+        %th
+          .center
+            Email
+        %th
+          .center
+            Account
+        %th
+          .center
+            Amount
+        %th
+          .center
+            Purchase Date
+        %th
+          .center
+            Expiration Date
+        %th
+          .center
+            Order #
+        %th
+          .center
+            Status
+        %th
+          .center
+            Redeemed
+    %tbody
+      - vouchers.each do |voucher|
+        - voucher_group = voucher.voucher_group
+        = redeem_all_form.hidden_field :token, name: "redeem_voucher[tokens][]", value: voucher.token
+        %tr
+          %td
+            .center
+              = voucher.token
+          %td
+            .center
+              = voucher_group.purcahser.name
+          %td
+            .center
+              = voucher_group.purcahser.email
+          %td
+            .center
+              = voucher_group.event.account.name
+          %td
+            .center
+              = number_to_currency voucher_group.cogs
+          %td
+            .center
+              = voucher_group.created_at.strftime("%m/%d/%Y")
+          %td
+            .center
+              = voucher.expires_at.present? ? voucher.expires_at.strftime("%m/%d/%Y") : '-'
+          %td
+            .center
+              = link_to voucher_group.event.pretty_id, voucher_group.event
+          %td
+            .center
+              = voucher.status.titleize
+          %td{style: "min-width: 68px;"}
+            .center
+              - unless voucher.status.titleize == "Redeemed"
+                %a.btn.btn-small.btn-primary.redeem_voucher_btn{:href => "#", :"data-url" => "#{redeem_voucher_admin_voucher_path(voucher)}"}
+                  Redeem
+              - else
+                = voucher.redeemed_at.strftime("%m/%d/%Y")

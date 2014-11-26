@@ -1,0 +1,28 @@
+- provide :title, "Forgot your password?"
+#user-details.row-fluid
+  .clearfix.overflow-hidden
+    .pull-left.sidebar-bg
+      .pull-right.sidebar-max-width
+        .sidebar
+          .logo.relative
+            = link_to image_tag("catering/logo_catering.png"), catering.root_path
+
+    .pull-left.content-bg
+      .pull-left.content-max-width
+        .content.padded
+
+          .clearfix
+            .pull-left
+              %h1.page-title
+                Forgot your password?
+          .clearfix
+            = form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post }) do |f|
+              /= devise_error_messages!
+              %div
+                = f.label :email
+                %br
+                = f.email_field :email, :autofocus => true
+                = f.hidden_field :catering, value: true
+              %div= f.submit "Send me reset password instructions"
+            = render "devise/shared/catering_links"
+

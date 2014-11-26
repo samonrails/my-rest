@@ -1,0 +1,39 @@
+- eligible = current_user.role?(:accounting)
+- new_transaction_style = (@event.event_transaction_method.transaction_method == 'credit_card') ? "display: show" : "display:none;"
+
+.row-fluid
+  .span12
+    %hr
+
+    #new_transaction_text.pull-right
+      Please save your payment method to create a new transaction.
+
+    -if eligible
+      %button.new-transaction.pull-right.btn.btn-small.btn-success{ style: new_transaction_style,  data:{url: new_event_transaction_path(@event)}} 
+        New Transaction
+    %h3 Transaction History
+
+.row-fluid
+  .span12
+    %table.table.table-striped.table-bordered.table-condensed.Grid
+      %thead
+        %tr
+          %th TimeStamp
+          %th Method
+          %th Amount
+          %th Transaction ID
+          %th Braintree Account
+          %th Initiated By
+          %th Status
+          %th Actions
+      %tbody
+        - @event.payment_histories.order('transaction_id, timestamp DESC').each do |ph|
+          %tr
+            %td= ph.timestamp.in_time_zone(ActiveSupport::TimeZone['Central Time (US & Canada)']).strftime("%D %H:%M %Z")
+            %td= "[#{ph.card_type}] #{ph.nickname} (#{ph.cc_last4}) exp: #{ph.exp_date}"
+            %td= number_to_currency(ph.amount)
+            %td= ph.transaction_id ? ph.transaction_id : "-"
+            %td= ph.customer_id            
+            %td= ph.user.try(:full_name)
+            %td= ph.status.titleize
+            %td.form-inline= braintree_links(ph) if ph.is_latest? && eligible

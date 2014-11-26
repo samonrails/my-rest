@@ -1,0 +1,18 @@
+%h5 Billing References:
+%table.table.table-condensed.table-bordered.table-striped
+  %thead
+    %th Collection
+    %th Required
+    %th Action
+  - e = @select_event_schedule.billing_references
+  - e.each do |event_br|
+    %tr{"data-record-id"=>event_br.id}
+      %td
+        %a.pointer.toggle-modal{"data-target"=>"#edit_event_billing_reference_form_" + event_br.id.to_s}#{event_br.name}
+      %td
+        = content_tag :i, nil, class: event_br.required? ? 'icon-ok' : 'icon-remove'
+      %td{"data-record-id"=>event_br.id}
+        %a.btn.btn-mini.btn-danger{:href=>"/accounts/" + @select_event_schedule.id.to_s + "/select_event_schedule_billing_references/"  + event_br.id.to_s, :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+          %i.icon.icon-white.icon-remove
+  
+ 

@@ -1,0 +1,30 @@
+- if user and can? :add_card, user
+  .new-card-form.auto_size_modal.modal.hide.fade
+    = render partial: "events/partials_payment/cards/new"
+
+.well
+  %h3 Credit Card Information
+  
+  .row-fluid
+    .span12
+      - if user 
+        - if show_new_card
+          - if (can? :add_card, user)
+            %a.btn.btn-small.btn-success.pull-right.toggle-modal#add-payment-card{"data-target" => '.new-card-form'}
+              %i.icon.icon-plus.icon-white{"data-target" => '.new-card-form'}
+              Credit Card
+        - else
+          %i.pull-right Save payment method to add a new card.
+
+        - cards = cards(user)
+        - if cards.present?
+          - card = card(user)
+          = select_tag 'credit-cards', options_for_select(payment_cards(cards), card.token), id: "select_payment_method_credit_card", data: {event: @event.id, event_transaction_method: @event.event_transaction_method.id}
+          %hr
+          #credit_card_box_meta= render 'events/partials_payment/cards/show', card: card
+        
+        - else
+          %i This user does not have any saved cards.
+
+      - else 
+        %i.center Please select a user.

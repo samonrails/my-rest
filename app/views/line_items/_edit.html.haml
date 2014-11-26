@@ -1,0 +1,76 @@
+- unique_id = line_item.id.to_s
+
+.modal-wrapper
+  = form_for [@event, line_item] do |f|
+
+    .modal-header
+
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h2 #{line_item.name}
+      .pull-right
+        %b ID: #{line_item.pretty_id}
+      %h4 #{line_item.line_item_type}: #{line_item.line_item_sub_type}
+
+
+    .modal-body.auto_size_modal_body
+      
+      .row
+        .span4
+          .in-between
+          = f.label :sku
+          = f.text_field :sku, :readonly => true
+          .in-between
+          = f.label :name
+          = f.text_field  :name
+          .in-between
+          = f.label :quantity
+          = f.number_field :quantity
+          .in-between
+          - if !line_item.payable_party_type.nil?
+            = f.label "Prep Notes"
+            = f.text_area :notes, :size => "30x5"
+          - if line_item.line_item_sub_type != "Menu-Item" && line_item.line_item_sub_type != "Menu-Fee"
+            .row
+              .span2
+                = f.label "Below Subtotal"
+              .span1
+                = f.check_box :after_subtotal, :class => "line_item_after_subtotal", :id => "line_item_after_subtotal_" + unique_id, :"unique-id" => unique_id
+            .row
+              .span2
+                = f.label "Percentage"
+              .span1
+                = f.check_box :percentage_of_subtotal, :class => "line_item_percentage_of_subtotal", :id => "line_item_percentage_of_subtotal_" + unique_id, :"unique-id" => unique_id
+        - if line_item.billable_party
+          .span4
+            .in-between
+            %h3 Billable Party: #{line_item.billable_party}
+            .row
+              .span2
+                = f.label "Include Price in Line Item"
+              .span1
+                = f.check_box :include_price_in_revenue
+            .in-between
+            = f.label "Unit Price"
+            = f.text_field :unit_price_revenue, :input_html => {value: number_with_precision(f.object.unit_price_revenue, precision: 2)}
+            .in-between
+            = f.label "Tax Rate Override"
+            = f.text_field :tax_rate_revenue
+        - if line_item.payable_party
+          .span4
+            .in-between
+            %h3 Payable Party: #{line_item.payable_party}
+            .row
+              .span2
+                = f.label "Include Price in Line Item"
+              .span1
+                = f.check_box :include_price_in_expense
+            .in-between
+            = f.label "Unit Price"
+            = f.text_field :unit_price_expense, :input_html => {value: number_with_precision(f.object.unit_price_expense, precision: 2)}
+            .in-between
+            = f.label "Tax Rate Override"
+            = f.text_field :tax_rate_expense
+              
+    .modal-footer
+      = f.submit commit_text, :class => "btn btn-primary"

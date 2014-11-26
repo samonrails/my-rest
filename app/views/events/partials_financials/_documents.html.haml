@@ -1,0 +1,49 @@
+%h2 Document Storage
+
+.pull-right
+  %a.btn.btn-success.btn-small.refresh_documents{ :"data-url" => "#{event_event_documents_path(@event.id)}"}
+    %i.icon.icon-refresh.icon-white
+    Refresh
+
+%table.table.table-striped.table-bordered.table-condensed
+  %thead
+    %tr
+      %th Name
+      %th Document Type
+      %th Recipient
+      %th Total
+      %th Creation Date
+      %th Created By
+
+  %tbody
+  - @documents.each do |doc|
+    %tr
+      %td 
+        - if doc.document_type == "online_order_receipt"
+          = link_to "#{doc.name}", catering.order_url(@event.order, subdomain: Rails.configuration.catering_subdomain)
+        - else
+          - if doc.status == DocumentStatus::created
+            = link_to "#{doc.name}", AWS::private_document_url(doc.full_file_name)
+          - else
+            %i.red
+              = doc.status
+
+      %td 
+        = doc.document_type.titleize
+      %td 
+        = doc.recipient
+      %td
+        / Order total is being saved in cents, so converting it to dollars
+        - if doc.document_type == "online_order_receipt"
+          = number_to_currency Money.new(doc.total.to_i)
+        - else
+          = doc.total == 0 ? "" : number_to_currency(doc.total, :negative_format => "(%u%n)")
+      %td
+        - zone = ActiveSupport::TimeZone.new("Central Time (US & Canada)")
+        = doc.created_at.in_time_zone(zone).strftime("%m/%d/%Y %l:%M %p")
+      %td
+        - if @event.order && doc.document_type == 'online_order_receipt'
+          - user = @event.order.user
+          = link_to user.email, catering.user_url(user, subdomain: Rails.configuration.catering_subdomain) if user
+        - else
+          = doc.creator.nil? ? '-' : doc.creator.email

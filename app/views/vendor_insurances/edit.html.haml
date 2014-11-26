@@ -1,0 +1,104 @@
+.new-vendor-insurance-form.modal.hide.fade
+  = render :partial => "vendor_documents/new", :locals => {party: [@vendor, @vendor_insurance]}
+
+#vendor-insurance
+  .row-fluid
+    .span12
+      %h1.center #{@vendor.name} : Building Insurance and Contracts
+
+      %b.event-id
+        %br
+        Market: #{@vendor_insurance.building.market.name} 
+        .pull-right
+          Status:
+          = ((Time.now.strftime("%Y-%m-%d").to_date < @vendor_insurance.insurance_effective_date) ? "Not Yet Effective" :(Time.now.strftime("%Y-%m-%d").to_date >= @vendor_insurance.insurance_expiration_date) ? "Expired" : "Current")
+      %hr
+
+  .row-fluid
+    .span12
+      = simple_form_for [@vendor, @vendor_insurance] do |f|
+        - @vendor_insurance.errors.full_messages.each do |msg|
+          %ul
+            %li{:style => 'color: red;'}
+              = msg
+
+        .row-fluid
+          .span4
+            %h5
+              Building Address
+            %br
+            = text_field_tag :address1,'',placeholder: "Address Line 1", :style => "width:270px", :value => "#{@vendor_insurance.building.address.address1}", :readonly => true
+            %br
+            = text_field_tag :address2, '', :style => "width:270px", :value => "#{@vendor_insurance.building.address.address2}", :readonly => true
+            %br
+            = text_field_tag :city,'',placeholder: "City", :value => "#{@vendor_insurance.building.address.city}", :readonly => true, :style => "width:100px;"
+            = text_field_tag :state,'',placeholder: "State", :value => "#{@vendor_insurance.building.address.state}", :readonly => true, :style => "width:35px;"
+            = text_field_tag :zip_code,'',placeholder: "Zip Code", :value => "#{@vendor_insurance.building.address.zip_code}", :readonly => true, :style => "width:100px;"
+            %br
+            = text_field_tag :country,'',placeholder: "Country", :style => "width:270px", :value => "#{@vendor_insurance.building.address.country}", :readonly => true
+          
+          .span4
+            %h5 Insurance Details
+            %br
+            Building Requirements:
+            %br
+            = text_area_tag "", "#{@vendor_insurance.building.insurance_requirements}", :readonly => true,  :rows => 5, :cols => 40
+            %br
+            = f.check_box :waiver_subrogation
+            Waiver of Subrogation
+            
+          .span4
+            %h5 Vendor Coverage
+            %br
+            Effective Date:
+            %br
+            .input-append.date.form_date
+              = f.text_field :insurance_effective_date, :value => (@vendor_insurance.insurance_effective_date ? @vendor_insurance.insurance_effective_date.strftime("%d %B %Y") : "")
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+            %br
+            Expiration Date:
+            %br
+            .input-append.date.form_date
+              = f.text_field :insurance_expiration_date, :value => (@vendor_insurance.insurance_expiration_date ? @vendor_insurance.insurance_expiration_date.strftime("%d %B %Y") : "")
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+            %br
+            %br
+
+        .row-fluid
+          .span12
+            .form-actions
+              .pull-right
+                = f.submit("Save Building Insurance Info", :class => "btn btn-primary")
+
+        .row-fluid
+          .span12
+            %h3 Documents
+            %span{:style => 'float: right'}
+              .pull-right{:style => 'position: relative;top: -20px;'}
+                %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-vendor-insurance-form"}
+                  %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-vendor-insurance-form"}
+                  Document
+            .results
+            %table.table.table-striped.table-condensed
+              %thead
+                %tr
+                  %th File Name
+                  %th Upload Date On
+                  %th Uploaded By
+              %tbody
+                - for document in @vendor_insurance.vendor_documents
+                  %tr
+                    - extension = File.extname( document.document_file_name )
+                    %td= link_to document.document_file_name, AWS::private_document_url("vendor_documents/#{document.id}#{extension}")
+                    %td= document.created_at.strftime("%m-%d-%Y")
+                    %td= document.vendor_insurance.user.name
+                    %td
+                      .btn-group
+                        %a.btn.btn-mini.btn-danger{:href=>vendor_vendor_insurance_vendor_document_path(@vendor, @vendor_insurance, document), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                          %i.icon.icon-white.icon-remove

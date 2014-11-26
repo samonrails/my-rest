@@ -1,0 +1,76 @@
+- unless params[:forgot]
+  - provide :title, "Setup your Fooda Account"
+- else
+  - provide :title, "Change your password"
+#user-details.row-fluid
+  .clearfix.overflow-hidden
+    .pull-left.sidebar-bg
+      .pull-right.sidebar-max-width
+        .sidebar
+          .logo.relative
+            = link_to image_tag("catering/logo_catering.png"), catering.root_path
+
+    .pull-left.content-bg
+      .pull-left.content-max-width
+        .content.padded
+
+          - user = User.find_by_reset_password_token(resource.reset_password_token)
+          - if user
+            .clearfix
+              .pull-left
+                %h1.page-title
+                  - unless params[:forgot]
+                    Setup your Fooda Account
+                  - else
+                    Change your password
+            .clearfix
+              = form_for(resource, :as => resource_name, :url => catering_update_password_path, :html => { :method => :put }) do |f|
+                /= devise_error_messages!
+                = f.hidden_field :reset_password_token
+                - unless params[:forgot]
+                  = f.hidden_field :welcome_email, value: true
+                  %div
+                    %label 
+                      %b First Name
+                    = f.text_field :first_name, autofocus: true, :value => user.first_name
+                  %div
+                    %label 
+                      %b Last Name
+                    = f.text_field :last_name, :value => user.last_name
+                  %div
+                    %label 
+                      %b Phone Number
+                    = f.text_field :phone_number, required: true, :value => user.phone_number
+                  %div
+                    %label 
+                      %b Position
+                    = f.text_field :position, :value => user.position
+                %div
+                  %label 
+                    - unless params[:forgot]
+                      %b Password
+                    - else
+                      Password
+                  = f.password_field :password, :autofocus => params[:forgot] ? true : false
+                %div
+                  %label 
+                    - unless params[:forgot]
+                      %b Confirm new password
+                    - else
+                      Confirm new password
+                  = f.password_field :password_confirmation
+                  = f.hidden_field :catering, value: true
+                - unless params[:forgot]
+                  %div
+                    = f.check_box :agreed_terms_at, required: true
+                    &nbsp
+                    I agree to the 
+                    = link_to "Terms of Use","https://www.fooda.com/terms-of-use", target: "_blank"
+                    %br
+                    %br
+                  %div= f.submit "Save"
+                - else
+                  %div= f.submit "Change my password"
+              = render "devise/shared/catering_links"
+          - else
+            %h1.page-title Sorry but this one time link has expired

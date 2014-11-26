@@ -1,0 +1,6 @@
+%tr{:class => "infinite_item"}
+  %td= link_to vendor.name, vendor_path(vendor)
+  %td= vendor.cuisines.map(&:name).join(", ")
+  %td= vendor.markets.map(&:name).join(", ")
+  %td= vendor.products.where("product != ?", "financial_m_s").map{|p| p.product.titleize}.join(", ") unless vendor.products.nil?
+  %td= vendor.vendor_manager unless vendor.vendor_manager.nil?

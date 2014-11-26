@@ -1,0 +1,18 @@
+.modal.hide.fade#ph_settle
+  .modal-wrapper
+    .modal-header
+      %button.close{:type=>"button", "data-dismiss"=>"modal"}
+        &times;
+      %h3
+        Submit For Settlement
+    .modal-body
+      = form_tag settle_event_transactions_path(@event) do
+        .form-inline
+          Enter amount to settle
+          = number_field_tag :amount, nil, id: 'amount-settle', step: 0.01, min: 0.01
+        = hidden_field_tag :trans_id, nil, id: 'trans-id-settle'
+        = hidden_field_tag :user_id, @user.try(:id)
+        %br
+        .modal-footer
+          = submit_tag "Submit", :class => "btn btn-success"
+          %a.btn{"data-dismiss"=>"modal"} Cancel

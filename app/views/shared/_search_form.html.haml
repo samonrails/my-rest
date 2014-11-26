@@ -1,0 +1,132 @@
+.searchable-sortable-pagination-form
+  = semantic_form_for :searchable, :html => { :method => :get, :id => "ssp_form" }  do |f|
+    .row
+      .span12
+        %h4 Filter
+    .row
+      %div{:class => additional_parameters[:ssp_persistence].nil? ? "span12" : "span10", :style => "margin-left:0px"}
+        - search_fields.each_index do |i|
+          .span3{:class => search_fields[i][:span_class].nil? ? "" : search_fields[i][:span_class]}
+            - field_name = search_fields[i][:name]
+            - from_field_name = (field_name.to_s+'_from').to_sym
+            - to_field_name = (field_name.to_s+'_to').to_sym
+            - current_value = params.key?('searchable') ? params['searchable'][field_name] : search_fields[i][:default]
+            // for ranges
+            - current_to_value = params.key?('searchable') ? params['searchable']["#{field_name}_to"] : search_fields[i][:default_to]
+            - current_from_value = params.key?('searchable') ? params['searchable']["#{field_name}_from"] : search_fields[i][:default_from]
+
+            - if (current_from_value.nil? || current_from_value.empty?) && (current_to_value.nil? || current_to_value.empty?)
+              - current_from_value = (Date.today-7).strftime("%d %B %Y - 12:00 AM"); current_to_value = (Date.today+14).strftime("%d %B %Y - 11:59 PM")
+            - elsif current_from_value.nil? || current_from_value.empty?
+              - current_from_value = (Date.parse(current_to_value)-14).strftime("%d %B %Y - 11:59 PM")
+            - elsif current_to_value.nil? || current_to_value.empty?
+              - current_to_value = (Date.parse(current_from_value)+14).strftime("%d %B %Y - 12:00 AM")
+
+            .search-option
+              - if search_fields[i][:as] == :string
+                %label= search_fields[i][:label] || field_name.to_s.titlecase
+                = text_field :searchable, field_name, :value => current_value
+              - elsif search_fields[i][:as] == :range
+                .range
+                  %label
+                    = search_fields[i][:label] || field_name.to_s.titlecase
+                    from
+                  = text_field :searchable, from_field_name, :value => current_from_value, :class => 'numeric'
+                  %label to
+                  = text_field :searchable, to_field_name, :value => current_to_value, :class => 'numeric'
+              - elsif search_fields[i][:as] == :daterange
+                .range
+                  %label
+                    = search_fields[i][:label] || field_name.to_s.titlecase
+                    from
+                  = text_field :searchable, from_field_name, :value => current_from_value, :class => 'datepicker'
+                  %label to
+                  = text_field :searchable, to_field_name, :value => current_to_value, :class => 'datepicker'
+              - elsif search_fields[i][:as] == :datetimerange
+                .range
+                  %label
+                    = label_to_display search_fields[i], "start_time"
+                  .input-append.date.form_date-start
+                    = text_field :searchable, from_field_name, :value => current_from_value
+                    %span.add-on
+                      %i.icon-remove
+                    %span.add-on
+                      %i.icon-th
+                  %label 
+                    = label_to_display search_fields[i], "end_time"
+                  .input-append.date.form_date-end
+                    = text_field :searchable, to_field_name, :value => current_to_value 
+                    %span.add-on
+                      %i.icon-remove
+                    %span.add-on
+                      %i.icon-th
+
+              - elsif search_fields[i][:as] == :select
+                %div{:style => "height:65px"}
+                  %label= search_fields[i][:label] || field_name.to_s.titlecase 
+                  = select(:searchable, field_name, options_for_select(search_fields[i][:collection].collect{|c| [c.titleize, c]}, current_value), {:include_blank => true})
+
+              - elsif search_fields[i][:as] == :multi_select
+                %div{:style => "height:65px"}
+                  - if search_fields[i][:nil_means_all] && current_value.nil?
+                    - current_value = search_fields[i][:collection]
+                  %label= search_fields[i][:label] || field_name.to_s.titlecase
+                  = select(:searchable, field_name, options_for_select(search_fields[i][:collection].collect{|c| [c.titleize, c]}, current_value), {}, {:class => "multiselect", :multiple => true, :style => "display:none"})
+
+              - elsif search_fields[i][:as] == :boolean
+                %label
+                  = check_box_tag("searchable[#{field_name}]", value = 1, checked = params[:searchable][field_name.to_sym], options = {})
+                  = search_fields[i][:label] || field_name.to_s.titlecase
+
+          = hidden_field_tag :direction, params[:direction]
+          = hidden_field_tag :sort, params[:sort]
+          = hidden_field_tag :per_page, params[:per_page]
+          = hidden_field_tag :meta_data, additional_parameters[:meta_data]
+      - unless additional_parameters[:ssp_persistence].nil?
+        .span2{:style => "margin-left:0px"}
+          = hidden_field_tag :ssp_persistence_id
+          = hidden_field_tag :ssp_persistence_action
+          = hidden_field_tag :ssp_persistence_name
+          = hidden_field_tag :ssp_persistence_type
+          .row
+            %h5 Saved Reports
+            - SspPersistence.where(:ssp_persistence_type => additional_parameters[:ssp_persistence]).sort_by{|e| e.name}.each do |sspp|
+              .btn-group.pull-right{:style => "padding-bottom:10px;"}
+                %a.btn.btn-small.btn-primary{:href => request.path_info+"?"+sspp.parameters, :style => "width:100px"}
+                  %i.icon.icon-download.icon-white
+                  #{sspp.name}
+                
+                - if sspp.locked
+                  %a.btn.btn-small.disabled
+                    %i.icon.icon-white.icon-upload
+                  %a.btn.btn-small.disabled
+                    %i.icon.icon-white.icon-remove
+                - else
+                  %a.btn.btn-small.btn-success.ssp_persistence_update{"data-ssp_persistence_id" => sspp.id}
+                    %i.icon.icon-white.icon-upload
+                  %a.btn.btn-small.btn-danger.ssp_persistence_delete{"data-ssp_persistence_id" => sspp.id}
+                    %i.icon.icon-white.icon-remove
+            %a.btn.btn-small.btn-success.pull-right.toggle-modal{"data-target"=>"#add_ssp_persistence"}
+              %i.icon.icon-white.icon-plus
+              Save As
+
+            #add_ssp_persistence.modal.hide.fade
+              .modal-wrapper
+                .modal-header
+                  %button.close{:type=>"button","data-dismiss"=>"modal"}
+                    &times;
+
+                  %h3 Save New Report
+
+                .modal-body
+                  %h4 Name
+                  = text_field_tag 'ssp_persistence_name'
+
+                .modal-footer
+                  %a.btn.btn-primary{:id => "ssp_persistence_add", "data-ssp_persistence_type" => additional_parameters[:ssp_persistence]}
+                    Save
+
+    .row
+      .span12
+        %input{:type => "submit", :value => 'Filter', :class => "btn btn-small", :name => "filter"}
+        %input{:type => "submit", :value => 'Export to XLS', :class => "btn btn-small btn-info", :name => "xls"}

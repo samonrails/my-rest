@@ -1,0 +1,103 @@
+.new-inventory-item-form.modal.auto_size_modal.hide.fade
+  = render partial: "inventory_items/new", locals: {vendor: @vendor, inventory_item: @inventory_item}
+
+.pull-right
+  %a#create_ii.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-inventory-item-form"}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-inventory-item-form"}
+    Inventory Item
+
+%h3.center Primary Inventory Items
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Name (Vendor)
+      %th Name (Public)
+      %th Type
+      %th Description
+      %th Options
+      %th Add-On Item
+      %th COGS
+      %th Perks Price
+      %th Retail Price
+      %th Premium Price
+      %th Product Types
+      %th Actions
+  %tbody
+    - @vendor.inventory_items.where(inventory_item_option: false).sort_by{|e| [MealType.available_values.index(e.meal_type), e.name_vendor]}.each do |inventory_item|
+      %tr{"data-record-id"=>inventory_item.id}
+        %td= link_to inventory_item.name_vendor, edit_vendor_inventory_item_path(@vendor, inventory_item)
+        %td= link_to inventory_item.name_public, edit_vendor_inventory_item_path(@vendor, inventory_item)
+        %td= inventory_item.meal_type.titleize
+        %td 
+          #{inventory_item.description}
+          %br
+          %i Sku: #{inventory_item.sku}
+        %td.center
+          - if inventory_item.option_groups.count > 0
+            %i.icon.icon-ok
+        %td.center
+          - if inventory_item.eligible_for_add_ons?
+            %i.icon.icon-ok
+        %td= number_to_currency inventory_item.cogs
+        %td= number_to_currency inventory_item.perks_price
+        %td= number_to_currency inventory_item.retail_price
+        %td= number_to_currency inventory_item.premium_price
+        %td= inventory_item.inventory_item_product_types.nil? ? "" : inventory_item.inventory_item_product_types.map { |item| item.product_type.titleize }.join(", ")
+        %td
+          .btn-group
+            -if inventory_item.can_destroy?
+              %a.btn.btn-mini.btn-danger{:href=>vendor_inventory_item_path(@vendor, inventory_item), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove
+            -else
+              %a.btn.btn-mini.disabled
+                %i.icon.icon-remove.icon-white
+
+%h3.center Inventory Item Options
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Name (Vendor)
+      %th Name (Public)
+      %th Type
+      %th Description
+      %th Add-On Item
+      %th COGS
+      %th Perks Price
+      %th Retail Price
+      %th Premium Price
+      %th Product Types
+      %th Actions
+  %tbody
+    - @vendor.inventory_items.where(inventory_item_option: true).each do |inventory_item|
+      %tr{"data-record-id"=>inventory_item.id}
+        %td= link_to inventory_item.name_vendor, edit_vendor_inventory_item_path(@vendor, inventory_item)
+        %td= link_to inventory_item.name_public, edit_vendor_inventory_item_path(@vendor, inventory_item)
+        %td= inventory_item.meal_type.titleize
+        %td 
+          #{inventory_item.description}
+          %br
+          %i Sku: #{inventory_item.sku}
+        %td.center
+          - if inventory_item.eligible_for_add_ons?
+            %i.icon.icon-ok
+        %td= number_to_currency inventory_item.cogs
+        %td= number_to_currency inventory_item.perks_price
+        %td= number_to_currency inventory_item.retail_price
+        %td= number_to_currency inventory_item.premium_price
+        %td= inventory_item.inventory_item_product_types.nil? ? "" : inventory_item.inventory_item_product_types.map { |item| item.product_type.titleize }.join(", ")
+        %td
+          .btn-group
+            -if inventory_item.can_destroy?
+              %a.btn.btn-mini.btn-danger{:href=>vendor_inventory_item_path(@vendor, inventory_item), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove
+            -else
+              %a.btn.btn-mini.disabled
+                %i.icon.icon-remove.icon-white
+
+- if params[:new_inventory_item] == "true"
+  :javascript
+    window.addEventListener('load', function () {
+      $('.new-inventory-item-form').modal('show');
+    });

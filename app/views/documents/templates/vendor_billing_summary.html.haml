@@ -1,0 +1,175 @@
+!!!
+%html
+  %head
+    %title Vendor Billing Summary
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}
+    :css
+      @page { margin: 40px 40px 160px 40px; background: #ffffff; }
+      
+      @page { @bottom { content: flow(foot); } }
+      #footer { 
+        flow: static(foot); 
+        font-size: 0.75em;
+        padding-top: 3px;
+        padding-bottom: 10px;
+      }
+
+      #container
+
+      h1 { padding: 0; margin: 0; }
+      h2 { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+      h3 { padding: 20px 0px 10px 0px; margin: 0px 0px 0px 0px; }
+      h4 { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+      p  { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+
+      table {
+        padding-top:20px;
+        width: 100%;
+      }
+
+      table tr th {
+        background: #eee;
+      }
+
+      table tr td.summary {
+        background: #ffdead;
+      }
+
+      table tr td {
+        text-align: left;
+        border-bottom: 1px #ccc solid;
+      }
+
+      table.table-condensed {
+        width: 30%;
+        float:right;
+        position:relative;
+      }
+
+      td.indent {
+        text-align: left;
+        border-bottom: 1px #ccc solid;
+        padding-left: 30px;
+      }
+
+      p.indent {
+        padding-left: 20px;
+      }
+
+      .pull-right {
+        float:right;
+        position:relative;
+      }
+
+      .pull-left {
+        float:left;
+        position:relative;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      #break {
+        clear: both;
+        border-bottom: 1px #000 solid;
+        padding-top: 20px; 
+        padding-bottom: 20px;
+      }
+
+      #footer-break {
+        clear: both;
+        border-bottom: 1px #000 solid;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+
+  %body#container
+    #break
+      .pull-right
+        %img{:src => "https://s3.amazonaws.com/snappea-marketing/logo.png"}
+      %h1 Billing Statement
+      %h2= @date.strftime("%A, %b #{DateTime.now.day.ordinalize}, %Y")
+
+    .pull-left
+      %h4 Bill To:
+      %b 
+        = @vendor.name
+      %p.indent
+        = @vendor.billing_address
+
+    %br
+    %br
+    %br
+    %br
+    - @event_dates.each do |event_date|
+      - unless @events_by_date[event_date].nil?
+        %br
+        %b 
+          Events from:
+          - first_event_start_time = @events_by_date[event_date].first.event_start_time
+          = first_event_start_time.strftime("%A, %b #{first_event_start_time.day.ordinalize}, %Y")
+        %table.table.table-striped
+          %thead
+            %tr
+              %th Event Date
+              %th Event ID
+              %th Service
+              %th Site
+              %th Amount
+          %tbody
+            - total_debit = Money.new(0)
+            - total_credit = Money.new(0)
+            - @events_by_date[event_date].each do |e|
+              - revenue = e.expense_total_by_party(@vendor)
+              - if revenue <= 0
+                - total_debit += revenue
+                %tr
+                  %td= e.event_start_time.strftime("%m/%d/%Y")
+                  %td= e.pretty_id
+                  %td= e.product.titleize
+                  %td= e.account.name
+                  %td= number_to_currency(revenue, :negative_format => "(%u%n)")
+            %tr
+              %td 
+              %td 
+              %td 
+              %td.summary Total Debit
+              %td.summary= number_to_currency(total_debit, :negative_format => "(%u%n)")
+            - @events_by_date[event_date].each do |e|
+              - revenue = e.expense_total_by_party(@vendor)
+              - if revenue >= 0
+                - total_credit += revenue
+                %tr
+                  %td= e.event_start_time.strftime("%m/%d/%Y")
+                  %td= e.pretty_id
+                  %td= e.product.titleize
+                  %td= e.account.name
+                  %td= number_to_currency(revenue, :negative_format => "(%u%n)")
+            %tr
+              %td 
+              %td 
+              %td 
+              %td.summary Total Credit
+              %td.summary= number_to_currency(total_credit, :negative_format => "(%u%n)")
+
+    #footer
+      #footer-break
+
+      %p.pull-left
+        Confidential Information - Do Not Distribute.
+        %br
+        Copyright 
+        = Date.today.year 
+        Fooda Inc. All rights reserved.
+      %p.pull-right
+        600 W Chicago Ave Suite 775 Chicago, IL 60654
+        %br
+        %b Phone: 
+        (312) 662 - 6539
+        = "&#160;" * 7
+        %b Fax:
+        (312) 924 - 0651
+        %br
+        %b Email:
+        accounting@fooda.com

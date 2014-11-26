@@ -1,0 +1,16 @@
+- vendors = select_event_vendor_list( @select_event, @select_event_vendor )
+.modal-wrapper
+  .modal-header
+
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+    %br
+  .modal-body
+
+    = form_for [@select_event, @select_event_vendor] do |f|
+      = render :partial => "select_event_vendors/properties", :locals => {select_event: @select_event, f: f, select_event_vendor: @select_event_vendor, vendors: vendors, entry_id:  @select_event_vendor.id }
+        
+      .modal-footer
+        %input{:type => "hidden", :id => "select_event_id", :value => @select_event.id, :name => "select_event_vendor[id]"}
+
+        = f.submit "Save Changes", :class => "btn btn-primary"

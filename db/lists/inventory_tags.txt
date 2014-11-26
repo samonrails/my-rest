@@ -1,0 +1,49 @@
+Lamb
+Vegetables
+Hamburgers
+Bagels
+Bakery
+Beef
+Beverages
+Bread
+Breakfast
+Cheese
+Chicken
+Chili
+Coffee and Tea
+Comfort Food
+Dessert & Sweets
+Dim Sum
+Dumplings
+Lunch
+Premium
+Flatbread
+Fresh Fruits
+Grilled
+Gyro
+Hot Dogs
+Ice Cream
+Noodles
+Organic
+Pasta
+Pitas
+Pizza
+Potato
+Pork
+Eggs
+Rice & Grains
+Ribs
+Salads
+Sandwiches
+Dips & Spreads
+Seafood
+Soft Drinks
+Soups & Stews
+Smoothies and Juices
+Skewers
+Steak
+Subs
+Spicy
+Tapas
+Wings
+Wraps

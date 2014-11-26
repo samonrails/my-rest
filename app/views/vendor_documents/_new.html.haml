@@ -1,0 +1,14 @@
+- contact ||= VendorDocument.new
+= simple_form_for [@vendor, @vendor_insurance, contact] do |f|
+
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h3 Vendor Insurance
+  .modal-body
+    .in-between
+    = f.label :document, "Document:"
+    = f.file_field :document
+  .modal-footer
+    = f.submit(:class => "btn btn-primary")

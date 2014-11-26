@@ -1,0 +1,27 @@
+- reference ||= BillingReference.new
+- tag_list ||= []
+
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h3 Billing Reference
+
+  = simple_form_for [@event, reference] do |f|
+    = f.hidden_field :name
+    .modal-body
+      .in-between
+      %h4 #{reference.name}
+      .in-between
+      / = f.input :tag_list, :collection => tag_list, label: "Choice"
+      = select_tag "billing_reference[data]", options_for_select(tag_list, reference[:data].count >= 1 ? reference[:data].first : "")
+      = f.hidden_field :required, value: required
+
+    .modal-footer
+      = f.submit (reference.id.nil? ? "Create Billing Reference" : "Save Billing Reference"), :class => "btn btn-primary"
+
+
+
+
+  

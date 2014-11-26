@@ -1,0 +1,56 @@
+.pull-right
+  %a.btn.btn-success.btn-small{ :href => new_account_select_event_schedule_path(@account)}
+    %i.icon.icon-plus.icon-white 
+    Select Event Schedule
+  %a.btn.btn-success.btn-small{ :href => new_account_event_schedule_path(@account) }
+    %i.icon.icon-plus.icon-white 
+    Schedule
+%table.table.table-striped
+  %thead
+    %tr
+      %th Status
+      %th Product
+      %th Location
+      %th Event Time
+      %th Vendor
+      %th Schedule
+      %th Scheduled Until
+      %th Created By
+      %th Created At
+      %th 
+  %tbody
+    - all_events = event_schedule_and_select_event_schedule( @account )
+    / - @account.event_schedules.each do |ec|
+    - all_events.each do |ec|
+      %tr{"data-record-id"=>ec.id}
+        %td= ec.active_friendly_string
+        %td= ec.product.titleize
+        %td= ec.location.name if ec.location
+        %td= ec.event_time
+        %td= ec.vendor.name if ec.vendor
+        %td= ec.schedule_friendly_string
+        %td= ec.processed_until.strftime("%m/%d/%Y") unless ec.processed_until.nil?
+        %td= ec.created_by.name if ec.created_by
+        %td= ec.created_at.strftime("%m/%d/%Y")
+        %td
+          - if ec.is_a?(EventSchedule)
+            .btn-group
+              %a.btn.btn-mini{ :href => edit_account_event_schedule_path(@account, ec) }
+                %i.icon.icon-edit.toggle-modal{ :href => edit_account_event_schedule_path(@account, ec) }
+              -if ec.can_destroy?
+                %a.btn.btn-mini.btn-danger{:href=>account_event_schedule_path(@account, ec), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                  %i.icon.icon-white.icon-remove
+              -else
+                %a.btn.btn-mini.disabled
+                  %i.icon.icon-white.icon-remove
+
+          - if ec.is_a?(SelectEventSchedule)
+            .btn-group
+              %a.btn.btn-mini{ :href => edit_account_select_event_schedule_path(@account, ec) }
+                %i.icon.icon-edit.toggle-modal{ :href => edit_account_select_event_schedule_path(@account, ec) }
+              -if ec.can_destroy?
+                %a.btn.btn-mini.btn-danger{:href=>account_select_event_schedule_path(@account, ec), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                  %i.icon.icon-white.icon-remove
+              -else
+                %a.btn.btn-mini.disabled
+                  %i.icon.icon-white.icon-remove

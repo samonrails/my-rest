@@ -1,0 +1,27 @@
+!!!
+/[if IE 8] <html class="no-js ie8 ie" lang="en">
+/[if IE 9] <html class="no-js ie9 ie" lang="en">
+/ [if gt IE 9]><!
+%html.no-js{lang: "en"}
+  / <![endif]
+  %head
+    %meta{charset: "utf-8"}/
+    %title Error 404 | Not Found
+    %meta{content: "width=device-width, initial-scale=1.0", name: "viewport"}/
+    / Styles
+    %link{href: "//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css", rel: "stylesheet", type: "text/css"}/
+    %link{href: "/styles/error_pages.css", rel: "stylesheet", type: "text/css"}/
+    %link{href: "favicon.ico", rel: "shortcut icon"}/
+  %body.error-page
+    / Error page container
+    %section.error-container
+      %a{"data-original-title" => "", href: "/", title: ""}
+        %img{alt: "Logo", border: "0", src: "/assets/logo.png"}/
+      %h1 404
+      %p.description Whoops! Page Not Found...
+      %p
+        Sorry, it appears the page you were looking for doesn't exist anymore or might have been moved. If the problem persists, please contact our support at
+        = succeed "." do
+          %a{href: "mailto:info@fooda.com"} info@fooda.com
+      %a.btn.btn-alt.btn-primary.btn-large.fooda-colors{href: "/", title: "Back to Homepage"} Back to Homepage
+    / /Error page container

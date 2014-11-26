@@ -1,0 +1,21 @@
+.page-header
+  %h1 Menu Templates Listings
+  = link_to 'New Menu Template', new_menu_template_path, :class => "btn btn-primary pull-right", :style => "margin-top: -30px;"
+%table
+  %tr
+    %th Name
+    %th Pricing Type
+    %th Start Date
+    %th Expiration Date
+    %th Actions
+  - @menu_templates.each do |menu_template|
+    %tr
+      %td= menu_template.name
+      %td= menu_template.pricing_type
+      %td= menu_template.start_date
+      %td= menu_template.expiration_date
+      %td
+        = link_to 'Show', vendor_menu_template_path(@vendor, menu_template)
+        = link_to 'Edit', edit_vendor_menu_template_path(@vendor, menu_template)
+        = link_to 'Destroy', vendor_menu_template_path(@vendor, menu_template), method: :delete, data: { confirm: 'Are you sure?' }
+%br/

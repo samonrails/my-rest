@@ -1,0 +1,46 @@
+#delivery-group {
+
+  #name-pane {
+    margin-bottom: 1em;
+    font-weight: bold;
+
+    label {
+      display: block;
+      font-weight: bold;
+    }
+  }
+
+  #available-accounts-pane {
+    float: left;
+    width: 38%;
+
+    ul {
+      cursor: pointer;
+    }
+
+    ul strong {
+      font-weight: normal;
+    }
+  }
+
+  #selected-accounts-pane {
+    float: right;
+    width: 60%;
+    height: 200px;
+    max-height: 2000px;
+    overflow: scroll;
+
+    td {
+      cursor: pointer;
+      color: #888;
+
+      &.priority {
+        text-align: center;
+      }
+    }
+
+    strong {
+      color: #000;
+    }
+  }
+}

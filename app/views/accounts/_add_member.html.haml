@@ -1,0 +1,29 @@
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+    %h3 Members
+    .well-small.form-inline.center
+      .input-append
+        .btn-group
+          %input.search-field.span3{:type=>"text",:placeholder=>"Search user", :id => "search-string"}
+          %button.btn#search-parameter{:value => "search"} Search
+          %button.btn.dropdown-toggle{"data-toggle" => "dropdown"}
+            %span.caret
+          %ul.dropdown-menu#select-search-param.pull-right
+            %li
+              %a{:href => "#", :value => "search"} Search
+            %li
+              %a{:href => "#", :value => "name"} Search Name
+            %li
+              %a{:href => "#", :value => "email"} Search Email
+
+    = simple_form_for @account, :url => {:action => "associate_users", :method => "PUT"} do |f|
+      .modal-body.auto_size_modal_body
+        = hidden_field_tag "account_id", @account.id, :id => "account_id"
+        = hidden_field_tag "add_users", "", :id => "add_users"
+        = hidden_field_tag "remove_users", "", :id => "remove_users"
+        #users
+          = render :partial => "accounts/list_user"
+      .modal-footer
+        = f.submit "Save", class: "btn btn-success", id: "save_users"

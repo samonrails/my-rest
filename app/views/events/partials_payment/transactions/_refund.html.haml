@@ -1,0 +1,18 @@
+.modal.hide.fade#ph_refund
+  .modal-wrapper
+    .modal-header
+      %button.close{:type=>"button", "data-dismiss"=>"modal"}
+        &times;
+      %h3
+        Refund Amount
+    .modal-body
+      = form_tag refund_event_transactions_path(@event) do
+        .form-inline
+          Enter amount to refund
+          = number_field_tag :amount, nil, id: 'amount-refund', step: 0.01, min: 0.01
+        = hidden_field_tag :trans_id, nil, id: 'trans-id-refund'
+        = hidden_field_tag :user_id, @user.try(:id)
+        %br
+        .modal-footer
+          = submit_tag "Refund", :class => "btn btn-danger"
+          %a.btn{"data-dismiss"=>"modal"} Cancel

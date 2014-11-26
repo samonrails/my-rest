@@ -1,0 +1,48 @@
+.auto_size_modal.modal.hide.fade{"id"=>"add_menu_line_item_form_"  + vendor.class.name + "_" + vendor.id.to_s}
+  = render :partial => "line_items/new_menu_item", :locals => {payable_party_type: vendor.class.name, payable_party_id: vendor.id}
+
+- @event.line_items.select{|li| li.add_on_parent_id.nil? && !li.inventory_item.nil? && li.line_item_sub_type == "Menu-Item" && li.inventory_item.vendor == vendor && li.payable_party == vendor}.sort_by{|e| [MealType.available_values.index(e.inventory_item.meal_type)]}.each do |li|
+  .auto_size_modal.modal.hide.fade{"id"=>"edit_line_item_menu_form_" + li.id.to_s}
+    = render :partial => "line_items/edit_menu_item", :locals => {line_item: li, commit_text: "Edit Menu Item"}
+
+%h2 Menu (#{vendor})
+
+.pull-right
+  %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#add_menu_line_item_form_" + vendor.class.name + "_" + vendor.id.to_s}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#add_menu_line_item_form_" + vendor.class.name + "_" + vendor.id.to_s}
+    Menu Item
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Name
+      %th Type
+      %th Description
+      %th Prep Notes
+      %th.hide COGS
+      %th.hide Sell Price
+  %tbody
+    - @event.line_items.select{|li| li.add_on_parent_id.nil? && !li.inventory_item.nil? && li.line_item_sub_type == "Menu-Item" && li.inventory_item.vendor == vendor && li.payable_party == vendor}.sort_by{|e| [MealType.available_values.index(e.inventory_item.meal_type)]}.each do |li|
+      %tr{"data-record-id"=>li.id}
+        %td
+          %a.pointer.toggle-modal#show_item{"data-target"=>"#edit_line_item_menu_form_" + li.id.to_s}#{li.name}
+        %td= li.inventory_item.meal_type.titleize
+        %td
+          #{li.inventory_item.description}
+          - if li.add_ons.count > 0
+            - option_list = li.add_ons_sorted.map{|li| li.name}.uniq.join(", ")
+            %br
+            %i Options: #{option_list}
+          %br
+          - if li.inventory_item.option_groups.count > 0
+            - if li.required_options_satisfied
+              %span.label.label-success Required Options Satisfied
+            - else
+              %span.label.label-important Required Options Not Satisfied
+        %td.hide= number_to_currency(li.unit_price_expense)
+        %td= li.notes
+        %td.hide= number_to_currency(li.unit_price_revenue)
+        %td
+          - if li.document.nil?
+            %a.btn.btn-mini.btn-danger{:href=>event_line_item_path(@event, li, menu_item: true), :"data-method" => "delete", data: { confirm: 'Are you sure?'}}
+              %i.icon.icon-white.icon-remove

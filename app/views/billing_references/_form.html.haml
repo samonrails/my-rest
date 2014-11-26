@@ -1,0 +1,28 @@
+- reference ||= BillingReference.new
+
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h3
+      .center
+        = reference.id.nil? ? "New Billing Reference" : "Edit Billing Reference"
+
+  = form_for [@account, reference] do |f|
+    .modal-body
+      .form-inline
+        .in-between
+        Name:
+        = f.text_field :name
+        .pull-right
+          = f.check_box :required, style: 'margin-top: 0px;'
+          Required
+      %br
+      .in-between
+      References:
+      %h6{:style => 'margin:0px'} one per line
+      = f.text_area :data, size: '30x10', value: reference.data
+
+    .modal-footer
+      = f.submit (reference.id.nil? ? "Create Billing Reference" : "Save Billing Reference"), :class => "btn btn-primary"

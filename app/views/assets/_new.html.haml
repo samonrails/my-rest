@@ -1,0 +1,9 @@
+%span.btn.btn-small.btn-success.fileinput-button
+  %i.icon-plus.icon-white
+  %span Images
+  #file-fields
+    = ff.file_field "asset_attributes", :name => field_name, :multiple => true, class: 'active'
+%br
+%br
+#hidden-fields{:style => "display: none"}
+%table.table.table-striped#uploadFilesBox

@@ -1,0 +1,133 @@
+-provide :title, "Event | #{@event.pretty_id} | Vendor | #{@event_vendor.vendor.name}"
+- item_level = (@event_vendor.menu_template.pricing_type == MenuPricingType.item_level)
+
+%h2 #{@event.name}
+%h4 #{@event_vendor.vendor.name}
+%br
+
+= simple_form_for [@event, @event_vendor] do |f|
+  .in-between
+  = f.input :participation
+  .in-between
+  - if @event_vendor.invoiced_line_items?
+    = f.hidden_field :menu_template_id
+    Menu Template: 
+    %b #{@event_vendor.menu_template.name}
+    %br
+    %br
+  - else
+    = f.input :menu_template_id, collection: @menu_templates.map { |a| [a.name, a.id]}, :include_blank => false, label: "Menu Template", readonly: @event_vendor.invoiced_line_items?
+  .in-between
+  = f.submit(:class => "btn btn-primary")
+
+
+.pull-right
+  %a.btn.btn-success.btn-small{:href=>new_menu_level_discount_path(:event_vendor_id => @event_vendor.id)}
+    %i.icon.icon-plus.icon-white
+    Menu Level Discount
+
+%table.table.table-striped
+  %thead
+    %tr
+      %th Min Participation
+      %th COGS
+      %th Sell Price
+      %th Actions
+  %tbody
+    %td= "-"
+    %td= number_to_currency(@event_vendor.default_menu_cogs)
+    %td= number_to_currency(@event_vendor.default_menu_sell_price)
+    %td 
+    - @event_vendor.menu_level_discounts.each do |item|
+      %tr{"data-record-id"=>item.id}
+        %td= item.min_participation
+        %td= number_to_currency(item.cogs)
+        %td= number_to_currency(item.sell_price)
+        %td
+          .btn-group
+            %a.btn.btn-mini{:href=>edit_menu_level_discount_path(item)}
+              %i.icon.icon-edit
+            %a.btn.btn-mini.btn-danger{:href=>menu_level_discount_path(item), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove     
+
+%hr
+%h3.center Menu Configuration
+= form_tag change_grouped_menu_template_selections_event_event_vendor_path, :method => :post do
+  - @event_vendor.menu_template.menu_template_groups_with_inventory_items.each do |mtg|
+
+    - inventory_items = []
+    - inventory_items[0] = @event_vendor.menu_template.menu_template_inventory_items_by_group(mtg.id).take(@event_vendor.menu_template.menu_template_inventory_items_by_group(mtg.id).count / 2.0 + 0.5)
+    - inventory_items[1] = @event_vendor.menu_template.menu_template_inventory_items_by_group(mtg.id) - inventory_items[0]
+
+    %h3 #{mtg.name}: Select up to #{mtg.choices_to_select}
+
+    .row
+      - [*0..1].each do |j|
+        .span6
+          %table.table.table-striped.table-condensed
+            %thead
+              %tr
+                %th
+                %th Inventory Item Name
+                - if item_level
+                  %th Incl Exp Prc
+                  %th Incl Rev Prc
+            %tbody
+              - inventory_items[j].each do |ii|
+                %tr
+                  - if item_level
+                    %td
+                      %select{:style => "width:60px; font-size: 12px; height:25px;", :name => "inventory_item_quantity[#{ii.id}]", :class => "inventory_item_quantity"}
+                        - [*0..100].each do |i|
+                          - selected = (i == @event.quantity_of_inventory_item(ii.id))
+                          %option{:value => i, :selected => selected}= i
+                    %td= ii.name_public + (ii.option_groups.count > 0 ? " (Options)" : "")
+                    %td= check_box_tag("include_expense_price[]", value = ii.id, checked = @event.include_expense_price_for_inventory_item(ii.id), options = {})
+                    %td= check_box_tag("include_revenue_price[]", value = ii.id, checked = @event.include_revenue_price_for_inventory_item(ii.id), options = {})
+                  - else
+                    %td= check_box_tag("item_ids[]", value = ii.id, checked = @event.inventory_items_on_menu.include?(ii), options = {})
+                    %td= ii.name_public + (ii.option_groups.count > 0 ? " (Options)" : "") + (ii.premium_price > 0 ? " (+" + number_to_currency(ii.premium_price.to_s) + ")" : "")
+                    
+    %hr
+
+  - if @event_vendor.menu_template.inventory_items_with_no_group.count > 0
+
+    - inventory_items = []
+    - inventory_items[0] = @event_vendor.menu_template.inventory_items_with_no_group.take(@event_vendor.menu_template.inventory_items_with_no_group.count / 2.0 + 0.5)
+    - inventory_items[1] = @event_vendor.menu_template.inventory_items_with_no_group - inventory_items[0]
+
+    - if @event_vendor.menu_template.pricing_type == MenuPricingType.menu_level
+      %h3 Included Items
+
+    .row
+      - [*0..1].each do |j|
+        .span6
+          %table.table.table-striped.table-condensed
+            %thead
+              %tr
+                %th
+                %th Inventory Item Name
+                - if item_level
+                  %th Incl Exp Prc
+                  %th Incl Rev Prc
+            %tbody
+              - inventory_items[j].each do |ii|
+                %tr
+                  - if item_level
+                    %td
+                      %select{:style => "width:60px; font-size: 12px; height:25px;", :name => "inventory_item_quantity[#{ii.id}]", :class => "inventory_item_quantity"}
+                        - [*0..100].each do |i|
+                          - selected = (i == @event.quantity_of_inventory_item(ii.id))
+                          %option{:value => i, :selected => selected}= i
+                    %td= ii.name_public + (ii.option_groups.count > 0 ? " (Options)" : "")
+                    %td= check_box_tag("include_expense_price[]", value = ii.id, checked = @event.include_expense_price_for_inventory_item(ii.id), options = {})
+                    %td= check_box_tag("include_revenue_price[]", value = ii.id, checked = @event.include_revenue_price_for_inventory_item(ii.id), options = {})
+                  - else
+                    %td= check_box_tag("item_ids[]", value = ii.id, checked = @event.inventory_items_on_menu.include?(ii), options = {})
+                    %td= ii.name_public + (ii.option_groups.count > 0 ? " (Options)" : "") + (ii.premium_price > 0 ? " (+" + number_to_currency(ii.premium_price.to_s) + ")" : "")
+                    
+    %hr
+
+  = submit_tag "Submit Changes", :class => "btn btn-primary", :disabled => @event_vendor.invoiced_line_items?
+
+= link_to 'Back to Event', @event

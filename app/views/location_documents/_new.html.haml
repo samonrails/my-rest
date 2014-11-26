@@ -1,0 +1,14 @@
+- contact ||= LocationDocument.new
+= simple_form_for [@location, contact] do |f|
+
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h3 Location Document
+  .modal-body
+    .in-between
+    = f.label :document, "Document:"
+    = f.file_field :document
+  .modal-footer
+    = f.submit(:class => "btn btn-primary")

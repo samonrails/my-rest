@@ -1,0 +1,244 @@
+body {
+  margin-bottom: 100px;
+}
+
+.navbar-fixed-top {
+  position: relative;
+}
+.container {
+  margin-top: 30px;
+}
+
+table.account-product-pricing-tier {
+  width: 400px;
+}
+
+table.account-product-pricing-tier tr th {
+  background: #eee;
+}
+
+table.account-product-pricing-tier tr td {
+  text-align: center;
+  border-bottom: 1px #ccc solid;
+}
+
+i.indent{
+  padding-left: 20px;
+  font-size: .9em;
+}
+
+// Dave said this was cool to do.
+.form-remove {
+  margin-top: 25px;
+}
+
+.container .alert-container {
+  .alert-success {
+    padding: 8px;
+    border-radius: 2px;
+  }
+  .alert-error {
+    padding: 8px;
+    border-radius: 2px;;
+  }
+  position: relative;
+  top: -20px;
+}
+.js-event-toggle-location-type
+{
+  display:none;
+  vertical-align:top;
+  float:left;
+  margin-left:0;
+  padding-left:0;
+}
+
+#user_new_building_new_location
+{
+  display:none;
+  vertical-align:top;
+}
+
+.inline_field_wrapper {
+    display: inline-block;
+}
+
+table.fixed { table-layout:fixed; }
+table.fixed td { overflow: hidden; }
+
+.admin-buttons {
+  float:right;
+  position:relative;
+  padding-top: 15px;
+}
+
+.admin-email-buttons {
+  float:right;
+  position:relative;
+  padding-top: 5px;
+}
+
+.center {
+  text-align: center;
+}
+
+.searchable-sortable-pagination-form {
+  background: #f5f5f5;
+  padding: 30px;
+  margin-bottom: 50px;
+}
+
+.create-buttons {
+  margin: 10px 0px 40px 0px;
+  float:right;
+  position:relative;
+}
+
+#homepage {
+  text-align: center;
+  margin-top: 200px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+#issue-priority {
+  margin-top: 10px;
+  margin-right: 150px;
+}
+
+.js-event-toggle-preference-type {
+  display: none;
+}
+
+.pull-right-m-20 {
+  float: right;
+  margin: 10px;
+}
+
+.stacked-admin-email-buttons {
+  a {
+    margin-bottom: 5px;
+    width: 90%;
+    }
+}
+
+.drpdwn-role {
+  width: 120px;
+}
+
+#inventory-item hr {
+  margin-top: 0;
+}
+
+.margin-left-0 {
+  margin-left: 0px;
+}
+
+.margin-left-10 {
+  margin-left: 10px;
+}
+
+.well .white {
+  background-color: white;
+}
+
+.default {
+  font-size: .8em;
+  color: red;
+  float: right;
+}
+
+.sub-title {
+  font-size: .8em
+}
+
+.admin-user-reviews-td {
+  width:110px;
+}
+
+.item-user-reviews {
+  max-height: 200px;
+  overflow-y: scroll;
+  background: none repeat scroll 0% 0% white;
+  margin: 10px 0 0;
+}
+
+.grey-header {
+  background : #DAD7D7;
+}
+
+.margin-left-0 {
+  margin-left: 0px;
+}
+
+.margin-left-10 {
+  margin-left: 10px;
+}
+
+.pre-scrollable {
+  max-height: 260px;
+}
+
+.vertical-aligned-text td {
+  vertical-align: middle;
+}
+
+.btn-group {
+  .multiselect {
+    text-align: left;
+    
+    .caret {
+      float: right;
+    }
+  }
+}
+  
+.modal form {
+  margin-bottom: 0;
+}
+
+.box-rounded {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+
+  .inner {
+    padding: 15px;
+  }
+
+  form {
+    margin-bottom: 0;
+  }
+}
+
+.dl-horizontal {
+  &.dl-narrow {
+    dt {
+      width: 90px;
+    }
+    dd {
+      margin-left: 110px;
+    }
+  }
+}
+.align-right {
+  text-align: right !important;
+}
+
+.table-striped {
+  font-size: 12px;
+  border-top: 1px solid #dddddd;
+
+  th, td {
+    line-height: 1.3;
+    border: 1px solid #dddddd;
+
+  }
+}
+
+

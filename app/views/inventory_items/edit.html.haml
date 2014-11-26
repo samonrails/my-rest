@@ -1,0 +1,110 @@
+-provide :title, "Inventory Item | #{@inventory_item.id}"
+
+#inventory-item
+  .row-fluid
+    .span12
+      %h1.center Edit Inventory Item
+      %b.event-id
+        ID:
+        = @inventory_item.pretty_id
+        .pull-right
+          Vendor:
+          =@vendor.name
+      %hr
+      
+  .row
+    .span12
+      = simple_form_for [@vendor, @inventory_item] do |f|
+        .row
+          .span3
+            %h5 Details       
+            = f.input :name_vendor, :label => "Name (Vendor)"
+            = f.input :name_public, :label => "Name (Public)"
+            = f.label "Item Type"
+            = f.select :meal_type, MealType.available_values.sort.collect{|c| [c.titleize, c]}
+            = f.input :min_quantity, label: "Minimum Self Service Quantity"
+
+          .span3
+            %h5 Pricing 
+            = f.input :cogs, label: "COGS"
+            = f.input :perks_price
+            = f.input :retail_price
+            .child-inventory-item
+              = f.input :premium_price
+          .span3
+            %h5 Tags
+            = f.input :tag_list, label: "Internal Tags", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.inventory_tags"}
+            
+            = f.input :external_tag_list, label: "External Tags", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.inventory_tags"}
+            
+            = f.input :dietary_restriction_list, label: "Dietary Restrictions", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.dietary_restrictions"}
+        
+          .span3
+            %h5 Products
+            - ProductType.available_values.each do |product_type|
+              - checked = (@inventory_item.inventory_item_product_types.where(:product_type => product_type).count > 0)
+              .row-fluid
+                .span8
+                  %label= product_type.titleize
+                .span1
+                  %input{:checked=>checked, :id=>"product_type_allowed_#{ product_type }",:type=>"checkbox",:name=>"inventory_item[product_types_allowed][#{ product_type }]"}
+        .row-fluid
+          .span6
+            .row-fluid
+              .span6
+                %h5
+                  Feeds Quantity:
+                .span5.margin-left-0
+                  = f.input :min_feeds, label: false, :input_html => {class: "input-small"}
+                .span1.margin-left-10 -
+                .span2.margin-left-0
+                  = f.input :max_feeds, label: false, :input_html => {class: "input-small"}
+              .span6
+                %h5 Packaging Details:
+                = f.input :packaging_details, label: false, collection: PackagingDetails.available_values.collect{|c| [c.titleize, c]}, as: :radio_buttons
+            .row-fluid
+              .span6
+                = f.input :inventory_item_option, inline_label: "Use as Inventory Item Option", label: false
+                = f.input :eligible_for_add_ons, inline_label: "Eligible for Self Service Impulse Add-Ons", label: false
+              .span6 
+
+                /= f.input :add_on, inline_label: "Add-on Item", label: false
+
+            .row-fluid
+              = f.input :description, input_html: { rows: 5, style: 'width: 88%' }
+          .span6
+            .row-fluid
+              .span
+                %h5 Rating
+                - rating_array = @inventory_item.reviews.map(&:rating)
+                - if rating_array.size > 0
+                  %table
+                    %tr
+                      %td
+                        .inventory_rating{"data-rating" => average_rating(rating_array)}
+                      %td
+                        #{average_rating(rating_array)} (#{rating_array.size})
+                  .span10{style: "margin: 10px 0;"}
+                    %b
+                      User Reviews
+                    = render partial: "user_reviews"
+                - else
+                  No Feedback Yet
+
+        .row-fluid
+          .span12
+            .form-actions
+              .pull-right
+                %a.btn.back_to_vendor{:href=>vendor_path(@vendor.id, :selected => "inventory_items")} Back to Vendor
+              = f.submit "Save", :class => "btn btn-primary", :name => 'submit'
+              = f.submit "Save & Add Another", :class => "btn btn-primary", :name => 'submit'
+
+      .row.primary-inventory-item
+        .span12
+          %hr
+          = render :partial => "inventory_items/option_group", :locals => {vendor: @vendor, inventory_item: @inventory_item}
+
+      .row
+        .span12
+          %h3.center Images
+          = render partial: "assets/index", locals: {enclosing_resource: @inventory_item}

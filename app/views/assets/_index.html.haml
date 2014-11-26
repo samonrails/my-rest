@@ -1,0 +1,20 @@
+- asset = Asset.new
+
+.pull-right
+  = form_for [enclosing_resource, asset], html: {multipart: true} do |f|
+    .span.btn.btn-small.btn-success.fileinput-button
+      %i.icon-plus.icon-white
+      %span
+        Image
+        = f.file_field :resource, name: "asset[resource]", multiple: true
+%br
+.span12#add_new_image{ style: enclosing_resource.kind_of?(MenuTemplate) ? "width:82%;" : ""}
+  = render partial: "assets/asset", collection: enclosing_resource.assets
+
+  %script#template-upload{"type" => "text/x-tmpl"}
+    .upload.span2.well#progress_bar_container
+      Uploading Image...
+      .progress.progress-striped.active
+        .bar
+      %div
+        %label#upload_status

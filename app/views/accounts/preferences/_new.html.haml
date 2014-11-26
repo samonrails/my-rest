@@ -1,0 +1,26 @@
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h3 New Preference
+
+- preference ||= AccountPreference.new
+
+= simple_form_for [@account, preference] do |f|
+  .modal-body.moday-body-pref 
+
+    = f.input :preference_type, collection: Fooda::Preferences::Account.available_values.collect{|c| [c.titleize, c]}, include_blank: "Select a Preference Type"
+
+    .js-event-toggle-preference-type
+
+      .js-event-toggle-preference-type-vendor
+        = f.association :vendor
+      .js-event-toggle-preference-type-cuisine
+        = f.input :cuisine, collection: StaticData::Cuisines
+
+      = f.input :disposition, collection: Fooda::Preferences::Disposition.available_values.collect{|c| [c.titleize, c]}
+
+  .modal-footer
+    = f.submit(:class => "btn btn-primary")
+

@@ -1,0 +1,27 @@
+#product-config-section.form-actions
+  = simple_form_for(@vendor, :remote => true, :data => {type: :json}) do |f|
+    %input{:type=>"hidden",:name=>"_method",:value=>"PUT"}
+
+    / - vendor.product_types.sort.each do |record|  
+    - vendor.product_types.select{ |pt| pt.product_type != ProductType.perks}.sort.each do |record|
+      .container.control-group.row-fluid
+        .span3
+          %h5= record.product_type.titleize
+
+        .span4
+          %select{:id=>"product_type_status_#{ record.product_type }",:name=>"vendor[product_type_config][#{ record.product_type }][status]"}
+            - %w{active inactive onboarding}.each do |status|
+              - selected = (vendor.product_type_config[record.product_type]["status"] == status)
+              %option{:value=>status,:selected=>selected}= status.capitalize
+
+        .product-selectors.span5
+          - display_products = ProductType.find_products_by_type(record.product_type) - [Product.financial_m_s]
+
+          - display_products.each do |product|
+            - checked = (vendor.product_type_config[record.product_type][product] == true)
+            .control-group
+              %label= product.titleize
+              %input{:checked=>checked, :id=>"product_availability_#{ product }",:type=>"checkbox",:name=>"vendor[product_type_config][#{ record.product_type }][#{ product }]"}
+
+    .row-fluid
+      = f.button :submit, "Save Products", :class => "btn btn-primary"

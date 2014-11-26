@@ -1,0 +1,7 @@
+.container
+  .span4
+    %b
+      = comment.user.to_s
+    commented at #{comment.created_at}:
+  .container.well.issue_container
+    = comment.description

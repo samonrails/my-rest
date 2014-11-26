@@ -1,0 +1,54 @@
+- events.each do |event|
+  %tr
+    %td
+      .center
+        = link_to event.pretty_id, event
+    %td
+      .center
+        - created_at = event.created_at.in_time_zone(ActiveSupport::TimeZone['Central Time (US & Canada)'])
+        = created_at.strftime("%m/%d/%Y")
+        %br
+          = created_at.strftime("%I:%M %P %Z")
+    %td
+      .center
+        = event.location and event.location.building and event.location.building.market ? event.location.building.market.name : "-"
+    %td
+      .center
+        / We assume central timezone here. This won't work for new markets. 
+        - start_time = event.event_start_time_utc.in_time_zone(ActiveSupport::TimeZone['Central Time (US & Canada)'])
+        = start_time.strftime("%m/%d/%Y")
+        %br
+          = start_time.strftime("%I:%M %P %Z")
+    %td
+      .center
+        = link_to event.account, event.account
+    %td
+      .center
+        = event.created_by.try(:name).try(:titleize)
+    %td
+      .center
+        - event.vendors.each do |v|
+          = link_to v, v
+          %br
+    %td
+      .center
+        - if total = event.revenue_total_by_party(event.account) + event.voucher_groups.inject(Money.new(0)) { |sum, voucher_group| sum + voucher_group.total}
+          = number_to_currency(total)
+    %td
+      .center
+        = event.quantity
+    %td
+      .center
+        = event.status.titleize
+    %td
+      .center
+        = event.account.account_exec.name if event.account.account_exec
+    %td{style: "min-width: 68px;"}
+      .center
+        - if type == 'my_events'
+          %a.btn.btn-small.btn-success#log_issue{href: event_path(event, selected: 'issues', new_issue: true)}
+            %i.icon.icon-plus.icon-white
+            Issue
+        - else
+          = form_for :claim_event, :url => {:controller => "events", :action => "claim_event", :id => event.id}, :method => :put do |f| 
+            = f.submit "Claim", :class => "btn btn-primary btn-small"

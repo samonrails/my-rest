@@ -1,0 +1,87 @@
+- line_item = LineItem.new(:payable_party_type => payable_party_type, :payable_party_id => payable_party_id, :include_price_in_expense => true,  :billable_party_type => billable_party_type, :billable_party_id => billable_party_id, :include_price_in_revenue => true, :quantity => 1, :tax_rate_expense => 0)
+
+- unique_id = ""
+- unique_id += payable_party_type unless payable_party_type.nil?
+- unique_id += payable_party_id.to_s unless payable_party_id.nil?
+- unique_id += billable_party_type unless billable_party_type.nil?
+- unique_id += billable_party_id.to_s unless billable_party_id.nil?
+
+.modal-wrapper
+  = form_for [@event, line_item] do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h2 New Line Item: #{@event.name}
+
+    .modal-body.auto_size_modal_body
+      
+      = f.hidden_field :payable_party_id
+      = f.hidden_field :payable_party_type
+      = f.hidden_field :billable_party_id
+      = f.hidden_field :billable_party_type
+
+      = select_tag 'line_item_type_id', grouped_options_for_select(payable_party_type.nil? ? LineItemType.non_menu_types : LineItemType.non_menu_item_types), :class => "line_item_type_id", :"unique-id" => unique_id
+
+      %hr
+      %div{class:"js-menu-fee-message", style: "display: none;"}
+        .span4
+          The menu-fee line item will be created using the vendor quantity, the COGS from the menu template, and well as the appropriate account pricing tier for the account.  You may change this information after creating the menu-fee line item.
+      %div{class:"js-non-menu-fee-data"} 
+        .row
+          .span4
+            .in-between
+            = f.label :name
+            = f.text_field  :name
+            .in-between
+            = f.label :quantity
+            = f.number_field :quantity
+            .in-between
+            - if !payable_party_type.nil?
+              = f.label "Prep Notes"
+              = f.text_area :notes, :size => "30x5"
+              .in-between
+            .row
+              .span2
+                = f.label "Below Subtotal"
+              .span1
+                = f.check_box :after_subtotal, :class => "line_item_after_subtotal", :id => "line_item_after_subtotal_" + unique_id, :"unique-id" => unique_id
+            .row
+              .span2
+                = f.label "Percentage"
+              .span1
+                = f.check_box :percentage_of_subtotal, :class => "line_item_percentage_of_subtotal", :id => "line_item_percentage_of_subtotal_" + unique_id, :"unique-id" => unique_id
+          - if line_item.billable_party
+            .span4
+              .in-between
+              %h3 Billable Party: #{line_item.billable_party}
+              .in-between
+              .row
+                .span2
+                  = f.label "Include Price in Line Item"
+                .span1
+                  = f.check_box :include_price_in_revenue
+              .in-between
+              = f.label "Unit Price"
+              = f.text_field :unit_price_revenue
+              .in-between
+              = f.label "Tax Rate Override"
+              = f.text_field :tax_rate_revenue, :id => "line_item_tax_rate_revenue_" + unique_id
+          - if line_item.payable_party
+            .span4
+              .in-between
+              %h3 Payable Party: #{line_item.payable_party}
+              .in-between
+              .row
+                .span2
+                  = f.label "Include Price in Line Item"
+                .span1
+                  = f.check_box :include_price_in_expense, :label => "Include Price in Line Item"
+              .in-between
+              = f.label "Unit Price"
+              = f.text_field :unit_price_expense
+              .in-between
+              = f.label "Tax Rate Override"
+              = f.text_field :tax_rate_expense, :id => "line_item_tax_rate_expense_" + unique_id
+              
+    .modal-footer
+      = f.submit "Create Line Item", :class => "btn btn-primary"

@@ -1,0 +1,14 @@
+.row-fluid
+  .span6
+    %h4
+      = image_tag card.image_url, style: 'height:20px;'
+      Card Information
+    %p
+      =card.cardholder_name
+      %br="XXXX-XXXX-XXXX-#{card.last_4}"
+      ="Expires: #{card.expiration_month}/#{card.expiration_year}"
+
+  .span6
+    %h4 Billing Address 
+    = Card.html_address card.billing_address
+   

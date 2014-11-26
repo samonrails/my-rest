@@ -1,0 +1,15 @@
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h3 Refund Amount
+
+  .modal-body
+    = form_tag event_transactions_refund_path(@event) do
+      = label_tag :amount, 'Enter amount to Refund:'
+      = number_field_tag :amount, 0
+      = hidden_field_tag :user_id, @event.event_transaction_method.user_id
+      
+      .modal-footer
+        = submit_tag "Refund", :class => "btn btn-primary"

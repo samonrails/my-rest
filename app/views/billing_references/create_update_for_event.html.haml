@@ -1,0 +1,5 @@
+=render 'form_for_event'
+
+- content_for(:local_data) do
+  :javascript
+    Application.data.account_reference_choices = #{ (@account_reference_choices.to_json) };

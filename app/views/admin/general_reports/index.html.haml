@@ -1,0 +1,47 @@
+- provide :title, "Miscellaneous Reports"
+.section-header
+  %h1.center General Reports
+  %hr
+
+  = ssp_search_form Account
+
+.row
+  .span12 
+    %h2.center New Audience Report 
+    
+.results
+  .row
+    .span12
+      %table.table.table-condensed
+        %thead
+          %tr
+            %th Account
+            %th Location Type
+            %th Location
+            %th Building Name
+            %th Expected Participation
+        %tbody
+          - @accounts.each do |account|
+            %tr{:style => "background: #eee8aa; font-weight: bold;"}
+              %td= link_to account.name, account_path(account)
+              %td
+              %td
+              %td
+              %td= account.locations.inject(0) { |sum, l| sum + l.expected_participation }
+            - account.locations.each do |location|
+              %tr
+                %td
+                %td= location.location_type.titleize 
+                %td= link_to location.html_address, edit_account_location_path(account, location)
+                %td= link_to(location.building.name, edit_admin_building_path(location.building)) unless location.building.nil?
+                %td= location.expected_participation
+          %tr
+            %td
+          %tr{:style => "background: #A0A0A0; font-weight: bold;"}
+            %td Total
+            %td
+            %td
+            %td
+            %td= @accounts.map {|a| a.locations }.flatten.inject(0) { |sum, l| sum + l.expected_participation }
+
+

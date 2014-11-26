@@ -1,0 +1,29 @@
+!!!
+%html
+  %head
+    %title= "SnapPea | #{yield(:title)}"
+    %meta{:content=>"IE=edge,chrome=1","http-equiv"=>"X-UA-Compatible"}
+    %meta{:name=>"viewport",:content=>"width=device-width, initial-scale=1.0"}
+    = csrf_meta_tag
+    = stylesheet_link_tag 'application'
+    = javascript_include_tag 'application'
+
+    = yield :head
+
+  %body{:id=>body_id,:class=>body_class}
+    = render "shared/tags"
+    = render :partial => "shared/header"
+
+    .container
+      .alert-container
+        - flash.each do |type, message|
+          %div{:class => flash_class(type) }
+            %button{ :class => 'close', :data_dismiss => 'alert' }
+              x
+            = message
+
+      = yield
+
+    = render :partial => "shared/footer"
+    = render :partial => "shared/modal"
+    = render :partial => "shared/javascripts"

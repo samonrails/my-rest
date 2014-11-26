@@ -1,0 +1,19 @@
+%h4 Billing References Shown at Checkout:
+%table.table.table-condensed.table-bordered.table-striped
+  %thead
+    %th Collection
+    %th Required
+    %th Action
+    - @select_event.account.billing_references.each do |account_br|
+      - e = @select_event.select_event_billing_references.select{|br| br.billing_reference_id == account_br.id}
+      - e.each do |event_br|
+        %tr{"data-record-id"=>event_br.id}
+          %td
+            #{account_br.name}
+          %td
+            = content_tag :i, nil, class: account_br.required? ? 'icon-ok' : 'icon-remove'
+          %td{"data-record-id"=>event_br.billing_reference_id}
+            %a.btn.btn-mini.btn-danger{:href=>select_event_select_event_billing_references_path(@select_event, event_br) + "/" + event_br.billing_reference_id.to_s, :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+    
+   

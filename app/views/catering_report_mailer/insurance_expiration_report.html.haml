@@ -1,0 +1,92 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    :css
+      h1 {
+        padding: 0px;
+        margin: 0px 0px 10px 0px;
+        font-size 
+      }
+
+      h2 {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      h3 {
+        padding: 0px;
+        margin-bottom: 0px;
+      }
+
+      p {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      table {
+        padding-top:20px;
+        width: 100%;
+      }
+
+      table tr th {
+        background: #eee;
+      }
+
+      table tr td {
+        text-align: center;
+        border-bottom: 1px #ccc solid;
+      }
+
+      p.pos_left {
+        padding-left: 30px;
+        /position:relative;
+      }
+
+      .pull-right {
+        float:right;
+        position:relative;
+        padding-top: 15px;
+      }
+  %body
+    .pull-right
+      = image_tag("logo.png")
+    %h1 Fooda
+    %h2 Vendor Insurance Expiration Report
+
+  %hr
+    %h3 Generation:
+    %p.pos_left
+      %b Method:
+      = @method
+      %br
+      %b By:
+      = @full_name
+      %br
+      %b At:
+      = DateTime.now.strftime("%m/%d/%Y at %I:%M%p") 
+
+    %table.table.table-striped
+      %thead
+        %tr
+          %th Vendor Name
+          %th Building Name
+          %th Building Address
+          %th Insurance Expiration
+
+      %tbody
+        - @expirations.each do |e|
+          %tr{"data-record-id"=>e.id}
+            %td= link_to e.vendor.name, edit_vendor_vendor_insurance_path(e.vendor, e)
+            %td= link_to e.building.name, edit_admin_building_path(e.building)
+            %td= e.building.html_address
+            %td= e.insurance_expiration_date
+
+    %hr
+
+    %p
+      Confidential Information - Do Not Distribute.
+      %br
+      Copyright © 
+      = Date.today.year 
+      Fooda Inc. All rights reserved.

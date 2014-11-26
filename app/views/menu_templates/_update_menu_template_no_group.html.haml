@@ -1,0 +1,33 @@
+.modal-wrapper
+  = form_tag change_inventory_items_vendor_menu_template_path, remote: true do
+    = hidden_field_tag 'menu_template_group_id', nil
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Edit Menu Template: Included Items
+
+    .modal-body.auto_size_modal_body
+      %table.table.table-striped.condensed.table-bordered
+        %thead
+          %tr
+            %th Active 
+            %th Name (Vendor)
+            %th Name (Public)
+            %th Type
+            %th COGS
+            %th Perks Price
+            %th Retail Price
+        %tbody
+          - @available_items.sort_by{|ii| [MealType.available_values.index(ii.meal_type), ii.name_vendor]}.each do |item|
+            %tr 
+              %td= check_box_tag("item_ids[]", value = item.id.to_s, checked = @menu_template.inventory_items_with_no_group.include?(item), options = {})
+              %td= item.name_vendor
+              %td= item.name_public
+              %td= item.meal_type.titleize
+              %td= number_to_currency(item.cogs)
+              %td= number_to_currency(item.perks_price)
+              %td= number_to_currency(item.retail_price)
+
+    .modal-footer
+      = submit_tag "Save Inventory Items", :class => "btn btn-primary"

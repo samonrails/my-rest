@@ -1,0 +1,99 @@
+= simple_form_for :card, url: event_cards_path(@event.id), :html => {:class => "jqvalidate"} do |f|      
+  .modal-body.auto_size_modal_body
+    %h3 
+      Add a new personal card for: 
+      %span#new_card_user_name
+        #{@event.event_transaction_method.user.try(:name)}
+
+    %hr
+    .row-fluid{style: 'margin:0px 0px 10px 0px;'}
+      .span6
+        %input{name: "nickname", type: "text", placeholder: "Payment Method Nickname", style: 'margin:0px;', required: "1"}
+        %input{name: "user_id", type: "hidden", value: @event.event_transaction_method.user_id }
+
+    .row-fluid
+      .span6
+
+        %h4 Card Information
+        = f.input_field :cardholder_name, :maxlength => 255, placeholder: "Card Holder's Name", style: 'width: 200px; margin:0px;', required: "1"
+        
+        = f.input_field :number,
+          :autocomplete => "off",
+          "data-encrypted-name" => "number",
+          class: "cc_number",
+          placeholder: "Number",
+          style: 'width: 200px; margin:10px 0px 0px 0px;',
+          maxlength: 16,
+          required: "1"
+        
+        = f.input_field :cvv,
+          :autocomplete => "off",
+          "data-encrypted-name" => "cvv",
+          placeholder: "CVV",
+          class: "cc_cvv",
+          label: false,
+          style: 'width: 40px; margin:10px 0px 0px 0px;',
+          maxlength: 4,
+          required: "1"
+        
+        .row-fliud{style: 'margin-top:10px;'}
+          .span7
+            %label Expiration 
+            = f.input_field :expiration_month,
+              "data-encrypted-name" => "month",
+              :size => 1,
+              collection: 1..12,
+              :include_blank => false,
+              style: "width: 50px"
+            \/
+            = f.input_field :expiration_year,
+              "data-encrypted-name" => "year",
+              :size => 1,
+              collection: Date.today.year..Date.today.year + 20,
+              :include_blank => false,
+              style: "width: 75px"
+          
+          .span9.form-inline{style: "margin:25px 0px 0px 0px;"}
+            %label{for: "card-as-default", style: 'margin-bottom:0px;'}
+              %input{ "type" => "checkbox", "name" => "card[options][make_default]", "id" => "card-as-default", style: "margin:0px 0px 1px 0px;"}
+              Make this the Default Card
+
+      .span6
+        %h4 Billing Address
+        = f.input_field :street_address, 
+          input_html: { style: 'width: 208px' },
+          placeholder: "Address Line 1",
+          label: false,
+          class: "jqvalidate_ignore",
+          name: "card[billing_address][street_address]"
+        = f.input_field :extended_address, 
+          input_html: { style: 'width: 208px'},
+          placeholder: "Address Line 2",
+          label: false,
+          class: "jqvalidate_ignore",
+          name: "card[billing_address][extended_address]"
+        = f.input_field :locality, 
+          input_html: { maxlength: 20, style: 'width: 105px'}, 
+          wrapper_html: { class: "inline_field_wrapper" }, 
+          placeholder: "City", 
+          label: false,
+          class: "jqvalidate_ignore",
+          name: "card[billing_address][locality]"
+        = f.input_field :region, 
+          input_html: { maxlength: 2, style: 'width: 20px' },
+          wrapper_html: { class: "inline_field_wrapper" }, 
+          placeholder: "State",
+          label: false,
+          class: "jqvalidate_ignore",
+          name: "card[billing_address][region]"
+        = f.input_field :postal_code, 
+          wrapper_html: { class: "inline_field_wrapper" }, 
+          input_html: { maxlength: 6, style: 'width: 45px' },
+          placeholder: "Zip", 
+          label: false,
+          class: "jqvalidate_ignore",
+          name: "card[billing_address][postal_code]"
+        = f.input_field :country_name, name: "card[billing_address][country_name]", :style => 'margin-bottom:0px;', :include_blank => false, :priority => ["United States"]
+
+  .modal-footer
+    = f.submit(:class => "btn btn-primary", :id => "save_card")

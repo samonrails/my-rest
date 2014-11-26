@@ -1,0 +1,90 @@
+= simple_form_for [@vendor, @inventory_item] do |f|
+  .row-fluid
+    .span3
+      %h5 Details       
+      = f.input :name_vendor, :label => "Name (Vendor)"
+      = f.input :name_public, :label => "Name (Public)"
+      = f.label "Item Type"
+      = f.select :meal_type, MealType.available_values.sort.collect{|c| [c.titleize, c]}
+      %br
+      %br
+      = f.input :inventory_item_option, inline_label: "Use as Inventory Item Option", label: false 
+
+    .span3
+      %h5 Pricing 
+      = f.input :cogs, label: "COGS"
+      = f.input :perks_price
+      = f.input :retail_price
+      .child-inventory-item
+        = f.input :premium_price
+
+    .span3
+      %h5 Tags
+      = f.input :tag_list, label: "Internal Tags", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.inventory_tags"}
+      
+      = f.input :external_tag_list, label: "External Tags", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.inventory_tags"}
+      
+      = f.input :dietary_restriction_list, label: "Dietary Restrictions", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.dietary_restrictions"}
+  
+    .span3
+      %h5 Products
+      - ProductType.available_values.each do |product_type|
+        - checked = (@inventory_item.inventory_item_product_types.where(:product_type => product_type).count > 0)
+        .row-fluid
+          .span8
+            %label= product_type.titleize
+          .span1
+            %input{:checked=>checked, :id=>"product_type_allowed_#{ product_type }",:type=>"checkbox",:name=>"inventory_item[product_types_allowed][#{ product_type }]"}
+  .row-fluid
+    .span6
+      = f.input :description, input_html: { rows: 5, style: 'width: 88%' }
+      
+  .row-fluid
+    .span12
+      %hr
+
+
+    .parent-inventory-item
+      .row-fluid
+        .span6
+          .new_inventory_item_option_group_form.modal.auto_size_modal.hide.fade{"id"=>"new_inventory_item_option_group_form"}
+            = render :partial => "inventory_items/new_option_group", :locals => {vendor: @vendor, inventory_item: @inventory_item}
+          %a.btn.btn-small.btn-success.toggle-modal.pull-right{"data-target"=>"#new_inventory_item_option_group_form"}
+            %i.icon.icon-plus.icon-white
+            New Option Group
+          %h5 Inventory Item Options
+          -if @option_groups       
+            %br
+            .row-fluid
+              .span12
+                %table.table.table-striped.condensed.table-bordered
+                  %thead
+                    %tr
+                      %th Name
+                      %th Included Options
+                      %th Max Options
+                  %tbody
+                    - @inventory_item.option_groups.each do |group|
+                      %tr 
+                        %td= group.name
+                        %td= group.included
+                        %td= group.max
+
+  .row
+    .span12
+      / %hr
+      / %h5 Images
+      - if !@menu.nil?
+        = f.simple_fields_for @menu do |menu|
+          = menu.hidden_field :id
+
+      - if @inventory_item.new_record?
+        .in-between
+          = f.simple_fields_for :assets_attributes, multipart: true do |b|
+            = render partial: "assets/new", locals: {:field_name => "inventory_item[assets_attributes][][resource]", :ff => b }
+
+      %hr
+      = f.submit "Save Inventory Item", :class => "btn btn-primary"
+
+      .pull-right
+        %a.btn{:href=>vendor_path(@vendor.id, :selected => "inventory_items")} Back to Vendor

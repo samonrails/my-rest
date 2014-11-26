@@ -1,0 +1,19 @@
+-# select_order is a local
+.modal-wrapper
+  = simple_form_for :select_order, url: select_select_order_path(select_order), method: :PUT  do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h3 Submit Adjusted Order
+
+    .modal-body
+      %strong No payment or refund
+      %p
+        The changes being submitted do not require a payment or refund. Please click on
+        %em Confirm Changes
+        to continue.
+
+    .modal-footer
+      = f.hidden_field :edit_mode, value: !select_order.edit_mode
+      = f.submit "Confirm Changes", :class => "btn btn-primary", id: "submit-transaction"
+

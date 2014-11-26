@@ -1,0 +1,9 @@
+-provide :title, "Event Schedule"
+
+#event-schedule
+  .row-fluid
+    .span12
+      %h1.center New Event Schedule
+      %hr
+
+  =render 'form', :locals => {account: @account}

@@ -1,0 +1,39 @@
+.row
+  .span12
+    %table.table.table-condensed
+      %thead
+        %tr
+          %th Customer
+          %th Transaction Date
+          %th Reference Number
+          %th Class
+          %th Item
+          %th Description
+          %th Price
+      %tbody
+        - row = 0
+        - @events.each do |event|
+          - market = event.location.building.market.name if (event.location.building and event.location.building.market)
+          - row = event.vendors.present? ? row : row += 1
+          - style = row.even? ? "background:#f5f5f5;" : "background:white;"
+          - row += 1 
+          - if event.vendors.present?
+            %tr{:style => style}
+              %td= allow_links ? (link_to event.account, account_path(event.account)) : event.account
+              %td= event.event_start_time.strftime("%m/%d/%y")
+              %td= allow_links ? (link_to event.pretty_id, event_path(event)) : event.pretty_id
+              %td= market if market.present?
+              %td Managed Services
+              %td= event.vendors.map(&:name).join("; ")
+              %td= number_to_currency event.revenue_subtotal_by_party(event.account)
+            - ["Delivery Fee", "Gratuity"].each do |type|
+              - price = event.revenue_by_party_and_line_item_subtype(event.account, type)
+              - if price != 0
+                %tr{:style => style}
+                  %td= allow_links ? (link_to event.account, account_path(event.account)) : event.account
+                  %td= event.event_start_time.strftime("%m/%d/%y")
+                  %td= allow_links ? (link_to event.pretty_id, event_path(event)) : event.pretty_id
+                  %td= market if market.present?
+                  %td= type == "Delivery Fee" ? "Managed Services:Delivery Charge" : "Managed Services:Gratuity"
+                  %td= event.vendors.map(&:name).join("; ")
+                  %td= number_to_currency price

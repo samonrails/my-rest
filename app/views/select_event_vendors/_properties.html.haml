@@ -1,0 +1,43 @@
+- entry_id ||= 'new'
+= f.hidden_field :market, value: @select_event.location.building.market.name if @select_event.location.building.is_approved?
+%input{:type => "hidden", :id => "event_vendor_account_id", :value => @select_event.account_id, :name => "account_id"}
+%input{:type => "hidden", :id => "event_vendor_product", :value => vendors[:product_type], :name => "account_id"}
+%input{:type => "hidden", :id => "event_vendor_market", :value => @select_event.location.building.market.name, :name => "event_vendor_marker"}
+%input{:type => "hidden", :id => "event_vendor_type", :value => "Restaurant", :name => "event_vendor_type"}
+%input{:type => "hidden", :id => "select_event_id", :value => @select_event.id, :name => "select_event_vendor[select_event_id]"}
+= f.label "Filter Vendors By Cuisine"
+%select{:id => "event_vendor_cuisine_" + entry_id.to_s, "data-edit_row_id" => entry_id.to_s, :name => "select_event_vendor[cuisine]", :class => "select_event_vendor_cuisine selectpicker"}
+  %option{ :value => "Any" }Any
+  - if vendors[:cuisines_favorite].count > 0
+    %optgroup{:label=>"Favorites"}
+      - vendors[:cuisines_favorite].each do |c|
+        %option{ :value => c }= c
+  - if vendors[:cuisines_neutral].count > 0
+    %optgroup{:label=>"Neutral"}
+      - vendors[:cuisines_neutral].each do |c|
+        %option{ :value => c }= c
+  - if vendors[:cuisines_do_not_schedule].count > 0
+    %optgroup{:label=>"Do Not Schedule"}
+      - vendors[:cuisines_do_not_schedule].each do |c|
+        %option{ :value => c }= c
+
+= f.label "Possible Vendors"
+%select{:id => "event_vendor_vendor_" + entry_id.to_s, "data-edit_row_id" => entry_id.to_s, :name => "select_event_vendor[vendor]", :class => "select_event_vendor_vendor selectpicker"}
+  
+  - if vendors[:vendors_favorite].count > 0
+    %optgroup{:label=>"Favorites"}
+      - vendors[:vendors_favorite].each do |c|
+        %option{ :value => c.id, :selected => c.id == @select_event_vendor.vendor_id  }= c
+  - if vendors[:vendors_neutral].count > 0
+    %optgroup{:label=>"Neutral"}
+      - vendors[:vendors_neutral].each do |c|
+        %option{ :value => c.id, :selected => c.id == @select_event_vendor.vendor_id }= c
+  - if vendors[:vendors_do_not_schedule].count > 0
+    %optgroup{:label=>"Do Not Schedule"}
+      - vendors[:vendors_do_not_schedule].each do |c|
+        %option{ :value => c.id , :selected => c.id == @select_event_vendor.vendor_id }= c
+
+
+= f.label "Possible Menu-Templates"
+= select(:event_vendor, :menu_template, options_for_select(vendors[:initial_menu_templates].collect{|c| [c.name, c.id]}, nil), {:include_blank => false}, :id => "select_event_vendor_menu_template_" + entry_id.to_s)
+

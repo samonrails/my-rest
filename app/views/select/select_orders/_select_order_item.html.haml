@@ -1,0 +1,14 @@
+-# select_order_item is a local
+.box-rounded
+  .inner
+    = simple_form_for :select_order_item, url: select_select_order_select_order_item_path(@select_order, select_order_item), method: :put do |f|
+      .row-fluid
+        .pull-left
+          %h4= select_order_item.inventory_item.vendor.name
+        - if select_order_item.select_order.editing?
+          .pull-right
+            %a.btn.btn-danger.btn-mini{:"data-confirm" => "Are you sure?", :"data-method" => :delete, :href => select_select_order_select_order_item_path(select_order_item.select_order, select_order_item)}
+              %i.icon.icon-white.icon-remove
+      %hr
+      = render :partial => "select/select_orders/inventory_item_details", locals: {select_order_item: select_order_item}
+

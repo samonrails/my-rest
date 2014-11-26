@@ -1,0 +1,157 @@
+!!!
+%html
+  %head
+    %title 
+      = "Feedback | "
+      = yield :title
+    - if @status == "expired" or @status == "not_found" or @status == "submitted"
+      %meta{:content=>"2,url=http://www.fooda.com","http-equiv"=>"refresh"}
+    %meta{:content=>"IE=edge,chrome=1","http-equiv"=>"X-UA-Compatible"}
+    %meta{:name=>"viewport",:content=>"width=device-width, initial-scale=1.0"}
+    = csrf_meta_tag
+    = stylesheet_link_tag 'snappea'
+    = yield :head
+
+  %body{:id=>body_id,:class=>body_class}
+
+    .container
+      .alert-container
+        - flash.each do |type, message|
+          %div{:class => flash_class(type) }
+            %button{ :class => 'close', :data_dismiss => 'alert' }
+              x
+            = message
+      - unless @status == "expired" or @status == "not_found" or @status == "submitted"
+        .row{:style => "margin-right:160px;"}
+          .span4.offset1
+            = image_tag('https://s3.amazonaws.com/snappea-marketing/email/feedback/logo1.png', border: '0')
+          .span.pull-right
+            #{@event.product.capitalize} #{@event.meal_period.capitalize} Event
+          %br
+          .span.pull-right
+            #{@event.event_start_time.strftime("%B %d, %Y")}
+          %br
+          .span.pull-right
+            Feeding #{@event.quantity} People
+          %br
+        .well{style: "padding:0px;border-radius:0;position:relative"}
+          %h3.center{style: "margin:0px;"}
+            YOU RATED THE FOOD
+          .center{style: "margin-bottom:8px;"}
+            - @token.data[:rating].times do |i|
+              = image_tag("https://s3.amazonaws.com/snappea-marketing/email/feedback/star#{i + 1}.gif", border: '0')
+        %h1.center{style: "margin:30px 0 20px 3px;"}
+          TELL US MORE
+          %br
+        - inventory_items = @event.event_reviews.map(&:reviewable)
+        - vendors = @event.event_vendors.map(&:vendor).select{|v| v.vendor_type == "Restaurant"}
+        - event_ratings = [["Food Presentation", "Order Accuracy", "On Time Delivery"], ["Ease of Ordering", "Customer Service"]]
+        
+        = simple_form_for (@event), :url => {:controller => "events", :action => "update_reviews", :method => "PUT", :id => @event.id} do |f|
+        
+          - if @token.data[:rating] > 3
+            %h4.center
+              Rate your individual items
+            - vendors.each_with_index do |vendor, i|
+              .row
+                .span2
+                .span
+                  %b.pull-left
+                    = vendor.name
+                  - if i == 0
+                    .span{style: "margin-right:210px;float:right;font-size:12px;"}
+                      %i
+                        Click to Change
+                  %br
+                  - @event.line_items.select{|li| li.add_on_parent_id.nil? && !li.inventory_item.nil? && li.line_item_sub_type == "Menu-Item" && li.inventory_item.vendor == vendor && li.payable_party == vendor}.sort_by{|e| [MealType.available_values.index(e.inventory_item.meal_type)]}.each do |li|
+                    - review = @event.event_reviews.select{|t| t.reviewable_id == li.inventory_item.id}.first
+                    .row
+                      .span1
+                      .span2
+                        #{li.name.titleize}
+                      .span1{style: "font-size:12px;color:#404040"}
+                        %i
+                          #{li.inventory_item.meal_type.titleize}
+                      .span2{style: "width:100px;"}
+                        .star{"data-rating" => review.rating, "data-name" => "event[event_reviews_attributes][][rating]" }
+                        = hidden_field_tag "event[event_reviews_attributes][][id]", review.id
+                        = hidden_field_tag "event[event_reviews_attributes][][rating_type]", "individual"
+                      .span2
+                        = text_field_tag "event[event_reviews_attributes][][content]", review.content, placeholder: "Comments", style: "font-size:10px;height:10px;"
+          - else
+            .row
+              .span5
+                - event_ratings.each_with_index do |er,i|
+                  %h4.center{style: "margin-left:35px;"}
+                    - if(i == 0) 
+                      How'd the restaurants do
+                    - else
+                      %br
+                      %br
+                      %br
+                      How was Fooda
+                  .span{style: "margin-left:313px;font-size:12px;"}
+                    %i
+                      - if i == 0
+                        Click to Rate
+                  - er.each do |event_rating|
+                    .row
+                      .span2{style: "margin-left:130px;"}
+                        = event_rating
+                      .span1
+                        .star{"data-name" => "event[event_ratings_attributes][][rating]"}
+                        = hidden_field_tag "event[event_ratings_attributes][][reviewable_id]", @event.id
+                        = hidden_field_tag "event[event_ratings_attributes][][reviewable_type]", "Event"
+                        = hidden_field_tag "event[event_ratings_attributes][][additional_event_ratings]", event_rating
+                        = hidden_field_tag "event[event_ratings_attributes][][contact_id]", @event.contact.id
+                
+                .span5.center
+                  %br
+                  %br
+                  = f.submit "Submit Feedback", class: "btn btn-large btn-warning", style: "background:#f26522;color:white;"
+              .span
+                %h4.center
+                  Rate your individual items
+                - vendors.each_with_index do |vendor, i|
+                  .row
+                    .span{style: "margin-left:2px;"}
+                      %b.pull-left
+                        = vendor.name
+                      - if i == 0
+                        .span{style: "margin-right:100px;float:right;font-size:12px;"}
+                          %i
+                            Click to Change
+                      %br
+                      - @event.line_items.select{|li| li.add_on_parent_id.nil? && !li.inventory_item.nil? && li.line_item_sub_type == "Menu-Item" && li.inventory_item.vendor == vendor && li.payable_party == vendor}.sort_by{|e| [MealType.available_values.index(e.inventory_item.meal_type)]}.each do |li|
+                        - review = @event.event_reviews.select{|t| t.reviewable_id == li.inventory_item.id}.first
+                        .row{:style => "margin-left:30px;"}
+                          .span2
+                            #{li.name.titleize}
+                          .span{style: "margin-left:0px;font-size:12px;color:#404040;width:76px;"}
+                            %i
+                              #{li.inventory_item.meal_type.titleize}
+                          .span2{style: "width:100px;margin-left:0px;"}
+                            .star{"data-rating" => review.rating, "data-name" => "event[event_reviews_attributes][][rating]", style: "margin-left: 10px;" }
+                            = hidden_field_tag "event[event_reviews_attributes][][id]", review.id
+                            = hidden_field_tag "event[event_reviews_attributes][][rating_type]", "individual"
+                          .span1
+                            = text_field_tag "event[event_reviews_attributes][][content]", review.content, placeholder: "Comments", class: "input-small", style: "font-size:10px;height:10px;"
+
+          - if @token.data[:rating] > 3
+            .span7.pull-right
+              %br
+              = f.submit "Submit Feedback", class: "btn btn-large btn-warning", style: "background:#f26522;color:white;"
+
+
+    = render :partial => "shared/footer"
+    = render :partial => "shared/javascripts"
+
+    -if Rails.env.production?
+      :javascript
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-26050335-2', 'fooda.com');
+        ga('send', 'pageview');

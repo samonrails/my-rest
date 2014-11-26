@@ -1,0 +1,12 @@
+-# Locals:
+-# f
+-# cards
+- if cards
+  %strong Use an existing payment method
+  - cards.each do |cc|
+    %label.radio
+      = f.radio_button :card_id, cc.id
+      = cc.nickname
+      / TODO: why doesn't the cards table have last4 & card type?
+  %hr
+

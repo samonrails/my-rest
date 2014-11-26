@@ -1,0 +1,34 @@
+.modal-wrapper
+  = form_tag duplicate_event_event_path, remote: true do
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Duplicate Financial Event
+    .modal-body
+      .row
+        .span3
+          Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "event_start_time"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+      .row
+        .span3
+          Event Name
+          %br
+          .input
+            %input{:type => "text", :name => "name"}
+
+      .row
+        .span3
+          Event Owner
+          %br
+          = select_tag "event[event_owner_id]", options_for_select(User.fooda_employee.collect{|c| [c.name, c.id]}, current_user.id)
+          %br
+
+    .modal-footer
+      = submit_tag "Duplicate", :class => "btn btn-primary"

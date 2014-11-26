@@ -1,0 +1,28 @@
+.container
+  #accordion_events.accordion
+    .accordion-group
+      .accordion-heading
+        %a.accordion-toggle{"data-parent" => "#accordion_events", "data-toggle" => "collapse", :href => "#collapse_1"}
+          %span
+            My Events
+      #collapse_1.accordion-body.collapse.in
+        .accordion-inner
+          = render partial: 'events/partials_dashboard/tabular_data', locals: {type: 'my_events', events: @my_events, id: 'my'}
+
+    .accordion-group
+      .accordion-heading
+        %a.accordion-toggle{"data-parent" => "#accordion_events", "data-toggle" => "collapse", :href => "#collapse_2"}
+          %span
+            Complete & Final
+      #collapse_2.accordion-body.collapse
+        .accordion-inner
+          = render partial: 'events/partials_dashboard/tabular_data', locals: {type: 'my_events', events: @completed_events, id: 'completed'}
+
+    .accordion-group
+      .accordion-heading
+        %a.accordion-toggle{"data-parent" => "#accordion_events", "data-toggle" => "collapse", :href => "#collapse_3"}
+          %span
+            Canceled
+      #collapse_3.accordion-body.collapse
+        .accordion-inner
+          = render partial: 'events/partials_dashboard/tabular_data', locals: {type: 'my_events', events: @canceled_events, id: 'canceled'}

@@ -1,0 +1,19 @@
+- @select_event_schedule_vendor = SelectEventScheduleVendor.new(:account_id => @account.id, :select_event_schedule_id => @select_event_schedule.id)
+- vendors = select_event_vendor_list( @select_event_schedule )
+
+.modal-wrapper
+  .modal-header
+
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h2 Add Vendor
+    %br
+
+  .modal-body
+
+    = form_for [@account, @select_event_schedule_vendor] do |f|
+      = render :partial => "select_event_schedule_vendors/properties", :locals => {account: @account, select_event_schedule: @select_event_schedule, f: f, select_event_schedule_vendor: @select_event_schedule_vendor, vendors: vendors }
+      
+      .modal-footer
+        = f.submit "Add Vendor", :class => "btn btn-primary"

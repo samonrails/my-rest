@@ -1,0 +1,124 @@
+.span4{:style => "margin-left: 12px;"}
+  %h4{:style => "margin-bottom: 0px;"}
+    %u
+      Vendor Items
+.pull-right
+  Sort: 
+  %a{:href => "#", :class => "trigger-link", "data-index" => "item#{index}", "data-column" => "0", "data-order" => "1"}
+    = image_tag('/images/sort_descending.png', size: "25x25")
+  %a{:href => "#", :class => "trigger-link", "data-index" => "item#{index}", "data-column" => "0", "data-order" => "0"}
+    = image_tag('/images/sort_ascending.png', size: "25x25")
+.well.user-reviews-div
+  - colors = ["#E05D62", "#ED8560", "#F3AF64", "#DDCA61", "#D3A75E"]
+  - reviews = Array.new
+  %table.table.table-striped.table-condensed{:class => "Grid", :id => "Griditem#{index}"}
+    %thead{:style => "display: none"}
+      %tr
+        %th Rating
+        %th Inventory Item
+        %th Stacked Bar
+    - inventory_items_for_pt.each_with_index do |ii, i|
+      - reviews = ii.reviews.flatten
+      - rating_array = reviews.map(&:rating)
+      - unless rating_array.blank?
+        - ratings = Array.new
+        - (1..5).each do |a|
+          - ratings << rating_array.count{|r| r == a}
+        %tr
+          %td{:style => "display:none"}
+            #{average_rating(rating_array)}
+          %td{:style => "line-height: 3;"}
+            = link_to ii.name_vendor.titleize, edit_vendor_inventory_item_path(@vendor, ii)
+          %td
+            %div{:id => "barstack_#{pt}_#{i}", :class => "bb"}
+          %td
+            .row{:style => "margin: 15px;"}
+              .span
+                .inventory_rating{"data-rating" => average_rating(rating_array)} 
+              .span{:style => "margin-left: 5px;"}
+                #{average_rating(rating_array)} (#{rating_array.size})
+        = content_for(:local_data) do
+          :javascript
+            $(function () {
+              $("#barstack_#{pt}_#{i}").highcharts({
+                chart: {
+                  width: 300,
+                  height: 50,
+                  backgroundColor:'transparent',
+                  type: 'bar'
+                },
+                title: {
+                  text: ''
+                },
+                xAxis: {
+                  lineWidth: 0,
+                  minorGridLineWidth: 0,
+                  lineColor: 'transparent',
+                  labels: {
+                    enabled: false
+                    },
+                  minorTickLength: 0,
+                  tickLength: 0,
+                  max: 0,
+                  categories: ['Rating']
+                },
+                yAxis: {
+                  min: 0,
+                  gridLineWidth: 0,
+                  minorGridLineWidth: 0,
+                  labels: {
+                    enabled: false
+                    },
+                  title: {
+                    text: ''
+                  }
+                },
+                legend: {
+                  backgroundColor: '#FFFFFF',
+                  reversed: true
+                },
+                plotOptions: {
+                  bar: {
+                    borderWidth: '0',
+                    dataLabels: {
+                      enabled: true,
+                      style: {
+                        fontWeight: 'bold'
+                      },
+                      formatter: function() {
+                        if (this.y != 0) {
+                          return this.y
+                        } 
+                        else {
+                          return '';
+                        }
+                      }
+                    }
+                  },
+                  series: {
+                    stacking: 'normal',
+                    showInLegend: false,
+                    pointWidth: 15,
+                    pointPadding: 0
+                  }
+                },
+                  series: [
+                   {
+                  name: '5 Star',
+                  data: [{y: #{ratings[4]}, color: "#{colors[0]}"}]
+              }, {
+                  name: '4 Star',
+                  data: [{y: #{ratings[3]}, color: "#{colors[1]}"}]
+              }, {
+                  name: '3 Star',
+                  data: [{y: #{ratings[2]}, color: "#{colors[2]}"}]
+                  
+              }, {
+                  name: '2 Star',
+                  data: [{y: #{ratings[1]}, color: "#{colors[3]}"}]
+              }, {
+                  name: '1 Star',
+                  data: [{y: #{ratings[0]}, color: "#{colors[4]}"}]
+              }]
+              });
+            });

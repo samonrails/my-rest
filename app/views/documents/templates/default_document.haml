@@ -1,0 +1,170 @@
+!!!
+%html
+  %head
+    %title Fooda 
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}
+    :css
+      @page { margin: 40px 40px 160px 40px; background: #ffffff; }
+      
+      @page { @bottom { content: flow(foot); } }
+      #footer { 
+        flow: static(foot); 
+        font-size: 0.75em;
+        padding-top: 3px;
+        padding-bottom: 10px;
+      }
+
+      #container
+
+      h1 { padding: 0; margin: 0; }
+      h2 { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+      h3 { padding: 20px 0px 10px 0px; margin: 0px 0px 0px 0px; }
+      h4 { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+      p  { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+
+      table {
+        padding-top:20px;
+        width: 100%;
+      }
+
+      table tr th {
+        background: #eee;
+      }
+
+      table tr td {
+        text-align: left;
+        border-bottom: 1px #ccc solid;
+      }
+
+      table.table-condensed {
+        width: 30%;
+        float:right;
+        position:relative;
+      }
+
+      td.indent {
+        text-align: left;
+        border-bottom: 1px #ccc solid;
+        padding-left: 30px;
+      }
+
+      p.indent {
+        padding-left: 20px;
+      }
+
+      .pull-right {
+        float:right;
+        position:relative;
+      }
+
+      .pull-left {
+        float:left;
+        position:relative;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      #break {
+        clear: both;
+        border-bottom: 1px #000 solid;
+        padding-top: 20px; 
+        padding-bottom: 20px;
+      }
+
+      #footer-break {
+        clear: both;
+        border-bottom: 1px #000 solid;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+
+      #notes {
+        width: 45%;
+      }
+
+  %body#container
+    #break
+      .pull-right
+        %img{:src => "https://s3.amazonaws.com/snappea-marketing/logo.png"}
+      - if @event.financial_product?
+        %h1 Fooda
+      - else
+        %h1 Fooda Catering
+      %h2
+    
+    #break
+      %b  Number:
+      = @document_name
+      %br
+      %b  Date:
+      = DateTime.now.strftime("%A, %b #{DateTime.now.day.ordinalize}, %Y")
+      %br
+      %b Event Date:
+      = @event.event_start_time.strftime("%m/%d/%Y") unless @event.event_start_time.nil?
+      %br
+      %b Delivery:
+      = @event.setup_start_time.strftime("%m/%d/%Y") unless @event.setup_start_time.nil?
+      at 
+      - unless (@event.setup_start_time.nil? or @event.setup_end_time.nil?)
+        = "#{@event.setup_start_time.strftime("%I:%M%p")} until #{@event.setup_end_time.strftime("%I:%M%p")}"
+
+    .pull-left
+      %h3 Account:
+      %b
+        = @event.account.name
+      %p.indent
+        = @event.contact.name unless @event.contact.nil?
+        %br 
+        =@event.location.html_address unless @event.location.nil?
+        %br
+        = @event.contact.phone_number unless @event.contact.nil?
+        %br 
+        = @event.contact.email unless @event.contact.nil?
+
+    .pull-right
+      %h3 
+        - if (@event.event_vendors.count > 1)
+          Vendors: 
+        - else
+          Vendor:
+      - @event.event_vendors.each do |ev|
+        %b 
+          = ev.vendor.name
+        %p.indent
+          = ev.vendor.address.address1
+          %br
+          = ev.vendor.address.address2
+          %br
+          = ev.vendor.address.city
+          , 
+          = ev.vendor.address.state
+
+          = ev.vendor.address.zip_code
+
+    #break
+
+
+    #footer
+      #footer-break
+        %p.center
+          All orders are subject to a 24 hour cancellation policy – any orders cancelled within 24 hours will be subject to a 50% fee
+
+      %p.pull-left
+        Confidential Information - Do Not Distribute.
+        %br
+        Copyright 
+        = Date.today.year 
+        Fooda Inc. All rights reserved.
+      %p.pull-right
+        600 W Chicago Ave Suite 775 Chicago, IL 60654
+        %br
+        %b Phone: 
+        (312) 662 - 6539
+        = "&#160;" * 7
+        %b Fax:
+        (312) 924 - 0651
+        %br
+        %b Email:
+        catering@fooda.com

@@ -1,0 +1,70 @@
+=render partial: "events/partials_payment/transactions/settle"
+=render partial: "events/partials_payment/transactions/void"
+=render partial: "events/partials_payment/transactions/refund"
+#new-transaction.modal.hide.fade
+
+- if @event.order
+  .row-fluid
+    .span3{:style => 'margin-left:20px;'}
+      %b Order Placed:
+      %br= order_placed_time
+
+    .span3.offset6.pull-right
+      %b Order Claimed:
+      %br= event_claimed_time
+       
+.row-fluid
+  .span12
+    %h2 Payment  
+    .pull-right
+      %b Event Revenue: 
+      = number_to_currency @event.revenue_total_by_party(@event.account)
+    %br
+    %hr
+
+    .payment-alert-container
+
+.row-fluid
+  .span3
+    %form{name: "payment", id: "payment_form"}
+      %input{type: "hidden", value: Account.name, name: "event_transaction_method[party_type]"}
+      %input{type: "hidden", value: @event.account.id, name: "event_transaction_method[party_id]"}
+
+      %label Payment Method
+      - selected = @event.event_transaction_method.transaction_method || 0
+      - options = [["", ""],["On Account", "on_account"], ["Credit Card", "credit_card"]]
+      = select_tag :payment_method, options_for_select(options, selected), id: "event_transaction_method_transaction_method", class: "select_payment_method", name: "event_transaction_method[transaction_method]", data: {event: @event.id, event_transaction_method: @event.event_transaction_method.id}
+
+      %label Payment User
+      - selected = @event.event_transaction_method.try(:user_id) || 0
+      - options = [["", 0]] + @event.account.users.collect{ |u| ["#{u.name}", u.id]}    
+      / consider a user that's not part of the account -djb
+      = select_tag :user, options_for_select(options, selected), id: "event_transaction_method_user_id", name: "event_transaction_method[user_id]"
+
+    %button.btn.btn-primary#save_payment_method Save Payment Method
+    %br
+      
+  #payment_method_well.span6
+    #payment_method_card{style: @event.event_transaction_method.transaction_method == "credit_card" ? '' : 'display:none'}
+      #credit_card_box
+      -url = fetch_cards_event_path(@event)
+      :javascript
+        window.addEventListener('load', function () {
+          $.fetch_cards("#{url}");
+        });
+
+    #payment_method_account{style: @event.event_transaction_method.transaction_method == "on_account" ? '' : 'display:none'}
+      = render "events/partials_payment/on_account_payment"
+
+  .span3
+    #payment_method_change_warning
+      .alert.alert-error
+        %h4 You changed the payment method. 
+        %br
+        %h4 You must save the payment method to complete your change.
+
+    
+= render 'events/partials_payment/payment_history', payment_method: @event.event_transaction_method.transaction_method
+
+
+

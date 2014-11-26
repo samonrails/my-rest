@@ -1,0 +1,44 @@
+.new-membership-form.modal-membership.modal.hide.fade
+  = render :partial => "accounts/add_member"
+
+- @members.each do |user|
+  .modal.hide.fade{:id => "user-membership#{user.id}"}
+    - role = AccountRole.find_record(@account.id, user.id)
+    = render :partial => "accounts/edit_member", :locals => {role: role}
+
+.pull-right
+  %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-membership-form"}
+    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-membership-form"}
+    Member
+
+%br
+%br
+
+%table.table.table-striped#account-member-table
+  %thead
+    %tr
+      %th Name
+      %th Email
+      %th Join Date
+      %th Last Login
+      %th Account Role
+
+  %tbody
+    - @members.each do |user|
+      %tr
+        %td
+          = link_to user.full_name, edit_admin_user_path(user)
+        %td
+          = user.email
+        %td
+          = AccountRole.find_record(@account.id, user.id).created_at ? AccountRole.find_record(@account.id, user.id).created_at.strftime("%a %d %b, %Y") : " - "
+        %td
+          = user.last_sign_in_at ? user.last_sign_in_at.in_time_zone(ActiveSupport::TimeZone['Central Time (US & Canada)']).strftime("%B %d,%Y at %I:%M %p %Z") : " - "
+        %td
+          = AccountRole.find_record(@account.id, user.id).role.titleize
+        %td
+          .btn-group
+            %a.btn.btn-mini.toggle-modal{"data-target"=>"#user-membership#{user.id}"}
+              %i.icon.icon-edit.toggle-modal{"data-target"=>"#user-membership#{user.id}"}
+            %a.btn.btn-mini.btn-danger{:href => account_role_path(AccountRole.find_record(@account.id, user.id)), "data-method" => "delete", data: { confirm: 'Are you sure?'}}
+              %i.icon.icon-white.icon-minus

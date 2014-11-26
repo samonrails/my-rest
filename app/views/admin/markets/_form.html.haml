@@ -1,0 +1,64 @@
+.modal-wrapper
+  = form_for [:admin, market] do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 #{title}
+
+    .modal-body
+      = f.label "Market Name"
+      .in-between
+      = f.text_field :name
+      = f.label "Default Tax Rate"
+      .in-between
+      = f.text_field :default_tax_rate
+      .in-between
+      
+      %hr
+
+      = f.label "Office Phone"
+      .in-between
+      = f.text_field :office_default_phone
+      .in-between
+      = f.label "Office Fax"
+      .in-between
+      = f.text_field :office_default_fax
+      %label Office SMS
+      .in-between
+      = f.text_field :office_default_sms
+      .in-between
+      = f.label "Office Email"
+      .in-between
+      = f.text_field :office_default_email
+      .in-between
+
+      %hr
+
+      = f.label "Address1 Line 1"
+      .in-between
+      = f.text_field :address1
+      .in-between
+      = f.label "Address Line 2"
+      .in-between
+      = f.text_field :address2
+      .in-between
+      = f.label "City"
+      .in-between
+      = f.text_field :city
+      .in-between
+      = f.label "State"
+      .in-between
+      = f.text_field :state
+
+      %hr
+      .in-between
+      %b
+        Market Zip Codes:
+      %p{:style => 'margin:0px;font-size:11px;'} (One Per Line)
+      = text_area_tag "zip_codes", market.list_zip_codes, rows: 10, cols: 10
+
+
+    .modal-footer
+      = f.submit (market.id.nil? ? "Create Market" : "Save Market"), :class => "btn btn-primary"

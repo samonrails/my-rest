@@ -1,0 +1,46 @@
+/ .update_transaction_method_form.modal.hide.fade{"id"=>"update_billing_method_form_" + party.class.name + "_" + party.id.to_s}
+/   = render :partial => "events/partials_financials/update_billing_method", :locals => {party: party, event_transaction_method: event_transaction_method}
+/ .auto_size_modal.modal.hide.fade{"id"=>"new_line_item_form_"  + party.class.name + "_" + party.id.to_s}
+/   = render :partial => "line_items/new", :locals => {payable_party_type: party.class.name, payable_party_id: party.id, billable_party_type: nil, billable_party_id: nil}
+
+
+
+/ .pull-right
+/   %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#new_line_item_form_" + party.class.name + "_" + party.id.to_s}
+/     %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_line_item_form_" + party.class.name + "_" + party.id.to_s}
+/     Line Item
+
+%h2 Miscellaneous
+
+%table.table.table-striped.table-bordered.table-condensed
+  %thead
+    %tr
+      %th Type
+      %th Sub-Type
+      %th SKU
+      %th Name
+      %th Quantity
+      %th Unit Price
+      %th Total Price
+      %th Invoice ID
+
+  %tbody
+    - @event.voucher_groups.each do |voucher| 
+      %tr{ "data-record-id"=>voucher.id }
+        %td{:nowrap => ""} Financial
+        %td{:nowrap => ""} Voucher
+        %td{:nowrap => ""} 999201
+        %td= voucher.name
+        %td= voucher.quantity
+        %td= number_to_currency(voucher.cogs)
+        %td= number_to_currency(voucher.total)
+        %td= voucher.invoice.name if voucher.invoice
+
+
+.row
+  .span3.offset9
+    %table.table.table-condensed
+      %tr 
+        %td Total:
+        %td= number_to_currency(voucher_total) 
+        %td

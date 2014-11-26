@@ -1,0 +1,25 @@
+.row
+  .span12
+    %table.table.table-condensed
+      %thead
+        %tr
+          %th Vendor
+          %th Transaction Date
+          %th Reference Number
+          %th Expenses Amount
+          %th Expenses Account
+          %th Expenses Class
+      %tbody
+        - row = 0
+        - @events.each do |event|
+          - row = event.vendors.present? ? row : row += 1
+          - style = row.even? ? "background:#f5f5f5;" : "background:white;"
+          - row += 1 
+          - event.vendors.each do |vendor|
+            %tr{:style => style}
+              %td= allow_links ? (link_to vendor.name, vendor_path(vendor)) : vendor.name
+              %td= event.event_start_time.strftime("%m/%d/%y")
+              %td= allow_links ? (link_to event.pretty_id, event_path(event)) : event.pretty_id
+              %td= number_to_currency event.expense_total_by_party(vendor)
+              %td Managed Services COGS
+              %td= event.location.building.market.name if (event.location.building and event.location.building.market)

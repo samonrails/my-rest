@@ -1,0 +1,21 @@
+- @vendor ||= Vendor.new
+
+.modal-wrapper
+  = simple_form_for @vendor, remote: false  do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 New Vendor
+
+    .modal-body.auto_size_modal_body
+      = f.input :name
+      = f.input :cuisine_list, label: "Cuisines (primary first)", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.cuisines"}
+      = f.input :market_list, label: "Markets", :input_html => {class: "select2 input-large", "data-restricted"=>true,"data-tag-source"=>"Application.data.markets"}
+      = f.input :vendor_manager_id, :label => "Fooda Rep", collection: User.fooda_employee.sort, label_method: :name, value_method: :id
+      = f.input :default_tax_rate
+      = f.input :vendor_type, collection: VendorTypes.available_values.collect{|c| [c.titleize, c]}, as: :radio_buttons
+
+    .modal-footer
+      = f.submit(:class => "btn btn-primary")
+

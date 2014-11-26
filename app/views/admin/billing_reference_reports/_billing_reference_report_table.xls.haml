@@ -1,0 +1,70 @@
+.results
+  .row
+    .span12
+      %table.table.table-condensed
+        %thead
+          %tr
+            %th Event ID
+            %th Date
+            %th Contact
+            %th Vendor
+            %th Subtotal
+            %th Gratuity
+            %th Tax
+            %th GP
+            %th Total Billing Price
+        %tbody
+          - @account.billing_reference_choices_by_group(billing_reference_group).each do |choice|
+            %tr{:style => "background: #87ceeb; font-weight: bold;"}
+              %td= "#{billing_reference_group}: #{choice}"
+              %td
+              %td
+              %td
+              %td
+              %td
+              %td
+              %td
+              %td= number_to_currency @account.event_billing_reference(billing_reference_group, choice).flatten.inject(0) {|sum, br| sum + (events.include?(br.event) ? br.event.catering_total_billing.to_f : 0)}
+              - @account.event_billing_reference(billing_reference_group, choice).each do |br|
+                - unless br.event.nil? or !events.include?(br.event)
+                  %tr
+                    %td= br.event.pretty_id
+                    %td= br.event.pretty_event_datetime
+                    %td= br.event.contact.name unless br.event.contact.nil?
+                    %td= br.event.pretty_vendors
+                    %td= number_to_currency br.event.catering_subtotal
+                    %td= number_to_currency br.event.catering_gratuity
+                    %td= number_to_currency br.event.catering_total_tax
+                    %td= number_to_currency(br.event.catering_revenue - br.event.catering_cogs)
+                    %td= number_to_currency br.event.catering_total_billing
+          %tr{:style => "background: #87ceeb; font-weight: bold;"}
+            %td= "#{billing_reference_group}: Not Defined"
+            %td
+            %td
+            %td
+            %td
+            %td
+            %td
+            %td
+            %td= number_to_currency events.select{|e| e.billing_references.where(:name => billing_reference_group).count == 0}.inject(0) {|sum, e| sum + e.catering_total_billing.to_f}
+            - events.select{|e| e.billing_references.where(:name => billing_reference_group).count == 0}.each do |event|
+              %tr
+                %td= event.pretty_id
+                %td= event.pretty_event_datetime
+                %td= event.contact.name unless event.contact.nil?
+                %td= event.pretty_vendors
+                %td= number_to_currency event.catering_subtotal
+                %td= number_to_currency event.catering_gratuity
+                %td= number_to_currency event.catering_total_tax
+                %td= number_to_currency(event.catering_revenue - event.catering_cogs)
+                %td= number_to_currency event.catering_total_billing
+          %tr{:style => "background: #A0A0A0; font-weight: bold;"}
+            %td Total
+            %td
+            %td
+            %td
+            %td
+            %td
+            %td
+            %td
+            %td= number_to_currency events.inject(0) {|sum, e| sum + e.catering_total_billing.to_f}

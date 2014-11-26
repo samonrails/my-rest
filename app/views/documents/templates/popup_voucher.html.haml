@@ -1,0 +1,124 @@
+!!!
+%html
+  %head
+    %meta{charset: "utf-8"}
+    %link{href: "http://fonts.googleapis.com/css?family=Open+Sans:400,700,800,300", rel: "stylesheet", type: "text/css"}/
+    %title Fooda Vouchers
+    :css
+      @page { 
+        margin: 20px 0 0 0; 
+        background: #ffffff; }
+
+      body {
+        background: url(../apple-touch-icon.png) no-repeat center center;
+        font-family: 'Open Sans', sans-serif;
+        color: #5d5d5d; }
+
+      .voucher-body {
+        width: 760px;
+        margin: 0px auto;
+        display: table; }
+
+      .voucher-block {
+        background: #fff;
+        width: 50%;
+        float: left;
+        padding: 25px;
+        box-sizing: border-box; }
+        .voucher-block:nth-child(4n+1) {
+          border-bottom: 2px dashed #ddd; 
+          border-right: 2px dashed #ddd;}
+        .voucher-block:nth-child(4n+2) {
+          border-bottom: 2px dashed #ddd;}
+        .voucher-block:nth-child(4n+3) {
+          border-right: 2px dashed #ddd; }
+        .voucher-block .content {
+          border: 1px solid #000;
+          padding: 23px; }
+        .voucher-block .logo {
+          margin-bottom: 15px;
+          text-align: right; }
+        .voucher-block .logo img {
+          width: 145px;
+          height: 50px;
+          text-align: right; 
+          image-resolution: auto, normal; }
+        .voucher-block .value {
+          margin-bottom: -30px; }
+          .voucher-block .value .super {
+            font-weight: 200;
+            font-size: 30px;
+            vertical-align: 28px; 
+            margin-right: -10px; }
+          .voucher-block .value .bold-number {
+            font-size: 70px;
+            font-weight: 800;
+            letter-spacing: -5px;
+            color: #a2a2a2;
+            margini-left: -5px; }
+        .voucher-block .company .company-name {
+          font-size: 25px;
+          font-weight: 400;
+          text-transform: uppercase;
+          margin-bottom: -20px; }
+        .voucher-block .company .description {
+          font-size: 20px;
+          font-weight: 300; }
+        .voucher-block .instructions {
+          font-size: 20px;
+          font-weight: 300;
+          line-height: 20px;
+          margin-top: 30px;
+          margin-bottom: 40px; }
+        .voucher-block .signature-area {
+          margin-bottom: 30px; }
+          .voucher-block .signature-area .label {
+            color: #a2a2a2;
+            display: block;
+            border-top: 1px solid;
+            font-size: 12px;
+            font-weight: 300;
+            text-transform: uppercase; }
+        .voucher-block .purchase-info p {
+          margin: 0;
+          font-size: 12px; }
+        .voucher-block .purchase-info .light-grey {
+          color: #a2a2a2; }
+        .kern {
+          letter-spacing: -2px;
+          padding-right: 2px; }
+        .purchased-by {
+          padding-top: 10px;
+          font-weight: 300;
+          color: #a2a2a2;
+          text-transform: uppercase; }
+        .website-link {
+          font-weight: 300;
+          color: #a2a2a2; }
+
+  %body
+    %section.voucher-body
+      - @voucher_group.vouchers.each do |voucher|
+        .voucher-block
+          .content
+            .logo 
+              %img{src: "https://s3.amazonaws.com/snappea-marketing/documents/vouchers/popup_vouchers_logo.png"}
+            .value
+              %h1.bold-number 
+                %small.super $
+                = @voucher_group.cogs_cents/100
+            .company
+              %h1.company-name= @voucher_group.account_name
+              %h2.description POPUP VOUCHER
+            .instructions
+              %p 
+                Bring this voucher to 
+                %br a Popup to redeem
+            .signature-area
+              %span.label REDEEMED BY (PRINT NAME)
+            .purchase-info
+              %p.purchase-details= "ID: #{voucher.token} | EXP. #{@voucher_group.expiration_date.strftime('%m/%d/%y')}"
+              - timezone = @voucher_group.event.try(:location).try(:building).try(:timezone)
+              - time = timezone ? @voucher_group.created_at.in_time_zone(timezone).strftime('%m/%d/%y') : @voucher_group.created_at.strftime('%m/%d/%y') 
+              %p.purchased-by= "Purchased by #{@voucher_group.purcahser} on #{time}"
+              %p.website-link See fooda.com/terms-of-use for info

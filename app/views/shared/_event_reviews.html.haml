@@ -1,0 +1,58 @@
+- require "date"
+.span{:style => "margin-left:75px;"}
+  %b
+    %u
+      Data Preview Pane
+.pull-right
+  .span
+    Sort: 
+    %a{:href => "#", :class => "trigger-link", "data-index" => index, "data-column" => "0", "data-order" => "1"}
+      = image_tag('/images/calendar_icon.png', size: "25x25")
+    %a{:href => "#", :class => "trigger-link", "data-index" => index, "data-column" => "1", "data-order" => "1"}
+      = image_tag('/images/sort_descending.png', size: "25x25")
+    %a{:href => "#", :class => "trigger-link", "data-index" => index, "data-column" => "1", "data-order" => "0"}
+      = image_tag('/images/sort_ascending.png', size: "25x25")
+  .span
+    - if reference.class == Vendor
+      = link_to "Export XLS", export_event_reviews_vendor_path(reference, product_type: product_type, format: :xls, level: level, rating: rating), class: "btn btn-small btn-info"
+    - else
+      = link_to "Export XLS", export_event_reviews_account_path(reference, product_type: product_type, format: :xls, level: level, rating: rating), class: "btn btn-small btn-info"
+.well.user-reviews-div
+  %b
+    %div{id: "data_header_#{index}_#{product_type}"}
+      - if rating.blank?
+        = level
+      - else
+        #{level} (#{rating} Star Data)
+  %hr
+  %table.table.table-striped.table-condensed{:class => "Grid", :id => "Grid#{index}"}
+    %thead{:style => "display: none"}
+      %tr
+        %th Date
+        %th Rating
+        %th Rating
+        %th EventId / Sku
+    - events.each_with_index do |event,i|
+      - review = average_rating(event.event_reviews.map(&:rating))
+      - if review and (rating.blank? or review.round(0) == rating.to_i)
+        - last_reviewed = event.event_reviews.last
+        %tr{:class => "review_#{product_type}_#{level.split(" ")[0]}_#{review.round(0)} review_#{product_type}_#{level.split(" ")[0]}", :style => "display:block"}
+          %td{:style => "display:none"}
+            = last_reviewed.updated_at
+          %td{:style => "display:none"}
+            = review
+          %td.user-reviews-td
+            .inventory_rating{"data-rating" => review }
+            .row
+              .span
+                = last_reviewed.contact.name if last_reviewed.contact
+            .row
+              .span
+                %i
+                  = last_reviewed.content
+          %td.user-reviews-td
+            .row
+              Event: #{link_to event.pretty_id, event}
+            .row
+              Date: #{event.event_start_time.strftime("%m/%d/%y")}
+

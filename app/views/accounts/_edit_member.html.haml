@@ -1,0 +1,27 @@
+.modal-wrapper
+  = simple_form_for role do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h3 Edit Membership
+      .modal-body.auto_size_modal_body
+      %table.table
+        %tr
+          %th Name
+          %td
+            = role.user.full_name.nil? ? " - " : role.user.full_name
+        %tr
+          %th Email
+          %td
+            = role.user.email
+        %tr
+          %th Account
+          %td 
+            = role.account
+        %tr
+          %th Role
+          %td
+            = f.input :role, collection: %w(member administrator), label: false, include_blank: false
+      
+      .modal-footer
+        = f.submit "Save", class: "btn btn-success"

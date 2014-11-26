@@ -1,0 +1,92 @@
+= simple_form_for [@account, @location] do |f|
+  .row-fluid
+    .span3
+      %h5 Details
+      = f.association :building, 
+        include_blank: "Building"
+      = f.association :contact, 
+        collection: Contact.where(account_id: @account.id), 
+        include_blank: "Contact"
+    .span5
+      = render 'edit_location_address', f: f, location: @location
+    .span3
+      %h5 Participation 
+      = f.input :privacy, 
+        collection: LocationPrivacy.available_values.collect{|c| [c.titleize, c]}, 
+        as: :radio_buttons
+      = f.input :expected_participation, 
+        as: :integer, 
+        placeholder: "Expected Participation"
+      = f.input :default_site_fee, 
+        as: :decimal, 
+        placeholder: 0.0
+
+  %hr
+  .row-fluid
+    .span4
+      = f.input :service_event_instructions, 
+        as: :text, 
+        input_html: {style: 'width: 90%', :rows => 5}, 
+        label: "Service Event Instructions"
+    .span4
+      = f.input :connectivity_instructions, 
+        as: :text, 
+        input_html: {style: 'width: 90%', :rows => 5}, 
+        label: "Connectivity Instructions"
+    .span4
+      = f.input :delivery_event_instructions, 
+        as: :text, 
+        :input_html => {:style=> 'width: 90%', :rows => 5}, 
+        label: "Delivery Event Instructions"
+  %hr
+  - unless @location.deleted?
+    .row-fluid
+      .span12
+        = f.submit "Update Location", :class => "btn btn-primary"
+        .pull-right
+          - unless @location.deleted?
+            %a.btn.btn-warning{:href=>account_location_path(@account, @location), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+              Account (Soft) Delete
+
+- if @location.deleted?
+  .row
+    .span12
+      .pull-right
+        %a.btn.btn-warning.disabled
+          %i.icon.icon-white.icon-remove
+          Account (Soft) Delete
+      %button.btn.btn-primary.disabled Update Location
+
+%hr
+
+
+.span12
+  %h3.center Documents
+.row-fluid
+  %span{:style => 'float: right'}
+    .pull-right{:style => 'position: relative;top: -20px;'}
+      %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-location-document-form"}
+        %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-location-document-form"}
+        Document
+  .results
+  %table.table.table-striped.table-condensed
+    %thead
+      %tr
+        %th File Name
+        %th Upload Date On
+        %th Uploaded By
+    %tbody
+      - for document in @location.location_documents
+        %tr
+          - extension = File.extname( document.document_file_name )
+          %td= link_to document.document_file_name, AWS::private_document_url("location_documents/#{document.id}#{extension}")
+          %td= document.created_at.strftime("%m-%d-%Y")
+          %td= document.user.name
+          %td
+            .btn-group
+              %a.btn.btn-mini.btn-danger{:href=>location_location_document_path(@location, document), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove
+
+.new-location-document-form.modal.hide.fade
+  = render :partial => "location_documents/new"

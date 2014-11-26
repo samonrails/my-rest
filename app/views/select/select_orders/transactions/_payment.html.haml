@@ -1,0 +1,44 @@
+-# Locals:
+-# select_order
+-# payment_amount
+-# cards
+.modal-wrapper
+  = simple_form_for :select_order_transaction, url: select_select_order_adjust_path(select_order), html: {method: :POST, id: :select_order_transaction} do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h3 Adjusted Order &mdash; Payment
+
+    .modal-body
+      .clearfix
+        %span.label.label-success Payment
+        %span due for adjusted order
+      %h2{:style => "color: #468847"}= number_to_currency(payment_amount)
+      = f.hidden_field :select_order_id, value: select_order.id
+      = f.hidden_field :is_refund, value: false
+      = f.hidden_field :amount, value: payment_amount
+
+      .well
+        / Show existing credit cards
+        = render partial: "select/select_orders/transactions/payment_cards",
+                 locals:  { f: f, cards: cards }
+        / New card
+        = render partial: "select/select_orders/transactions/payment_new_card",
+                 locals:  { f: f }
+
+      %label.checkbox
+        = f.check_box :send_receipt, checked: true
+        Send updated receipt to
+        %strong #{select_order.user.name}
+        %em (#{select_order.user.email})
+
+    .modal-footer
+      .pull-left
+        .input-prepend
+          %span.add-on.muted
+            %small Notes
+          = f.text_field :notes, value: "Payment of "+number_to_currency(payment_amount)+" for select order #"+pretty_id(select_order.id), style: "width: 320px"
+      .pull-right
+        = f.submit "Make Payment", :class => "btn btn-primary", id: "submit-transaction"
+

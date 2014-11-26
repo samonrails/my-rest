@@ -1,0 +1,12 @@
+%tr{:class => "infinite_item"}
+  %td= link_to pretty_id(select_event.id), select_event_path(select_event)
+  %td{:nowrap => ""}= select_event.delivery_time.nil? ? '?' : select_event.delivery_time.strftime("%Y-%m-%d")
+  %td
+    = select_event.delivery_time.strftime("%I:%M %p") unless select_event.delivery_time.nil?
+  %td= select_event.contact
+  %td= ProductType.select.titleize
+  %td= link_to select_event.account.name, account_path(select_event.account)
+  %td= select_event.location.html_address unless select_event.location.nil?
+  %td= raw select_event.select_event_vendors.map {|a| link_to a.vendor.name, vendor_path(a.vendor)}.join(", ")
+  %td= select_event.created_by.name unless select_event.created_by.nil?
+  %td= select_event.status.titleize

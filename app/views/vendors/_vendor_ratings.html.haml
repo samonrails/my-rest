@@ -1,0 +1,29 @@
+.span11
+  .well{style: "height:2050px; width:1070px;"}
+    %h4
+      %u User Reviews
+    - product_types = @vendor.product_types.map(&:product_type)
+    .btn-group{"data-toggle" => "buttons-radio"}
+      %button.btn.btn-set-vendor.btn-primary{:type => "button", :id => "managed_services"} Managed Services
+      %button.btn.btn-set-vendor{:type => "button", :id => "perks"} Perks
+      %button.btn.btn-set-vendor{:type => "button", :id => "select"} Select
+    %br
+    %br
+    - product_types.each_with_index do |pt, i|
+      - reviews_rollup = @vendor.reviews_rollups.select{|r| r.product_type == pt}.first
+      %div{class: "category_#{pt} div_charts", style: pt == "managed_services" ? "display:block;" : "display:none;"}
+        - inventory_items_for_pt = @vendor.inventory_items.select{|i| i.inventory_item_product_types.map(&:product_type).include?(pt)}
+        .span11.margin_left_0
+          - if @vendor.vendor_type == "Restaurant"
+            - chart_types = ["Event Level Food Ratings", "Aggregate Item Level Food Ratings", "Food Presentation", "Order Accuracy", "On Time Delivery"]
+          - else
+            - chart_types = ["On Time Delivery"]
+          .span6.margin_left_0
+            - chart_types.each_with_index do |level, j|
+              - reviews, rating_array = reviews_for_current_graph(reviews_rollup, level) if reviews_rollup
+              - reviews, rating_array = [], [] unless reviews_rollup
+              = render partial: "/shared/charts", locals: {level: level, reviews_rollup: reviews_rollup, reviews: reviews.flatten, rating_array: rating_array, i: 5*i+j, product_type: pt}
+          .span5.margin_left_0{id: "data_pane_#{pt}"}
+        - if @vendor.vendor_type == "Restaurant" and !inventory_items_for_pt.map{|i| i.reviews.order("created_at")}.flatten.blank?
+          .span10.margin_top_20{:style => "margin-left: 15px; margin-top: 20px;"}
+            = render partial: "vendor_items", locals: {pt: pt, index: i, inventory_items_for_pt: inventory_items_for_pt}

@@ -1,0 +1,16 @@
+%table.table.table-striped#account-users-table
+  %tr
+    %th
+    %th Name
+    %th Email
+    %th Role
+  - @users.each do |user|
+    %tr
+      %td
+        = check_box_tag "ids", @account.has_member?(user) ? AccountRole.find_record(@account.id, user.id).id : "" , @account.has_member?(user), :id=> user.id, :class => "add-or-remove-from-account" 
+      %td
+        = user.full_name
+      %td
+        = user.email
+      %td
+        = @account.has_member?(user) ? AccountRole.find_record(@account.id, user.id).role.titleize : "Member"

@@ -1,0 +1,79 @@
+- unique_id = line_item.id.to_s
+
+.modal-wrapper
+  = form_for [@event, line_item] do |f|
+
+    .modal-header
+
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h2 #{line_item.name}
+      %h4 #{line_item.line_item_type}
+      ID: #{line_item.pretty_id}
+
+    .modal-body.auto_size_modal_body
+      
+      .row
+        .span4
+          .in-between
+          = f.label :sku
+          = f.text_field :sku, :readonly => true
+          .in-between
+          = f.label :name
+          = f.text_field  :name
+        .span4
+          = f.label :quantity
+          = f.number_field :quantity
+          .in-between
+          - if !line_item.payable_party_type.nil?
+            = f.label "Prep Notes"
+            = f.text_area :notes, :size => "30x5"
+
+      - if defined?(line_item.inventory_item.option_groups) && line_item.inventory_item.option_groups.count > 0
+        - line_item.inventory_item.option_groups.each do |grp|
+
+          %hr
+          %h3 #{grp.name}
+          - if grp.max.nil?
+            %h4 Choose options (#{grp.included} included, #{grp.required} required)
+          - else
+            %h4 Choose up to #{grp.max} options (#{grp.included} included, #{grp.required} required)
+
+          - add_ons = []
+          - add_ons[0] = grp.inventory_items.take(grp.inventory_items.count / 2.0 + 0.5)
+          - add_ons[1] = grp.inventory_items - add_ons[0]
+
+          .row{:style => "font-size: 12px"}
+
+            %input{:type => "hidden", :value => grp.required, :name => "required_options"}
+            - if grp.max.nil?
+              %input{:type => "hidden", :value => 100000, :name => "max_options"}
+            - else
+              %input{:type => "hidden", :value => grp.max, :name => "max_options"}
+
+
+            - [*0..1].each do |j|
+              .span5
+                %table.table.table-striped.table-condensed{:style => "margin-top: 5px;"}
+                  %thead
+                    %tr
+                      %th Quantity 
+                      %th Name (Public)
+                      %th COGS
+                      %th Prem Add-on COGS
+                  %tbody
+                    - add_ons[j].sort_by{|ii| ii.name_vendor}.each do |item|
+                      - quantity = line_item.add_ons.select{|li| li.inventory_item_id == item.id}.inject(0){|sum,e| sum += e.quantity }
+                      %tr 
+                        %td
+                          %select{:style => "width:60px; font-size: 12px; height:25px;", :name => "inventory_item_quantity[#{item.id}]", :class => "inventory_item_option_quantity"}
+                            - [*0..10].each do |i|
+                              - selected = (i == quantity)
+                              %option{:value => i, :selected => selected}= i
+                        %td= item.name_public
+                        %td= number_to_currency(item.cogs)
+                        %td= number_to_currency(item.premium_price)
+          %br
+
+    .modal-footer
+      = f.submit commit_text, :class => "btn btn-primary btn-menu-item-config"

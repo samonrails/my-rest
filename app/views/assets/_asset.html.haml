@@ -1,0 +1,18 @@
+- if asset.owner.class == Vendor
+  .span3.well
+    %a.btn.btn-danger.btn-mini.remove-asset.float-over{"href" => "/assets/#{asset.id}"}
+      %i.icon-remove.icon-white
+    %a{"href" => asset.resource.url, "target" =>"_blank"}
+      = image_tag asset.resource.url(:thumb)
+    %br
+    = radio_button_tag 'asset', 'is_default', asset.is_default? , class: 'set-default-image'
+    Set Default
+-else
+  .well{class: asset.owner.kind_of?(MenuTemplate) ? "span2" : "span"}
+    %a.btn.btn-danger.btn-mini.remove-asset.float-over{"href" => "/assets/#{asset.id}"}
+      %i.icon-remove.icon-white
+    %a{"href" => asset.resource.url, "target" =>"_blank"}
+      = image_tag asset.resource.url(:thumb)
+    %br
+    = radio_button_tag 'asset', 'is_default', asset.is_default? , class: 'set-default-image'
+    Set Default

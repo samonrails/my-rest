@@ -1,0 +1,89 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    :css
+      h1 {
+        padding: 0px;
+        margin: 0px 0px 10px 0px;
+        font-size 
+      }
+
+      h2 {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      h3 {
+        padding: 0px;
+        margin-bottom: 0px;
+      }
+
+      p {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      table {
+        padding-top:20px;
+        width: 100%;
+      }
+
+      table tr th {
+        background: #eee;
+      }
+
+      table tr td {
+        text-align: center;
+        border-bottom: 1px #ccc solid;
+      }
+
+      p.pos_left {
+        padding-left: 30px;
+        /position:relative;
+      }
+
+      .pull-right {
+        float:right;
+        position:relative;
+        padding-top: 15px;
+      }
+  %body
+    .pull-right
+      %img{:src => "https://s3.amazonaws.com/snappea-marketing/logo.png"}
+    %h1 Fooda
+    %h2 Billing Statement for #{@vendor.name}
+
+  %hr
+    %h3 Generation:
+    %p.pos_left
+      %b Method:
+      = @method
+      %br
+      %b By:
+      = @full_name
+      %br
+      %b At:
+      = DateTime.now.strftime("%m/%d/%Y at %I:%M%p")
+
+    %hr
+
+    Please see the most recent attached billing statement. Any credits will hit your account within 48 business hours and any debits will hit your account within 72 business hours from the event date. If you have any questions or concerns, please let us know.
+    %br
+    %br
+    Thanks,
+    %br
+    Fooda Accounting
+    %br
+    312.626.2549
+    %br
+    accounting@fooda.com
+
+    %hr
+
+    %p
+      Confidential Information - Do Not Distribute.
+      %br
+      Copyright © 
+      = Date.today.year 
+      Fooda Inc. All rights reserved.

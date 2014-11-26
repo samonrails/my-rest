@@ -1,0 +1,14 @@
+%tr{:class => "infinite_item"}
+	%td= link_to pretty_id(select_order.id), select_select_order_path(select_order)
+	%td= link_to select_order.user.name, edit_admin_user_path(select_order.user) unless select_order.user.nil?
+	%td= link_to select_order.user.email, edit_admin_user_path(select_order.user) unless select_order.user.nil?
+	%td= select_order_vendors(select_order)
+	%td= select_order_date(select_order) unless select_order.select_event.nil?
+	%td{:style=>"text-align:center;"}= select_order_item_count(select_order) unless select_order.select_event.nil?
+	%td{:style=>"text-align:center;"}= select_order_customized(select_order)
+	%td= select_order_transaction_card_short(select_order_recent_transaction(select_order))
+	%td= select_order_subtotal(select_order)
+	%td= select_order_subsidy(select_order)
+	%td= select_order_additional_charges(select_order)
+	%td= select_order_transaction_amount(select_order_recent_transaction(select_order))
+	%td= select_order_status(select_order)

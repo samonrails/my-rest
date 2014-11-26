@@ -1,0 +1,10 @@
+:javascript
+  Application.data                      = Application.data || {};
+  Application.data.cuisines             = #{ StaticData::Cuisines.to_json.html_safe };
+  Application.data.markets              = #{ Market.all.map(&:name).sort };
+  Application.data.buildings            = #{ StaticData::Buildings.to_json.html_safe };
+  Application.data.inventory_tags       = #{ StaticData::InventoryTags.to_json.html_safe };
+  Application.data.meal_periods         = #{ MealPeriod.available_values.sort };
+  Application.data.dietary_restrictions = #{ StaticData::DietaryRestrictions.to_json.html_safe };
+
+= yield(:local_data)

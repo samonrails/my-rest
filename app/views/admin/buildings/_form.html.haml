@@ -1,0 +1,118 @@
+= simple_form_for [:admin, @building] do |f|
+  = hidden_field_tag :referrer, params[:referrer]
+  .row-fluid
+    .span3
+      %h4 General Information
+      = f.input :name, label: "Building Name"
+      = f.association :market
+      = f.input :timezone, collection: ActiveSupport::TimeZone.us_zones.map(&:name)
+      - if @building.new_record?
+        = f.hidden_field :is_approved, value: true
+      %h4 Building Address
+      = f.simple_fields_for :address do |a|
+        = a.input :address1, :input_html => {:style=> 'width: 230px'}, placeholder: "Address Line 1", label: false
+        = a.input :address2, :input_html => {:style=> 'width: 230px'}, placeholder: "Address Line 2", label: false
+        = a.input :city, placeholder: "City", wrapper_html: { class: "inline_field_wrapper" }, input_html: { maxlength: 30}, label: false
+        = a.input :state, placeholder: "State", wrapper_html: { class: "inline_field_wrapper" }, input_html: { maxlength: 2, style: 'width: 35px'}, label: false
+        = a.input :zip_code, placeholder: "Zip Code", wrapper_html: { class: "inline_field_wrapper" }, input_html: { maxlength: 6, style: 'width: 60px'}, label: false
+        .inline_field_wrapper
+          = a.input :country, :as => :country, include_blank: "Country", label: false, wrapper_html: { class: "inline_field_wrapper" }
+    .span3
+      %h4 Building Contact
+      = f.input :contact_name, label: "Contact Name"
+      = f.input :contact_title, label: "Title"
+      = f.input :contact_email, label: "Email"
+      = f.input :contact_phone, label: "Phone"
+      = f.input :contact_cell, label: "Cell"
+      = f.input :contact_fax, label: "Fax"
+      
+    .span6
+      %h4 Building Requirements
+      = f.label :insurance_required, "Requires Insurance or Contract"
+      = f.check_box :insurance_required,{:onclick => "validate()", :id => 'remember', :checked => @building.insurance_required}
+      #insurance_requirements{style: (!@building.insurance_required ? "display: none;" : "display: block;")}
+        = f.input :insurance_requirements, label: "Insurance / Contract Notes", as: :text, input_html: { rows: 9 }
+        #insurances
+          %b
+            Authorized Vendors for Building
+          #insurance{:style => 'border: 1px solid gray;padding: 6px;width: 62%;'}
+            - if @building.vendor_insurances.present?
+              %table.table
+                %thead
+                  %tr
+                    %th Name
+                    %th Expiration Date
+                %tbody
+                  - for insurance in @building.vendor_insurances
+                    %tr
+                      %td
+                        = link_to insurance.vendor.name, vendor_path(insurance.vendor)
+                      %td
+                        = insurance.insurance_expiration_date.strftime("%m-%d-%Y")
+            - else
+              None.
+  .row-fluid
+    .span12
+      %hr
+      %h4 Notes
+  .row-fluid
+    .span4
+      = f.input :loading_information, as: :text, label: "Loading Information", input_html: { style: 'width: 100%', rows: 12 }
+    .span4
+      = f.input :site_directions, as: :text, label: "Site Directions", input_html: { style: 'width: 100%', rows: 12 }
+    .span4
+      = f.input :parking_information, as: :text, label: "Parking Information", input_html: { style: 'width: 100%', rows: 12 }
+
+  - if @building.new_record?
+    .row-fluid
+      .span12
+        %hr
+        = f.simple_fields_for :assets_attributes, multipart: true do |b|
+          = render partial: "assets/new", locals: {:field_name => "building[assets_attributes][][resource]", :ff => b }
+  .row
+    .form-actions
+      .pull-right
+        = f.button :submit, (@building.id.nil? ? "Create Building" : "Save Building"), :class => "btn btn-primary"
+
+  - unless @building.new_record?
+    .span12{style: "text-align: center;"}
+      %h3 Documents
+    .row-fluid
+      %span{:style => 'float: right'}
+        .pull-right{:style => 'position: relative;top: -20px;'}
+          %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-building-document-form"}
+            %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-building-document-form"}
+            Document
+      .results
+      %table.table.table-striped.table-condensed
+        %thead
+          %tr
+            %th File Name
+            %th Upload Date On
+            %th Uploaded By
+        %tbody
+          - for document in @building.building_documents
+            %tr
+              - extension = File.extname( document.document_file_name )
+              %td= link_to document.document_file_name, AWS::private_document_url("building_documents/#{document.id}#{extension}")
+              %td= document.created_at.strftime("%m-%d-%Y")
+              %td= document.user.name
+              %td
+                .btn-group
+                  %a.btn.btn-mini.btn-danger{:href=>building_building_document_path(@building, document), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                    %i.icon.icon-white.icon-remove
+
+- unless @building.new_record?
+  .new-building-document-form.modal.hide.fade
+    = render :partial => "building_documents/new"
+
+:javascript
+      function validate(){
+      if (document.getElementById('remember').checked){
+      document.getElementById("insurances").style.display="block";
+      document.getElementById("insurance_requirements").style.display="block";
+      }else{
+      document.getElementById("insurances").style.display="none";
+      document.getElementById("insurance_requirements").style.display="none";
+      }
+      }

@@ -1,0 +1,49 @@
+-# Locals:
+-# select_order
+-# payment_amount
+-# cards
+.modal-wrapper
+  = simple_form_for :select_order_transaction, url: select_select_order_select_order_transactions_path(select_order), html: {method: :POST, id: :select_order_transaction} do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+      %h3 New Transaction
+
+    .modal-body
+      = f.hidden_field :select_order_id, value: select_order.id
+      %label Transaction amount
+      .input-prepend.input-append
+        %span.add-on $
+        = f.text_field :amount
+        %span.add-on
+          %label.checkbox
+            = f.check_box :is_refund
+            Refund?
+
+      .well.payment-options-visibility
+        / Show existing credit cards
+        = render partial: "select/select_orders/transactions/payment_cards",
+                 locals:  { f: f, cards: cards }
+        / New card
+        = render partial: "select/select_orders/transactions/payment_new_card",
+                 locals:  { f: f }
+
+      .refund-options-visibility.hidden
+        %hr
+
+      %label.checkbox
+        = f.check_box :send_receipt, checked: true
+        Send updated receipt to
+        %strong #{select_order.user.name}
+        %em (#{select_order.user.email})
+
+    .modal-footer
+      .pull-left
+        .input-prepend
+          %span.add-on.muted
+            %small Notes
+          = f.text_field :notes, placeholder: "Optionally provide some notes...", style: "width: 320px"
+      .pull-right
+        = f.submit "Make Payment", :class => "btn btn-primary", id: "submit-transaction"
+

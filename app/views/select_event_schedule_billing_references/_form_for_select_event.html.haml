@@ -1,0 +1,23 @@
+- billing_reference ||= BillingReference.new()
+- select_event_schedule_billing_reference ||= SelectEventScheduleBillingReference.new( :billing_reference_id => billing_reference.id)
+
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    .modal-body  
+      = form_for [@account, select_event_schedule_billing_reference] do |f| 
+        %input{:type => "hidden", :name => "select_event_schedule_billing_reference[select_event_schedule_id]", 
+               :value => @select_event_schedule.id }
+
+        %select{:name => 'select_event_schedule_billing_reference[billing_reference_id]'}
+          - (@select_event_schedule.account.billing_references - @select_event_schedule.billing_references).each do |account_br|
+            %option{ :value => account_br.id }= account_br.name
+
+        .modal-footer
+          = f.submit "Add Reference", :class => "btn btn-primary"
+
+
+  
+    

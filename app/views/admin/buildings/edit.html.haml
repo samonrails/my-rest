@@ -1,0 +1,37 @@
+-provide :title, "Building"
+
+#building_status_update.auto_size_modal.modal.hide.fade
+  .modal-wrapper
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Building Status
+
+    .modal-body.auto_size_modal_body
+      = simple_form_for [:admin, @building], remote: false do |a|
+        = a.input :is_approved, inline_label: "Approved", label: false
+
+        .modal-footer
+          .span2
+            = a.button :submit, "Update Building", class: "btn btn-primary"
+
+.row-fluid
+  .span12
+    %h1.center Edit Building
+.row-fluid
+  .span12
+    - if @building.is_approved?
+      .label.label-success.pointer.toggle-modal{"data-target"=>"#building_status_update"} Approved
+    - else
+      .label.label-warning.pointer.toggle-modal{"data-target"=>"#building_status_update"} Unapproved
+    %br
+    %b.building-id
+      ID: 
+      = @building.pretty_id
+.row-fluid
+  .span12
+    %hr{style: 'margin-top:5px;'}
+=render 'form'
+%hr
+  = render partial: "assets/index", locals: {enclosing_resource: @building}

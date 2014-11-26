@@ -1,0 +1,35 @@
+.searchable-sortable-pagination-form
+  = form_for @vendor do |f|
+    .row
+      .span3.state
+        %h4 Managed Services Capacity
+        %label Vendor Minimum ($)
+        = f.number_field :vendor_minimum, label: false
+      .span6.state
+        %h4 Managed Services Lead Time
+        %br
+        %table
+          %tr
+            %td{style: "padding-top: 4px;"}
+              = f.number_field :managed_services_lead_time, label: false
+            %td{style: "vertical-align: top; padding: 5px;"}
+              hrs
+    %br
+    .row
+      .span6
+        %h4 Concurrent Capacity
+        %br
+        %table
+          %tr
+            %td
+              = f.number_field :concurrent_orders, label: false, class: "input-small"
+            %td{style: "vertical-align: top; padding: 5px;"}
+              orders within
+            %td
+              = f.number_field :concurrent_orders_time, label: false, class: "input-small"
+            %td{style: "vertical-align: top; padding: 5px;"}
+              min
+    %br
+    .row
+      .span2
+        = f.submit('Save', :class => "btn btn-primary")

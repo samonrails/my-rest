@@ -1,0 +1,32 @@
+- user ||= User.new
+
+.modal-wrapper
+  = simple_form_for [:admin, user] do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 User
+
+    .modal-body.auto_size_modal_body
+      = f.input :first_name
+      = f.input :last_name
+      = f.input :email, required: true
+      .form-inline
+        %label{:for => 'send_email'}
+          = check_box_tag :send_email, nil, nil, style: 'margin-top:0px;'
+          Send Welcome Email to the User
+      %br
+      %label User Role(s)
+      = select :user, :roles, options_for_select(UserRoles.available_values(current_user).map{|r| [r.titleize, r]}, ["catering_foodizen", "foodizen"]), {include_blank: false }, {class: 'multiselect', multiple: true, style: 'display:none;'}
+      %br
+      %br
+      = f.label :accounts
+      = select :user, :accounts, options_for_select(Account.all.map{|a| [a.to_s, a]}), {}, {class: 'multiselect', multiple: true, style: 'display:none;'}
+      %br
+      %br
+
+    .modal-footer
+      = f.submit(:class => "btn btn-primary")
+  

@@ -1,0 +1,36 @@
+.new-select-order-form.auto-size-modal.modal.hide.fade
+	= render :partial => "select/select_orders/new", :locals => {}
+
+.well-small.pull-right
+	%a#create_order.btn.btn-success.btn-small.toggle-modal{"data-target"=>".new-select-order-form"}
+		%i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>".new-select-order-form"}
+		Add Order
+
+.well-small.pull-right
+	.input-append
+		.btn-group
+			%input.search-field.span3{:type => "text", :placeholder=>"Search Orders", :id => "search-string"}
+
+%table.table.table-striped.table-condensed.custom-table
+	%thead
+		%tr
+			%th Order ID
+			%th User
+			%th Email
+			%th Vendor(s)
+			%th Date
+			%th # of Items Ordered
+			%th # of Customized Items
+			%th Payment Method
+			%th Sub Total
+			%th Subsidy Amount
+			%th Additional Charges
+			%th Payment Amount
+			%th Payment Status
+
+	%tbody.page
+		%tr{:class => "infinite_item"}
+
+		= render @select_orders
+
+= paginate @select_orders, :theme => 'twitter-bootstrap'

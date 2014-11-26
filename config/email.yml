@@ -1,0 +1,18 @@
+production: &defaults
+  valid_domains: [fooda.com]
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+qa:
+  <<: *defaults
+
+experimental:
+  <<: *defaults
+

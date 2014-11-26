@@ -1,0 +1,13 @@
+.select-order-line-item
+  .header-area
+    .row-fluid.clearfix
+      .pull-left
+        %h5
+          /= line_item.vendor.name
+          Vendor Name
+      .pull-right
+        %i.icon-minus
+          &nbsp;
+  .contents-area
+    = render :partial => "select/select_orders/inventory_item_details", :locals => {editable: false, inventory_item: inventory_item}
+

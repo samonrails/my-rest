@@ -1,0 +1,109 @@
+.modal.hide.fade{"id"=>"new_email_form"}
+  = render :partial => "/admin/emails/new", :locals => {email: Email.new}
+
+.row
+  .span12
+    .pull-right.admin-buttons
+      %a.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#new_email_form"}
+        %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_email_form"}
+        Edit Email Lists
+
+%hr
+
+.row
+  .span6
+    .pull-right.admin-email-buttons
+      %a.btn.btn-small{ :href => 'admin/mailer/catering_schedule_preview' }
+        Preview
+      %a.btn.btn-small{ :href => 'admin/mailer/catering_schedule_preview?send=true' }
+        Send
+    %h4 Catering Schedule Preview (4:00pm)
+    %table.table.table-striped.table-condensed
+      %thead
+        %tr
+          %th Email
+          %th Remove
+
+        - @catering_schedule_preview.each do |e|
+          .modal.hide.fade{"id"=>"edit_email_form_" + e.id.to_s}
+            = render :partial => "/admin/emails/edit", :locals => {email: e}
+          %tr
+            %td
+              %a.pointer.toggle-modal{"data-target"=>"#edit_email_form_" + e.id.to_s}#{e.email}
+            %td
+              %a.btn.btn-mini.btn-danger{:href => admin_email_path(e), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove
+  .span6
+    .pull-right.admin-email-buttons
+      %a.btn.btn-small{ :href => 'admin/mailer/end_of_day_sales_report' }
+        Preview
+      %a.btn.btn-small{ :href => 'admin/mailer/end_of_day_sales_report?send=true' }
+        Send
+    %h4 End of Day New Catering Sales (4:00pm)
+    %table.table.table-striped.table-condensed
+      %thead
+        %tr
+          %th Email
+          %th Remove
+
+        - @new_catering_sales.each do |e|
+          .modal.hide.fade{"id"=>"edit_email_form_" + e.id.to_s}
+            = render :partial => "/admin/emails/edit", :locals => {email: e}
+          %tr
+            %td
+              %a.pointer.toggle-modal{"data-target"=>"#edit_email_form_" + e.id.to_s}#{e.email}
+            %td
+              %a.btn.btn-mini.btn-danger{:href=>admin_email_path(e), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove
+%hr
+.row
+  .span6
+    .pull-right.stacked-admin-email-buttons
+      .row
+        %a.btn.btn-small{ :href => 'admin/mailer/vendor_billing_summaries' }
+          Email Template Preview
+      .row
+        %a.btn.btn-small{ :href => 'admin/mailer/vendor_billing_summaries?send=true&no_vendors=true' }
+          Send to the list below
+      .row
+        %a.btn.btn-warning.btn-small{ :href => 'admin/mailer/vendor_billing_summaries?send=true', :"data-method" => "get", data: { confirm: 'Are you sure?  This will email all vendor billing contacts!' } }
+          Send to Vendors
+    %h4 Vendor Billing Summaries (3:00pm)
+    %table.table.table-striped.table-condensed
+      %thead
+        %tr
+          %th Email
+          %th Remove
+
+        - @vendor_billing_summaries.each do |e|
+          .modal.hide.fade{"id"=>"edit_email_form_" + e.id.to_s}
+            = render :partial => "/admin/emails/edit", :locals => {email: e}
+          %tr
+            %td
+              %a.pointer.toggle-modal{"data-target"=>"#edit_email_form_" + e.id.to_s}#{e.email}
+            %td
+              %a.btn.btn-mini.btn-danger{:href => admin_email_path(e), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove
+
+  .span6
+    .pull-right.admin-email-buttons
+      %a.btn.btn-small{ :href => 'admin/mailer/insurance_expiration_report' }
+        Preview
+      %a.btn.btn-small{ :href => 'admin/mailer/insurance_expiration_report?send=true' }
+        Send
+    %h4 Vendor Insurance Expiration Report (5:00pm)
+    %table.table.table-striped.table-condensed
+      %thead
+        %tr
+          %th Email
+          %th Remove
+
+        - @insurance_expiration_report.each do |e|
+          .modal.hide.fade{"id"=>"edit_email_form_" + e.id.to_s}
+            = render :partial => "/admin/emails/edit", :locals => {email: e}
+          %tr
+            %td
+              %a.pointer.toggle-modal{"data-target"=>"#edit_email_form_" + e.id.to_s}#{e.email}
+            %td
+              %a.btn.btn-mini.btn-danger{:href => admin_email_path(e), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                %i.icon.icon-white.icon-remove

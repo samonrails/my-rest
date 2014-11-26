@@ -1,0 +1,21 @@
+.modal-wrapper
+  = form_for [:admin, email] do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 #{title}
+
+    .modal-body
+      = f.label "Email List"
+      .in-between
+      = select(:email, :email_list, options_for_select(DocumentType::Email.available_values.collect{|c| [c.titleize, c]}, email.email_list), {:include_blank => false})
+      .in-between
+      = f.label "Email Address"
+      .in-between
+      = f.text_field :email
+      .in-between
+
+    .modal-footer
+      = f.submit (email.id.nil? ? "Create Email" : "Save Email"), :class => "btn btn-primary"

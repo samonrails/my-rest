@@ -1,0 +1,35 @@
+- week_days = %w[Monday Tuesday Wednesday Thursday Friday Saturday]
+
+- (0..6).each do |i|
+  .edit-capacity-form.modal.hide.fade{:id => i}
+    - capacity = find_capacity(@vendor,i)
+    = render :partial => "vendors/edit_capacity", :locals => {capacity: capacity, day: i}
+
+%h4 Hours
+%hr
+%table.table.table-striped
+  %thead
+    %tr
+      %th Day
+      %th Hours of Operation
+
+  %tbody
+    - week_days.each_with_index do |wday,i|
+      %tr{:class => Date.today.wday-1 == i ? "loud" : ""}
+        %td
+          %a.pointer.toggle-modal{"data-target"=>"##{i}"}#{wday}
+        - capacity = find_capacity(@vendor,i)
+        - if capacity
+          %td= capacity.is_closed? ? "Closed" : "#{capacity.start_time.strftime("%I:%M %p")} - #{capacity.end_time.strftime("%I:%M %p")}"
+        - else
+          %td= "-"
+    %tr{:class => Date.today.wday == 0 ? "loud" : ""}
+      %td
+        %a.pointer.toggle-modal{"data-target"=>"#6"}Sunday
+      - capacity = find_capacity(@vendor,6)
+      - if capacity
+        %td= capacity.is_closed? ? "Closed" : "#{capacity.start_time.strftime("%I:%M %p")} - #{capacity.end_time.strftime("%I:%M %p")}"
+      - else
+        %td= "-"
+
+= render :partial => "vendors/group_meal_capacity"

@@ -1,0 +1,28 @@
+.modal-wrapper
+  = form_tag update_transaction_method_event_path, remote: true do
+    = hidden_field_tag 'party_id', party.id
+    = hidden_field_tag 'party_type', party.class.name
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Update Payment Method
+
+    .modal-body
+      %h4 #{party.name}
+      - if party.credit_status == "on_account"
+        =select_tag 'transaction_method', options_for_select(["CC", "Corp Acct"], event_transaction_method.transaction_method), {:include_blank => true}
+      - else
+        =select_tag 'transaction_method', "<option #{event_transaction_method.transaction_method == "CC" ? 'selected' : '' }>CC</option><option disabled='disabled'>Corp Acct</option>".html_safe, {:include_blank => true}
+      
+      %div{class:"js-transaction-method-toggle-extra-info", style: event_transaction_method.transaction_method == "CC" ? "" : "display: none;"}
+        %table.table-condensed
+          %tr
+            %td CC Last Name
+            %td= text_field_tag 'info1', event_transaction_method.info1
+          %tr
+            %td CC Last 4
+            %td= text_field_tag 'info2', event_transaction_method.info2
+
+    .modal-footer
+      = submit_tag "Update Payment Method", :class => "btn btn-primary"

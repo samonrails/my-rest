@@ -1,0 +1,31 @@
+= ssp_search_form Building, 
+  [{:name => :address, :as => :string, :wildcard => :both},
+  { :name => :market, :as => :multi_select, :collection => Market.all.map{|m| m.name}, :nil_means_all => true}]
+
+.pull-right.admin-buttons
+  %a.btn.btn-success.btn-small{ :href => '/admin/buildings/new' }
+    %i.icon.icon-plus.icon-white 
+    Building
+%table.table.table-striped
+  %thead
+    %tr
+      %th Name
+      %th Market
+      %th Action
+    = paginate @buildings, :theme => 'twitter-bootstrap'
+    - @buildings.each do |building|
+      %tr
+        %td.inline
+          = link_to building.name, edit_admin_building_path(building)
+          - unless building.is_approved?
+            .label.label-important Unapproved
+        %td= building.market.name unless building.market.nil?
+        %td
+          -if building.can_destroy?
+            %a.btn.btn-mini.btn-danger{:href=>admin_building_path(building), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+              %i.icon.icon-white.icon-remove
+          -else 
+            %a.btn.btn.btn-mini.disabled
+              %i.icon.icon-remove.icon-white
+
+= paginate @buildings, :theme => 'twitter-bootstrap'

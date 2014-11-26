@@ -1,0 +1,167 @@
+- provide(:title, "Select Event | #{pretty_id(@select_event.id)}")
+- now = DateTime.now.strftime("%d %B %Y")
+
+.auto_size_modal.modal.hide.fade{"id"=>"edit_event_billing_reference_form_2"}
+  = render :partial => "select_event_billing_references/form_for_select_event", :locals => {select_event: @select_event}
+
+
+.auto_size_modal.modal.hide.fade{"id"=>"new_select_event_vendor_form"}
+
+.auto_size_modal.modal.hide.fade{"id"=>"edit_select_event_vendor_form"}
+ 
+#event-details
+  .row-fluid
+    .span12
+      %h2 Select Event Details
+      %b.event-id
+        %br
+        ID: 
+        = pretty_id(@select_event.id)
+        .pull-right
+          Created by: 
+          = created_by(@select_event)
+        %br
+      %hr
+
+  .row-fluid
+    .span6
+      = simple_form_for(@select_event) do |f|
+        .row-fluid
+          .span6
+            %h4 General
+            = f.input :meal_period, collection: MealPeriod::available_values.collect{|c| [c.titleize, c]}
+            = f.input :status, collection: @select_event.status == Status::Event.auto_generated ? Status::Event.available_values.collect{|c| [c.titleize, c]} : Status::Event.available_values_for_user.collect{|c| [c.titleize, c]}
+            %label{:for => 'product_dummy'}
+              Product
+            %select{:name => 'product_dummy'}
+              %option{:value => 'Select'} Select
+          .span6
+            %h4 Account Details
+            = f.input :account, 
+              input_html: {value: @select_event.account.name},
+              wrapper_html: { class: "inline_field_wrapper" }, 
+              as: :string,
+              readonly: true,
+              label: "Account name"
+            %a{"href" => account_path(@select_event.account)}
+              = image_tag('/images/default_account.png', style: "width:13%; margin: 0 0 10px -11px;")
+            = f.association :location, include_blank: true, collection: @select_event.account.locations
+            %table
+              %td 
+                - contact_list =  (@select_event.account.contacts + @select_event.created_by.try(:contacts)).sort{|x,y| x.name <=> y.name }.uniq
+                = f.association :contact, include_blank: true, collection: contact_list
+              %td
+              %td
+                %a{"href" => account_path(@select_event.account, :selected => "contacts")}
+                  = image_tag('/images/address_icon.png', size: "100%x100%")
+            = f.association :event_owner, include_blank: true, collection: User.fooda_employee
+        .row-fluid
+          .span12
+          %hr
+          %h4 Schedule
+        .row-fluid
+          .span6
+            Event Start Time
+            %br
+            .input-append.date.form_datetime
+              %input{:size => "16", :type => "text", :name => "select_event[delivery_time]", :value => default_delivery_time( @select_event )}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+          .span6
+            Ready and Bagged
+            %br
+            %input{:size => "3", :type => "text", :name => "select_event[ready_and_bagged]", :value => ready_bagged( @select_event ), :style => "width: 30px"}
+            min prior
+            %br
+          .row-fluid
+            .span6
+              Ordering Window Start Time
+              %br
+              .input-append.date.form_datetime
+                %input{:size => "16", :type => "text", :name => "select_event[ordering_window_start_time]", :value => default_ordering_window_start_time( @select_event )}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+            .span6
+              Ordering Window End Time
+              %br
+              .input-append.date.form_datetime
+                %input{:size => "16", :type => "text", :name => "select_event[ordering_window_end_time]", :value => default_ordering_window_end_time( @select_event )}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+        %br
+        %br
+        %br
+        .form-actions
+          .pull-right.clearfix
+            = f.submit "Save Event", :class => "btn btn-primary"
+    .span6
+      .row-fluid
+        .pull-right
+          %a#add_event_vendor.btn.btn-success.btn-small.toggle-modal{ "data-target"=>"#new_select_event_vendor_form", "data-select_event_id" => @select_event.id, "id" => "select_event_add_event_vendor"}
+            %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#new_select_event_vendor_form"}
+
+        %h4 Vendor Details
+
+        %table.table.table-striped.table-bordered.table-condensed
+          %thead
+            %tr
+              %th Vendor
+              %th Menu Template
+              %th
+          %tbody
+            - @select_event.select_event_vendors.each do |ev|
+              %tr{"data-record-id"=>ev.id}
+                %td= link_to ev.vendor.name, vendor_path(ev.vendor)
+                %td= ev.menu_template.name
+                %td
+                  .btn-group
+                    %a.btn.btn-mini
+                      %i.open_edit_select_event_vendor.icon.icon-edit.toggle-modal{"data-target"=>"#edit_select_event_vendor_form", "data-select_event_id" => @select_event.id, "data-id" => ev.id}
+                      %a.btn.btn-mini.btn-danger{:href=>select_event_select_event_vendor_path(@select_event, ev), :"data-method" => "delete", data: { confirm: 'Are you sure?' }}
+                        %i.icon.icon-white.icon-remove
+      %br
+      %br
+      %br
+  
+    .span6
+      .row-fluid
+        .pull-right
+          - if @select_event.account.try(:billing_references).count != @select_event.try(:select_event_billing_references).count
+            %a#add_event_vendor.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#edit_event_billing_reference_form_2"}
+              %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#edit_event_billing_reference_form_2"}
+            
+        =render :partial => "select_events/partials_financials/financials_billing_references"
+
+
+  %ul#section-tab-navigation.nav.nav-tabs
+    %li{class: params[:selected].nil? || params[:selected] == "orders" ? 'active' : ''}
+      %a{:href=>"#orders"} Orders
+    %li{class: params[:selected] == "financials" ? 'active' : ''}
+      %a{:href=>"#financials"} Financials
+
+    %li{class: params[:selected] == "notify" ? 'active' : ''}
+      %a{:href=>"#notify"} Notifications
+        
+    %li{class: params[:selected] == "issues" ? 'active' : ''}
+      %a{:href=>"#issues"} Issues
+
+  #section-tabs
+
+    #orders.section-tab{style: params[:selected].nil? || params[:selected] == "orders" ? '' : 'display:none'}
+      = render :partial => "select_events/orders", :locals => {select_event: @select_event}
+
+    #financials.section-tab{style: params[:selected] == "financials" ? '' : 'display:none'}
+      = render :partial => "select_events/financials", :locals => {select_event: @select_event}
+
+    #notify.section-tab{style: params[:selected] == "notify" ? '' : 'display:none'}
+      = render :partial => "select_events/notifications", :locals => {select_event: @select_event}
+        
+    #issues.section-tab{style: params[:selected] == "issues" ? '' : 'display:none'}
+      = render :partial => "issues/issues", :locals => {subject: @select_event}
+

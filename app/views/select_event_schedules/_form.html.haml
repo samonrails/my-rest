@@ -1,0 +1,287 @@
+- default_times = select_event_schedule_default_times
+- @select_event_schedule ||= SelectEventSchedule.new(:meal_period => MealPeriod.lunch, :account => @account,
+           :delivery_time => default_times[:delivery_time],
+           :ordering_window_start_time => default_times[:ordering_window_start_time],
+           :ordering_window_end_time => default_times[:ordering_window_end_time]  )
+
+- @select_event_schedule.location = @account.locations.first unless defined?(@account.locations.first).nil?
+
+.auto_size_modal.modal.hide.fade{"id"=>"new_select_event_schedule_vendor_form"}
+  = render :partial => "select_event_schedule_vendors/new", :locals => {select_event_schedule: @select_event_schedule}
+
+.auto_size_modal.modal.hide.fade{"id"=>"edit_select_event_schedule_vendor_form"}
+
+.auto_size_modal.modal.hide.fade{"id"=>"edit_event_billing_reference_form_2"}
+  = render :partial => "select_event_schedule_billing_references/form_for_select_event", :locals => {select_event_schedule: @select_event_schedule}
+
+= simple_form_for [@account, @select_event_schedule] do |f|
+  .row-fluid
+    .span12.well
+      %h4 Select Event Details
+      .row-fluid
+        .span5
+          %h5 Account
+          = f.label "Account Name"
+          = f.hidden_field :account_id, :value => @account.id
+          %input{:size => "16", :type => "text", :value => "#{@account.name}", "readonly" => "true"}
+          = f.association :location, include_blank: "Choose a location", collection: @account.locations
+          = f.input :meal_period, :collection => MealPeriod.available_values.collect{|c| [c.titleize, c]}, :include_blank => false
+          = f.association :contact, include_blank: "Choose a contact" , collection: @account.contacts
+          = f.input :event_schedule_owner_id, label: "Event Schedule Owner", collection: User.fooda_employee.collect{|c| [c.name, c.id]}, :selected => @select_event_schedule.event_schedule_owner ? @select_event_schedule.event_schedule_owner_id : current_user.id
+          - if !@select_event_schedule.new_record?
+            = render :partial => "select_event_schedule_vendors/show", :locals => {select_event_schedule: @select_event_schedule}
+          - else
+            Once the schedule has been created, vendors can be added.
+        .span6
+          %h5 Event Timetable 
+          .row-fluid
+
+            .span6
+              Delivery Time
+              %br
+              .input-append.date.form_time
+                %input{:size => "16", :type => "text", :name => "select_event_schedule[delivery_time]", :value => "#{@select_event_schedule.delivery_time.to_s(:time) unless @select_event_schedule.delivery_time.nil?}"}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+            .span6
+              Ready and Bagged 
+              %br
+              %input{:size => 3, :type => "text", :name => "select_event_schedule[ready_and_bagged]", :value => "40", :style => "width: 30px"}
+              min prior
+              %br
+          .row-fluid
+            .span6
+
+              Ordering Window Start Time
+              %br
+              .input-append.date.form_time
+                %input{:size => "16", :type => "text", :name => "select_event_schedule[ordering_window_start_time]", :value => "#{@select_event_schedule.ordering_window_start_time.to_s(:time) unless @select_event_schedule.ordering_window_start_time.nil?}" }
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+            .span6
+              Ordering Window End Time
+              %br
+              .input-append.date.form_time
+                %input{:size => "16", :type => "text", :name => "select_event_schedule[ordering_window_end_time]", :value => "#{@select_event_schedule.ordering_window_end_time.to_s(:time) unless @select_event_schedule.ordering_window_end_time.nil?}"}
+                %span.add-on
+                  %i.icon-remove
+                %span.add-on
+                  %i.icon-th
+            %br
+            %br
+          .row-fluid
+            %h5 Event Notifications
+            .row-fluid
+              .span6
+                - time_zone = time_zone_abbreviation( @select_event_schedule.try(:location).try(:building) ) || ''
+                Introduction Email (#{time_zone})
+                %br
+                .input-append.date.form_time
+                  %input{:size => "16", :type => "text", :name => "select_event_schedule[introduction_email_time]", :value => "#{@select_event_schedule.introduction_email_time.strftime("%I:%M %p") unless @select_event_schedule.introduction_email_time.nil?}" }
+                  %span.add-on
+                    %i.icon-remove
+                  %span.add-on
+                    %i.icon-th
+            
+              .span6
+                Final Email (#{time_zone})
+                %br
+                .input-append.date.form_time
+                  %input{:size => "16", :type => "text", :name => "select_event_schedule[final_email_time]", :value => "#{@select_event_schedule.final_email_time.strftime("%I:%M %p") unless @select_event_schedule.final_email_time.nil?}" }
+                  %span.add-on
+                    %i.icon-remove
+                  %span.add-on
+                    %i.icon-th
+            .row-fluid
+              .span6
+                Email List ID
+                %br
+                %input{:size => 3, :type => "text", :name => "select_event_schedule[email_list_id]", :value => @select_event_schedule.email_list_id.nil? ? @select_event_schedule.account.try(:account_email_lists).try(:first).try(:list_id) : @select_event_schedule.email_list_id}
+
+          .row-fluid
+            .span10
+              %strong Gratuity
+              %br
+              .btn-group{style: "margin: 5px 0px;"}
+                %button.btn.btn-set-gratuity{:type => "button", :id => "user_gratuity", :class => @select_event_schedule[:gratuity_payer] == 'user' ? "btn-primary" : "",  :value => "user"} User Pays
+                %button.btn.btn-set-gratuity{:type => "button", :id => "account_gratuity", :class => @select_event_schedule[:gratuity_payer] == 'account' ? "btn-primary" : "",  :value => "account"} Account Pays
+              Default: 
+              %input{:size => "16", :type => "text", :style => "width: 45px; margin-bottom: 0px;", :name => "select_event_schedule[default_gratuity]", :value => @select_event_schedule[:default_gratuity] }
+              \%
+          .row-fluid
+            .span8
+              %label.check_box{ :for => "hide_gratuity_from_site", :class => "checkbox"}
+                = f.check_box :hide_gratuity_from_site, label: false, inline_label: true, class: "checkbox"
+                Hide At Checkout
+            %br
+            %br
+          .row-fluid
+            .span5
+              %strong Delivery Fee
+              %br
+              .btn-group{style: "margin: 5px 0px;"}
+                %button.btn.btn-set-delivery{:type => "button", :id => "user_delivery", :class => @select_event_schedule[:delivery_fee_payer] == 'user' ? "btn-primary" : "",  :value => "user"} User Pays
+                %button.btn.btn-set-delivery{:type => "button", :id => "account_delivery", :class => @select_event_schedule[:delivery_fee_payer] == 'account' ? "btn-primary" : "",  :value => "account"} Account Pays
+            .span5
+              %strong Tax
+              %br
+              .btn-group{style: "margin: 5px 0px;"}
+                %button.btn.btn-set-tax{:type => "button", :id => "user_pays_tax",  :class => @select_event_schedule[:tax_payer] == 'user' ? "btn-primary" : "", :name => "tax_payer", :value => "user"} User Pays
+                %button.btn.btn-set-tax{:type => "button", :id => "account_pays_tax",  :class => @select_event_schedule[:tax_payer] == 'account' ? "btn-primary" : "", :name => "tax_payer", :value => "account"} Account Pays
+            %br
+            %br
+            .row-fluid
+              .span5
+                %label.check_box{ :for => "hide_delivery_fee_from_site", :class => "checkbox"}
+                  = f.check_box :hide_delivery_fee_from_site, label: false, inline_label: true, class: "checkbox"
+                  Hide At Checkout
+              .span5
+                %label.check_box{ :for => "hide_tax_from_site", :class => "checkbox"}
+                  = f.check_box :hide_tax_from_site, label: false, inline_label: true, class: "checkbox"
+                  Hide At Checkout
+            %br
+            .row-fluid
+              .span6
+                %strong Subsidy
+                %br
+                .btn-group{style: "margin: 5px 0px;"}
+                  %button.btn.btn-set-subsidy{:type => "button", :id => "none", :class => ( @select_event_schedule[:subsidy] == 'none' or @select_event_schedule[:subsidy].nil?) ? "btn-primary" : "",  :value => "none"} None
+                  %button.btn.btn-set-subsidy{:type => "button", :id => "percentage",  :class => @select_event_schedule[:subsidy] == 'percentage' ? "btn-primary" : "",  :value => "percentage"} Percentage
+                  %button.btn.btn-set-subsidy{:type => "button", :id => "subsidy_fixed_amount", :class => @select_event_schedule[:subsidy] == 'fixed_amount' ? "btn-primary" : "", :value => "fixed_amount"} Fixed Amount
+                  %button.btn.btn-set-subsidy{:type => "button", :id => "fully_subsidized", :class => @select_event_schedule[:subsidy] == 'fully_subsidized' ? "btn-primary" : "",  :value => "fully_subsidized"} Fully Subsidized
+                %br
+                %br
+            .row-fluid
+              .div{id: "cap_options_for_percentage"}
+                .span3
+                  %label{:for => "is_subsidy_percentage_capped_false"}
+                  = f.radio_button :is_subsidy_percentage_capped, false, class: 'radio radio-fee', style: 'margin-top:0px;'
+                  No Cap
+                .span2
+                  %label{:for => "is_subsidy_percentage_capped_true"}
+                  = f.radio_button :is_subsidy_percentage_capped, true, class: 'radio radio-fee', style: 'margin-top:0px;'
+                  Capped
+                %br
+                %br
+                .row-fluid
+                  .span9
+                    .span4.form-inline
+                      = f.number_field :subsidy_percentage_cap, class: 'input-mini', placeholder: '%',  id: 'percentage_cap'
+                      \%
+                    .span5.form-inline{id: "subsidy_percentage_fixed_amount_cap_span"}
+                      up to 
+                      = f.number_field :subsidy_percentage_fixed_amount_cap, class: 'input-mini', placeholder: '$'
+                      dollars
+              .div{id: "subsidy_fixed_amount_option"}
+                .span
+                = f.number_field :subsidy_fixed_amount, class: 'input-mini', placeholder: '$'
+                dollars
+
+            .row-fluid
+              .div{id: "minimum_user_contribution", style: @select_event_schedule[:subsidy] == 'none' ? 'display:none' : ''}
+                .span6
+                  %br
+                  %label.check_box{ :for => "user_contribution_required", :class => "checkbox"}
+                    = f.check_box :user_contribution_required, id: 'user_contribution_checkbox', label: false, inline_label: true, class: "checkbox"
+                    Minimum User Contribution Required
+                  .div{id: "user_contribution_div", style: @select_event_schedule[:user_contribution_required] == false ? 'display:none' : ''}
+                    = f.number_field :user_contribution, id: 'user_contribution_cents', class: 'input-mini', placeholder: '$'
+                    dollars
+                  %br
+                  %br
+
+          .row-fluid
+            .span6
+              - if !@select_event_schedule.new_record?
+                .pull-right
+                  %a#add_event_vendor.btn.btn-success.btn-small.toggle-modal{"data-target"=>"#edit_event_billing_reference_form_2"}
+                    %i.icon.icon-plus.icon-white.toggle-modal{"data-target"=>"#edit_event_billing_reference_form_2"}
+                =render :partial => "select_event_schedules/partials_financials/financials_billing_references"
+
+  .row-fluid
+    .span6.well
+      %h4 Schedule Information
+      .row-fluid
+        .span12
+          .row-fluid
+            %label
+              * Repeat Frequency
+            = f.select_recurring :schedule
+          .row-fluid
+            .event-schedule-tool-tip
+              %label
+                %a{id: "tool-tip", title: "The Snappea event scheduler will automatically create events this many days in the future for this schedule." } 
+                  %i.icon.icon-info-sign
+                Number of Days to Auto Schedule
+            = f.number_field :days_to_schedule, label: false, min: 0
+          .row-fluid
+            .event-schedule-tool-tip
+              %label
+                %a{id: "tool-tip", title: "This date is inclusive so if this schedule wants an event on this day, the scheduler will place the first scheduled event on this day." } 
+                  %i.icon.icon-info-sign
+                * Schedule Start Date
+          .row-fluid
+            .input-append.date.form_date
+              %input{:size => "16", :type => "text", :name => "select_event_schedule[schedule_start_date]", :value => "#{@select_event_schedule.schedule_start_date.strftime("%d %B %Y") unless @select_event_schedule.schedule_start_date.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+          .row-fluid
+            .event-schedule-tool-tip
+              %label
+                %a{id: "tool-tip", title: "This date is inclusive so if this schedule wants an event on this day, the scheduler will place the final scheduled event on this day." } 
+                  %i.icon.icon-info-sign
+                Schedule Final Date
+          .row-fluid
+            .input-append.date.form_date
+              %input{:size => "16", :type => "text", :name => "select_event_schedule[schedule_end_date]", :value => "#{@select_event_schedule.schedule_end_date.strftime("%d %B %Y") unless @select_event_schedule.schedule_end_date.nil?}"}
+              %span.add-on
+                %i.icon-remove
+              %span.add-on
+                %i.icon-th
+
+    .span6.well
+      %h4 Pause Schedule
+      .row-fluid
+        .event-schedule-tool-tip
+          %label
+            %a{id: "tool-tip", title: "This date is inclusive so if you pause the schedule on this day and the schedule tried to schedule an event on this day, the scheduler will place the final scheduled event on this day. Be sure that your 'Number of days to auto-schedule' does not extended past this date or you will have to manually delete the extra events." } 
+              %i.icon.icon-info-sign
+            Pause Schedule at this Date
+      .row-fluid
+        .input-append.date.form_date
+          %input{:size => "16", :type => "text", :name => "select_event_schedule[pause_start_date]", :value => "#{@select_event_schedule.pause_start_date.strftime("%d %B %Y") unless @select_event_schedule.pause_start_date.nil?}"}
+          %span.add-on
+            %i.icon-remove
+          %span.add-on
+            %i.icon-th
+      .row-fluid
+        .event-schedule-tool-tip
+          %label
+            %a{id: "tool-tip", title: "This date is inclusive so if you resume the schedule on this day and the schedule tries to schedule an event on this day, the scheduler will place the first scheduled event on this day." } 
+              %i.icon.icon-info-sign
+            Resume Schedule at this Date
+      .row-fluid
+        .input-append.date.form_date
+          %input{:size => "16", :type => "text", :name => "select_event_schedule[pause_end_date]", :value => "#{@select_event_schedule.pause_end_date.strftime("%d %B %Y") unless @select_event_schedule.pause_end_date.nil?}"}
+          %span.add-on
+            %i.icon-remove
+          %span.add-on
+            %i.icon-th
+
+  %input{:type => "hidden", :id => "gratuity_payer_hidden",  :value => @select_event_schedule[:gratuity_payer], :name => "select_event_schedule[gratuity_payer]"}
+  %input{:type => "hidden", :id => "delivery_fee_payer_hidden", :value => @select_event_schedule[:delivery_fee_payer], :name => "select_event_schedule[delivery_fee_payer]"}
+  %input{:type => "hidden", :id => "tax_payer_hidden", :value => @select_event_schedule[:tax_payer], :name => "select_event_schedule[tax_payer]"}
+  %input{:type => "hidden", :id => "subsidy_payer_hidden", :value => @select_event_schedule[:subsidy], :name => "select_event_schedule[subsidy]"}
+
+ 
+  .row-fluid
+    .span12
+      = f.submit("Save Select Event Schedule", :class => "btn btn-primary")  
+
+

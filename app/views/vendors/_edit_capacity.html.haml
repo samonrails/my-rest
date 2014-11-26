@@ -1,0 +1,46 @@
+- week_days = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]
+- capacity ||= @vendor.capacities.new
+
+.modal-wrapper
+  = form_for capacity do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Hours of Operation (#{week_days[day]})
+
+    .modal-body-capacity.auto_size_modal_body
+      %input{:type=>"hidden", :value=>@vendor.id, :name=>:vendor_id}
+      = f.hidden_field :day, value: day
+      .control-group
+        Start Time
+        %br
+        .input-append.date.form_time
+          %input{:size => "16", :type => "text", :name => "capacity[start_time]", :value => capacity.start_time.nil? ? "" : capacity.start_time.strftime("%I:%M %p")}
+          %span.add-on
+            %i.icon-remove
+          %span.add-on
+            %i.icon-th
+        %br
+        End Time
+        %br
+        .input-append.date.form_time
+          %input{:size => "16", :type => "text", :name => "capacity[end_time]", :value => capacity.start_time.nil? ? "" : capacity.end_time.nil? ? "" : capacity.end_time.strftime("%I:%M %p")}
+          %span.add-on
+            %i.icon-remove
+          %span.add-on
+            %i.icon-th
+          %br
+      .control-group
+        .row
+          .span
+            = f.check_box :is_closed, label: false
+          .span2
+            %label
+              Closed for this day
+      .in-between
+
+    .modal-footer
+      = f.submit('Save Capacity', :class => "btn btn-primary")
+  

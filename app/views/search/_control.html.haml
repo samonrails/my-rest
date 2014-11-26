@@ -1,0 +1,16 @@
+#sitewide-search.navbar-search.pull-right
+  .input-append
+    %input.search-field{:type=>"text",:placeholder=>"Search the entire site"}
+    .btn-group.margin_top_0px
+      %button.btn.search-action{"tabindex"=>"-1"} Search All
+      %button.btn.dropdown-toggle{"data-toggle"=>"dropdown","tabindex"=>"-1"}
+        %span.caret
+      %ul.dropdown-menu.search-filter-selector
+        %li
+          %a{:href=>"#","data-search-filter"=>""} All
+        %li
+          %a{:href=>"#","data-search-filter"=>"accounts"} Accounts
+        %li
+          %a{:href=>"#","data-search-filter"=>"events"} Events
+        %li
+          %a{:href=>"#","data-search-filter"=>"vendors"} Vendors

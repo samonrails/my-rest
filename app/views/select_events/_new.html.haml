@@ -1,0 +1,78 @@
+- @select_event ||= SelectEvent.new(:meal_period => MealPeriod.lunch)
+- @select_event.account = account unless defined?(account).nil?
+- @select_event.location = account.locations.first unless defined?(account.locations.first).nil?
+- @select_event.contact = account.contacts.first unless defined?(account.contacts.first).nil?
+
+- location_choices = (defined?(account.locations) ? account.locations : {})
+- contact_choices = (defined?(account.contacts) ? account.contacts : {})
+
+.modal-wrapper
+  = form_for @select_event, remote: false do |f|
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+     
+      %h3 New Select Event
+
+    .modal-body.auto_size_modal_body
+      Account
+      %br
+      = select_tag "select_event[account_id]", options_for_select(Account.all.select{|a| a.active}.collect{|c| [c.name, c.id]}, @select_event.account_id), :include_blank => true
+      %br
+      Location
+      %br
+      = select_tag "select_event[location_id]", options_for_select(location_choices.collect{|c| [c.name, c.id]}, nil)
+      %br
+      Contact
+      %br
+      = select_tag "select_event[contact_id]", options_for_select(contact_choices.collect{|c| [c.name, c.id]}, nil)
+      %br
+      Meal Period
+      %br
+      = select_tag "select_event[meal_period]", options_for_select(MealPeriod.available_values.collect{|c| [c.titleize, c]}, @select_event.meal_period)
+      %br
+      .row
+        .span
+          Delivery Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "select_event[delivery_time]", :value => "#{DateTime.now.strftime("%d %B %Y - 12:00 PM")}"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+        .span
+          Ready and Bagged 
+          %br
+          %input{:size => 3, :type => "text", :name => "select_event[ready_and_bagged]", :value => "40", :style => "width: 30px"}
+          min prior
+          %br
+      .row  
+        .span
+          Ordering Window Start Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "select_event[ordering_window_start_time]", :value => "#{DateTime.yesterday.strftime("%d %B %Y - 02:00 PM")}" }
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+        .span
+          Ordering Window End Time
+          %br
+          .input-append.date.form_datetime
+            %input{:size => "16", :type => "text", :name => "select_event[ordering_window_end_time]", :value => "#{DateTime.now.strftime("%d %B %Y - 10:00 AM")}"}
+            %span.add-on
+              %i.icon-remove
+            %span.add-on
+              %i.icon-th
+
+      Event Owner
+      %br
+      = select_tag "select_event[event_owner_id]", options_for_select(User.fooda_employee.collect{|c| [c.name, c.id]}, current_user.id)
+      %br
+          
+
+    .modal-footer
+      = f.submit(:class => "btn btn-primary")

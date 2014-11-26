@@ -1,0 +1,10 @@
+- provide :title, "MS - Bill"
+.section-header
+  %h1.center MS - Bill
+  %hr
+
+  = ssp_search_form Event,
+    [{ :name => :market, :as => :multi_select, :collection => Market.all.map{|m| m.name}, :nil_means_all => true},
+    { :name => :status, :as => :multi_select, :collection => Status::Event.available_values, :nil_means_all => true},]
+
+= render :partial => "admin/ms_bills/table", :locals => {allow_links: true}

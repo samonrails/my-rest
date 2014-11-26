@@ -1,0 +1,6 @@
+- if controller_name != 'sessions'
+  = link_to "Sign in", catering_login_path
+  %br/
+
+- if controller_name != 'passwords'
+  = link_to "Forgot Password?", catering_forgot_password_path, id: "forgot_password"

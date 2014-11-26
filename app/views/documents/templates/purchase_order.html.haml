@@ -1,0 +1,327 @@
+!!!
+%html
+  %head
+    %title Fooda Catering Purchase Order
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}
+    :css
+      @page { 
+        margin: 40px 40px 160px 40px; background: #ffffff;
+        @bottom { padding-top: 3px; font-size: 0.75em; content:  "Page " counter(page) " of " counter(pages) }
+        @bottom-left { content:  flow(foot-left) }
+        @bottom-right { content:  flow(foot-right) }
+      }
+
+      #footer-left { 
+        flow: static(foot-left);
+        font-size: 0.75em;
+        padding-top: 3px;
+        padding-bottom: 10px;
+      }
+
+      #footer-right { 
+        flow: static(foot-right);
+        font-size: 0.75em;
+        padding-top: 3px;
+        padding-bottom: 10px;
+      }
+
+      h1 { padding: 0; margin: 0; }
+      h2 { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+      h3 { padding: 20px 0px 10px 0px; margin: 0px 0px 0px 0px; }
+      h4 { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+      p  { padding: 0px 0px 0px 0px; margin: 0px 0px 0px 0px; }
+
+      table {
+        padding-top:20px;
+        width: 100%;
+      }
+
+      table tr th {
+        background: #eee;
+      }
+
+      table tr td {
+        text-align: left;
+        border-bottom: 1px #ccc solid;
+      }
+
+      table.table-condensed {
+        width: 30%;
+        float:right;
+        position:relative;
+      }
+
+      td.indent {
+        text-align: left;
+        border-bottom: 1px #ccc solid;
+        padding-left: 30px;
+      }
+
+      p.indent {
+        padding-left: 20px;
+      }
+
+      .prep_notes {
+        padding-left: 40px;
+        font-size: 0.75em;
+      }
+
+      .pull-right {
+        float:right;
+        position:relative;
+      }
+
+      .pull-right-third {
+        float:right;
+        position:relative;
+        width: 35%;
+        margin: 0px 0px 80px 80px;
+      }
+
+      .pull-left {
+        float:left;
+        position:relative;
+      }
+
+      .pull-left-half {
+        float:left;
+        position:relative;
+        width: 100%;
+      }
+
+      .pull-right-quote-meta {
+        float:right;
+        position:relative;
+        width: 40%;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      #break {
+        clear: both;
+        border-bottom: 1px #000 solid;
+        padding-top: 20px; 
+        padding-bottom: 20px;
+      }
+
+      #footer-break {
+        clear: both;
+        border-bottom: 1px #000 solid;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+
+      #pretty_id {
+        font-size: 0.75em;
+      }
+
+  %body#container
+    - event_vendor = @event.event_vendors.find_by_vendor_id(@party)
+    
+    #break
+      .pull-right
+        %img{:src => "https://s3.amazonaws.com/snappea-marketing/logo.png"}
+      - if @event.financial_product?
+        %h1 Fooda
+      - else
+        %h1 Fooda Catering
+      %h2 Purchase Order
+    
+    #break
+      .pull-right-quote-meta
+        %b Purchase Order No.:
+        = @document_name
+        %br
+        %b Purchase Order Date:
+        = DateTime.now.strftime("%b #{DateTime.now.day.ordinalize}, %Y")
+      %b Delivery Date:
+      = @event.pretty_setup_datetime
+      %br
+      %b Event Date:
+      = @event.pretty_event_datetime
+
+    .pull-left
+      %h3 Account:
+      %b= @event.account.name 
+      #pretty_id
+        ID: 
+        = @event.account.pretty_id
+      %br
+      %p.indent
+        -unless @event.contact.nil? or @event.contact.name.nil?
+          =@event.contact.name 
+          %br 
+        - unless @event.location.nil?
+          = @event.location.html_address 
+        - else
+          %i No Location Selected        
+
+    .pull-right
+      %h3 Vendor:
+      - unless event_vendor.vendor.nil?
+        %b= event_vendor.vendor.name
+        #pretty_id
+          ID: 
+          = event_vendor.vendor.pretty_id
+        %br
+        %p.indent
+          = event_vendor.vendor.billing_address
+        %br
+
+    %table.table.table-striped
+      %thead
+        %tr
+          %th Item
+          %th Type
+          %th Quantity
+          %th Unit Price
+          %th Total
+      %tbody
+        - @event.line_items_per_person_charge_by_payable_party(party).each do |li|
+          %tr
+            %td
+              %b
+                = li.name_display
+              %div{:style => "font-size:12px; margin: 0;"}
+                = li.inventory_item.description unless li.inventory_item.nil?
+              - unless li.notes.empty?
+                .prep_notes
+                  %i
+                    Special Instructions:
+                    = li.notes
+            %td
+            %td{:style => "text-align: right;vertical-align:top;"}= li.quantity_display
+            %td{:style => "text-align: right;vertical-align:top;"}= li.unit_price_expense_display
+            %td{:style => "text-align: right;vertical-align:top;"}= li.total_expense_display
+        - @event.line_items_no_price_menu_items_by_payable_party(party).each do |li|
+          %tr
+            %td.indent
+              %b
+                = li.name_display_condensed
+              %div{:style => "font-size:12px; margin: 0;"}
+                = li.inventory_item.description unless li.inventory_item.nil?
+              - unless li.notes.empty?
+                .prep_notes
+                  %i
+                    Special Instructions:
+                    = li.notes
+            %td{:style => "vertical-align:top;"}= li.inventory_item.meal_type.titleize unless li.inventory_item.nil? or li.inventory_item.meal_type.nil?
+            %td{:style => "text-align: right;vertical-align:top;"}= li.quantity_display_condensed
+            %td{:style => "text-align: right;vertical-align:top;"}= li.unit_price_expense_display_condensed
+            %td{:style => "text-align: right;vertical-align:top;"}= li.total_expense_display_condensed
+        - @event.line_items_with_price_menu_items_by_payable_party(party).each do |li|
+          %tr
+            %td
+              %b
+                = li.name_display_condensed
+              %div{:style => "font-size:12px; margin: 0;"}
+                = li.inventory_item.description unless li.inventory_item.nil?
+              - unless li.notes.empty?
+                .prep_notes
+                  %i
+                    Special Instructions:
+                    = li.notes
+            %td{:style => "vertical-align:top;"}= li.inventory_item.meal_type.titleize unless li.inventory_item.nil? or li.inventory_item.meal_type.nil?
+            %td{:style => "text-align: right;vertical-align:top;"}= li.quantity_display_condensed
+            %td{:style => "text-align: right;vertical-align:top;"}= li.unit_price_expense_display_condensed
+            %td{:style => "text-align: right;vertical-align:top;"}= li.total_expense_display_condensed
+        - @event.line_items_non_menu_items_by_payable_party(party).each do |li|
+          %tr
+            %td
+              %b
+                = li.name_display
+              %div{:style => "font-size:12px; margin: 0;"}
+                = li.inventory_item.description unless li.inventory_item.nil?
+              - unless li.notes.empty?
+                .prep_notes
+                  %i
+                    Special Instructions:
+                    = li.notes
+            %td
+            %td{:style => "text-align: right;"}= li.quantity_display
+            %td{:style => "text-align: right;"}= li.unit_price_expense_display
+            %td{:style => "text-align: right;"}= li.total_expense_display
+ 
+    %table.table-condensed
+      - subtotal = @event.expense_subtotal_by_party(@party)
+      %tr
+        %td Sub Total:
+        %td{:style => "text-align: right;"} #{number_to_currency(subtotal)}
+        %td
+      %tr
+        %td General Tax:
+        %td{:style => "text-align: right;"}= "#{number_to_currency(@event.expense_general_tax_by_party(@party))}"
+        %td
+
+      - @event.line_items_after_subtotal_by_payable_party(@party).select{|li| li.parent_id.nil? }.each do |li|
+        %tr
+          %td= li.name + ':'
+          %td{:style => "text-align: right;"}= li.percentage_of_subtotal ? number_to_currency(li.expense_total_with_percentage(subtotal)) + ' (' + li.unit_price_expense.to_s + '%)' : number_to_currency(li.expense_total)
+      %tr 
+        %td Total:
+        %td{:style => "text-align: right;"}= number_to_currency(@event.expense_total_by_party(@party))
+
+    #break
+
+    - if !@event.financial_product?
+      .pull-left-half
+        .pull-right-third
+          %h3 Event Details:
+
+          %table.table
+            %tbody
+              %tr 
+                %td Drop Off/Serving:
+                %td= @event.service_style.titleize unless @event.service_style.nil?
+              %tr
+                %td Individually Labeled:
+                %td= Document::pretty_bool @event.individual_label
+              %tr
+                %td Serving Utensils:
+                %td= Document::pretty_bool @event.serving_utensils
+              %tr
+                %td Plates, Utensils & Napkins:
+                %td= Document::pretty_bool @event.utensils_plates_napkins
+              %tr
+                %td Chaffing Frames:
+                %td= Document::pretty_bool @event.chaffing_frames
+              %tr
+                %td Sternos:
+                %td= Document::pretty_bool @event.sternos
+
+        %h3 Event Notes
+        %br
+        %h4 Vendor Notes:
+        -unless event_vendor.nil? or event_vendor.external_vendor_notes.nil? or event_vendor.external_vendor_notes.empty?
+          %p= simple_format(event_vendor.external_vendor_notes)
+        -else
+          %i No Notes
+
+    #footer
+      #footer-left
+        .pull-left
+          %b
+            All orders are subject to a 24 hour cancellation policy – 
+            %br 
+            Orders cancelled within 24 hours are subject to a 50% fee. 
+          %br
+          Copyright 
+          = Date.today.year 
+          Fooda Inc. All rights reserved.
+
+
+      #footer-right
+        %p.pull-right
+          - address, phone, fax = market_info(@event)
+          = address
+          %br
+          %b Phone: 
+          = number_to_phone(phone, area_code: true)
+          = "&#160;" * 6
+          %b Fax:
+          = number_to_phone(fax, area_code: true)
+          %br
+          %b Email:
+          catering@fooda.com

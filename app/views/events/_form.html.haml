@@ -1,0 +1,46 @@
+- if @event.new_record?
+  = simple_form_for @event do |f|
+
+    = f.input :name
+    = f.input :status, collection: Status::Event.available_values.collect{|c| [c.titleize, c]}, default: Status::Event.scheduled.titleize
+    = f.association :account, include_blank: "Choose an Account"
+    = f.association :contact
+
+    %div{class:"js-event-toggle-vendor", style: "display: none;"} 
+
+      = f.association :vendor, include_blank: "Choose a Vendor" 
+
+      %div{class:"js-event-toggle-menu", style: "display: none;"} 
+
+        = f.label "Menu"
+        = f.grouped_collection_select :menu_id, Vendor.order(:name), :menu_templates, :name, :id, :name, :include_blank => true
+
+        %br/
+
+        = f.submit(:class => "btn btn-primary")
+
+- else
+  = simple_form_for @event do |f|
+
+    = f.input :name
+
+    = f.label "Account"
+    = f.select :account_id, account_select, :include_blank => "" 
+    
+    %br/
+
+    = f.association :contact
+
+    %br/ 
+
+    = f.label "Vendor"
+    = f.select :vendor_id, vendor_select, :include_blank => ""
+    
+    %br/ 
+    
+    = f.label "Menu"
+    = f.grouped_collection_select :menu_id, Vendor.order(:name), :menu_templates, :name, :id, :name, :include_blank => true
+
+    %br
+
+    = f.submit(:class => "btn btn-primary")

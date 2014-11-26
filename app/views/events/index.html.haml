@@ -1,0 +1,52 @@
+-provide(:title, 'Events')
+.new_event_form.auto_size_modal.modal.hide.fade
+  = render :partial => "events/new", :locals => {financial: false}
+
+.new_select_event_form.auto_size_modal.modal.hide.fade
+  = render :partial => "select_events/new"
+   
+.section-header
+  %h1.center Events
+  %hr
+
+= render :partial => "shared/search_events_form", :locals => {searchable:  params[:searchable], klass: :events, elements_to_hide: {product_types: 1} }
+  
+.create-buttons
+  %a.btn.btn-small.btn-success.toggle-modal#add_select_event{"data-target"=>".new_select_event_form"}
+    %i.icon.icon-plus-sign.icon-white{"data-target"=>".new_select_event_form"}
+    Select Event
+  %a.btn.btn-small.btn-success.toggle-modal#add_event{"data-target"=>".new_event_form"}
+    %i.icon.icon-plus-sign.icon-white{"data-target"=>".new_event_form"}
+    Event
+
+.results
+  %table.table.table-striped.table-condensed{:id => "infinite_items"}
+    %thead
+      %tr
+        %th Event ID
+        %th
+          =search_event_arrow( "event_start_time", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(events_path, "event_start_time", params)} Date
+        %th
+          =search_event_arrow( "event_start_times", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(events_path, "event_start_time", params)} Event Time
+        %th Contact
+        %th
+          =search_event_arrow( "product", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(events_path, "product", params)} Product
+        %th
+          =search_event_arrow( "account_names", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(events_path, "account_names", params)} Account
+        %th Location
+        %th Vendor(s)
+        %th Created By
+        %th
+          =search_event_arrow( "status", params[:sort], params[:direction])
+          %a{:href => search_event_sort_url(events_path, "status", params)} Status
+    %tbody.page
+      = render @events
+
+  = paginate @events, :theme => 'twitter-bootstrap'
+
+
+

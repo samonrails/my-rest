@@ -1,0 +1,41 @@
+- line_item = LineItem.new(:payable_party_type => payable_party_type, :payable_party_id => payable_party_id, :include_price_in_expense => true, :include_price_in_revenue => true)
+
+.modal-wrapper
+  = form_for [@event, line_item] do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h2 New Menu Item: #{@event.name}
+
+    .modal-body.auto_size_modal_body
+      
+      = f.hidden_field :line_item_type
+      = f.hidden_field :quantity
+      = f.hidden_field :payable_party_id
+
+      = f.label "Inventory Items:"
+      = f.select :inventory_item_id, line_item.payable_party.inventory_items.where(:inventory_item_option => false).map { |a| [a.name_vendor, a.id]}
+      .in-between
+      = f.label :quantity
+      = f.number_field :quantity
+      .in-between
+      .row
+        .span3
+          = f.label "Include Price in Line Item COGS"
+        .span1
+          = f.check_box :include_price_in_expense
+      .row
+        .span3
+          = f.label "Include Price in Line Item Revenue"
+        .span1
+          = f.check_box :include_price_in_revenue
+      .row
+        .span4
+          = f.label "Prep Notes"
+          = f.text_area :notes, :size => "30x5"
+      .in-between
+
+    .modal-footer
+      = f.submit "Add Menu Item", :class => "btn btn-primary"

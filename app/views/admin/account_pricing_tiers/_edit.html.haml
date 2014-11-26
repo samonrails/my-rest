@@ -1,0 +1,18 @@
+.modal-wrapper
+  .modal-header
+    %button.close{:type=>"button","data-dismiss"=>"modal"}
+      &times;
+
+    %h2 #{account_pricing_tier.account.name}
+
+  .modal-body
+    %h4 #{account_pricing_tier.product.titleize}
+    = form_for account_pricing_tier, 
+      :url => admin_account_pricing_tier_path(account_pricing_tier) do |f| 
+      
+      = f.hidden_field :account
+      = f.hidden_field :product
+      = select_tag 'account_pricing_tier[pricing_tier_id]', options_for_select(PricingTier.all.collect{|c| [c.name, c.id]}, account_pricing_tier.pricing_tier_id) , :include_blank => false
+
+      .modal-footer
+        = f.submit "Save Account Pricing Tier", :class => "btn btn-primary" 

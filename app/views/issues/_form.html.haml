@@ -1,0 +1,55 @@
+- issue ||= Issue.new(:priority => "Normal")
+
+.modal-wrapper
+  = form_for [subject, issue] do |f|
+
+    .modal-header
+      %button.close{:type=>"button","data-dismiss"=>"modal"}
+        &times;
+
+      %h3 Issue
+
+    .modal-body.auto_size_modal_body
+      
+      %input{:type=>"hidden", :value=>subject.id, :name=>:subject_id}
+      %input{:type=>"hidden", :value=>subject.class, :name=>:subject_type}
+      = f.hidden_field :assigner_id, value: current_user.id
+
+      Title
+      %br
+      = f.text_field :title, :class => 'issue_container'
+      Description
+      %br
+      = f.text_area :description, :class => 'issue_container', rows: 8
+
+      #issue-priority.pull-right
+        Priority
+        %br
+        = radio_button("issue", "priority", "High", options = {checked: (issue.priority == "High")})
+        High
+        %br
+        = radio_button("issue", "priority", "Normal", options = {checked: (issue.priority == "Normal")})
+        Normal
+        %br
+        = radio_button("issue", "priority", "Low", options = {checked: (issue.priority == "Low")})
+        Low
+        %br
+
+      Assignee
+      %br
+      = select_tag 'issue[assignee_id]', options_for_select(User.fooda_employee.sort.map {|u| [u.to_s, u.id]}, issue.assignee_id) , :include_blank => true
+
+      %br
+      Due Date
+      %br
+      .input-append.date.form_date
+        %input{:size => "16", :type => "text", :name => "issue[due_date]", :value => issue.due_date.nil? ? "" : issue.due_date.strftime("%d %B %Y")}
+        %span.add-on
+          %i.icon-remove
+        %span.add-on
+          %i.icon-th
+      .in-between
+
+    .modal-footer
+      = f.submit(:class => "btn btn-primary")
+  
